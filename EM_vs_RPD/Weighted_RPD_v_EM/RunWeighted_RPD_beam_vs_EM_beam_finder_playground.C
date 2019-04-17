@@ -19,8 +19,8 @@
 #include <string> // Eric Added
 //#include "EM_Beam_Position_Cut_and_Value_function.h" //custom header written by Eric A to measure beam position
 #include "EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
-#include "RPD_Beam_Position_Finder.h" //custom header written by Eric A to measure RPD beam postion in X and Y
-
+//#include "RPD_Beam_Position_Finder.h" //custom header written by Eric A to measure RPD beam postion in X and Y
+#include "RunWeighted_RPD_Beam_Position_Finder.h"
 using namespace std;
 
 // I am a chemist not an englishist I cant spell
@@ -34,10 +34,10 @@ using namespace std;
 void initRootStyle();
 ///home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/RPD_Beam_Position_Finder/*AOD_zdc_digi_tree_326776_many_3*/AOD_zdc_digi_tree_327126_many
 //main function macro
-void Weighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
+void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: Weighted_RPD_beam_vs_EM_beam_finder_playground.C 4/15/19 5:15" << endl;
+	cout << "Running SOFTWARE: RunWeighted_RPD_beam_vs_EM_beam_finder_playground.C 4/15/19 5:15" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 
