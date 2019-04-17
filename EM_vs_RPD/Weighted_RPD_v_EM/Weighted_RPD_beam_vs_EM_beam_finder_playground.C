@@ -20,7 +20,7 @@
 //#include "EM_Beam_Position_Cut_and_Value_function.h" //custom header written by Eric A to measure beam position
 #include "EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
 //#include "RPD_Beam_Position_Finder.h" //custom header written by Eric A to measure RPD beam postion in X and Y
-#include "Weighted_RPD_Beam_Position_Finder.h"
+#include "RunWeighted_RPD_Beam_Position_Finder.h"
 using namespace std;
 
 // I am a chemist not an englishist I cant spell
