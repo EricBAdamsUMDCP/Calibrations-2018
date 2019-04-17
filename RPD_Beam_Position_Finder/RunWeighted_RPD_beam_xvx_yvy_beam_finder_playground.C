@@ -76,15 +76,15 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 	//DECLARING HISTOGRAMS FOR fC VERSUS TS//
 	///////////////////////////////////////// 
 
-	TH2F* RPD_v_EM_P_BEAM;
-	TH2F* RPD_v_EM_N_BEAM;
+	TH2F* RPD_NegY_v_PosY;
+	TH2F* RPD_NegX_v_PosX;
 
 	
 	//THStack* hsRPD[2][16](EXAMPLE);
 
 
-	RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
-	RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
+	RPD_NegY_v_PosY = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_NegY_v_PosY_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
+	RPD_NegX_v_PosX = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_NegX_v_PosX_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	
 
 	//DECLARING NEW THStack FOR PLOTTING MANY HISTOS ON SAME PAD//
