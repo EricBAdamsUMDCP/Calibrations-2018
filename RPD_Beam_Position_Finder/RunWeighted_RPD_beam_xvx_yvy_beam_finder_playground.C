@@ -234,7 +234,7 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 	//title->SetFillColor(16);
 	//title->SetTextSize(2);
 	//title->Draw();
-	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPDY_%s_Beam_Position_v_RPDy_%s_%d.png", runnumber, stit2[0], stit2[1], runnumber));
+	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/326776WeightedRPDY_%s_Beam_Position_v_RPDy_%s_%d.png", runnumber, stit2[0], stit2[1], runnumber));
 	
 	TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 1500);
 	RPD_NegX_v_PosX->Draw("colz");
@@ -242,7 +242,7 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 	title2->SetFillColor(16);
 	title2->SetTextSize(2);
 	title2->Draw(); */
-	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPDX_%s_Beam_Position_v_RPDX_%s_%d.png", runnumber, stit2[0], stit2[1], runnumber));
+	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/326776WeightedRPDX_%s_Beam_Position_v_RPDX_%s_%d.png", runnumber, stit2[0], stit2[1], runnumber));
 	
 	
 	
