@@ -88,8 +88,8 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 	RPD_NegY_v_PosY = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("326776WeightedRPD_NegY_v_PosY_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	RPD_NegX_v_PosX = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("326776WeightedRPD_NegX_v_PosX_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	
-	EMP = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("326776WeightedRPD_NegY_v_PosY_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
-	EMN = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("326776WeightedRPD_NegX_v_PosX_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EMP = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("326776WeightedRPD_NegY_v_PosY_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EMN = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("326776WeightedRPD_NegX_v_PosX_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 
 	//DECLARING NEW THStack FOR PLOTTING MANY HISTOS ON SAME PAD//
 	//THStack* hs = new THStack("tHIS ONE", "");
@@ -251,11 +251,11 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 	
 	TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
 	EMP->Draw("hist e");
-	c3->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/326776WeightedEM_%s_%d.png", stit2[1], runnumber));
+	c3->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/326776WeightedEM_%s_%d.png", runnumber, stit2[1], runnumber));
 	
 	TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
 	EMN->Draw("hist e");
-	c3->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/326776WeightedEM_%s_%d.png", stit2[0], runnumber));
+	c3->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/326776WeightedEM_%s_%d.png", runnumber, stit2[0], runnumber));
 	
 	
 	f2.Write();
