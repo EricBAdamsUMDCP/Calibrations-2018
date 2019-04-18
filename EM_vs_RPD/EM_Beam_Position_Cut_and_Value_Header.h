@@ -127,9 +127,12 @@ double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int
 		double WeightedAvg_Pos = (sumWeightEMPos / sumEMPos);
 		double WeightedAvg_Neg = (sumWeightEMNeg / sumEMNeg);
 		//cout << "n" << n << endl;
-		//cout << "WeightedAvg_Neg " << WeightedAvg_Neg << endl;
-		//cout << "WeightedAvg_Pos " << WeightedAvg_Pos << endl;
-
+		cout << "WeightedAvg_Neg " << WeightedAvg_Neg << endl;
+		cout << "EMChannelN[0], EMChannelN[1], EMChannelN[2],  EMChannelN[3],  EMChannelN[4] " << EMChannelN[0] << " " << EMChannelN[1] << " " << EMChannelN[2] << " " << EMChannelN[3] << " " << EMChannelN[4];
+		cout << "WeightedAvg_Pos " << WeightedAvg_Pos << endl;
+		cout << "EMChannelP[0], EMChannelP[1], EMChannelP[2],  EMChannelP[3],  EMChannelP[4] " << EMChannelP[0] << " " << EMChannelP[1] << " " << EMChannelP[2] << " " << EMChannelP[3] << " " << EMChannelP[4];
+		
+		
 		if ((EM_CUT_N_Xmin < WeightedAvg_Neg) && (WeightedAvg_Neg < EM_CUT_N_Xmax)) { N_EM_Return = 1; }
 		if ((EM_CUT_P_Xmin < WeightedAvg_Pos) && (WeightedAvg_Pos < EM_CUT_P_Xmax)) { P_EM_Return = 1; }
 		//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
