@@ -119,6 +119,9 @@ double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int
 
 	}
 
+	double WeightedAvg_Pos;
+	double WeightedAvg_Neg;
+	
 	if (type == 3 /*RPD*/) {
 		if (EMChannelP[0] > 0 && EMChannelP[1] > 0 && EMChannelP[2] > 0 && EMChannelP[3] > 0 && EMChannelP[4] > 0){
 			sumEMPos = (EMChannelP[0] + EMChannelP[1] + EMChannelP[2] + EMChannelP[3] + EMChannelP[4]);
@@ -132,8 +135,8 @@ double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int
 			cout << "WeightedAvg_Neg " << WeightedAvg_Neg << endl;
 			cout << "EMChannelN[0], EMChannelN[1], EMChannelN[2],  EMChannelN[3],  EMChannelN[4] " << EMChannelN[0] << " " << EMChannelN[1] << " " << EMChannelN[2] << " " << EMChannelN[3] << " " << EMChannelN[4];
 		}
-		double WeightedAvg_Pos = (sumWeightEMPos / sumEMPos);
-		double WeightedAvg_Neg = (sumWeightEMNeg / sumEMNeg);
+		WeightedAvg_Pos = (sumWeightEMPos / sumEMPos);
+		WeightedAvg_Neg = (sumWeightEMNeg / sumEMNeg);
 		//cout << "n" << n << endl;
 		
 		
