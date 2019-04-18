@@ -34,10 +34,10 @@ using namespace std;
 void initRootStyle();
 ///home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/RPD_Beam_Position_Finder/*AOD_zdc_digi_tree_326776_many_3*/AOD_zdc_digi_tree_327126_many
 //main function macro
-void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776) {
+void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground.C 4/15/19 5:15" << endl;
+	cout << "Running SOFTWARE: RunWeighted_RPD_beam_vs_EM_beam_finder_playground.C 4/15/19 5:15" << endl;
 	cout << "Dataset = " << Dataset << ".root" << endl;
 
 
@@ -170,8 +170,8 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776)
 			NYG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "Y", "Give");
 
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
-			//PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
-			//NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 0, 1);
+			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
+			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 0, 1);
 
 
 			/* cout << "PXG " << PXG << endl;
@@ -181,9 +181,9 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776)
 
 
 
-			RPD_NegY_v_PosY->Fill(NYG, PYG);
+			RPD_v_EM_P_BEAM->Fill(PEMG, PYG);
 
-			RPD_NegX_v_PosX->Fill(NXG, PXG);
+			RPD_v_EM_N_BEAM->Fill(NEMG, PXG);
 
 
 
@@ -229,20 +229,20 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776)
 	//TPad* newpad = new TPad("newpad", "a transparent pad", 0, 0, 1, 1);
 	//newpad->SetFillStyle(4000);
 	//newpad->Draw();
-	RPD_NegY_v_PosY->Draw("colz");
+	RPD_v_EM_N_BEAM->Draw("colz");
 	//TPaveLabel* title = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[1], runnumber));
 	//title->SetFillColor(16);
 	//title->SetTextSize(2);
 	//title->Draw();
-	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPDY_%s_Beam_Position_v_RPDy_%s_%d.png", runnumber, stit2[0], stit2[1], runnumber));
+	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPD_Beam_Position_v_EM_%s_%d.png", runnumber, stit2[0], runnumber));
 
 	TCanvas * c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 1500);
-	RPD_NegX_v_PosX->Draw("colz");
+	RPD_v_EM_P_BEAM->Draw("colz");
 	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
 	title2->SetFillColor(16);
 	title2->SetTextSize(2);
 	title2->Draw(); */
-	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPDX_%s_Beam_Position_v_RPDX_%s_%d.png", runnumber, stit2[0], stit2[1], runnumber));
+	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPD_Beam_Position_v_EM_%s_%d.png", runnumber, stit2[1], runnumber));
 
 
 
