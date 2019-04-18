@@ -48,8 +48,7 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 		  int NumberofProcessedRPDEvents = 0;
 	const double MinXTH1F = 0.0; // change thsi back as this messes up calcualtions
 	const int MaxXTH1F = 90000000 /*removed 0 zeros*/;
-	const int NumberOfBins = 10001; //number of bins in TH1F histograms produced by this code
-	     double ArrayMaxXTH1F[16] = { 5000, 5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000}; /// this is for the plots not for the calcualtions (note must be greater than 1000 otherwise will interefere with * 100 weiughting and seg fault 4/11/19 5:19)
+	const int NumberOfBins = 500; //number of bins in TH1F histograms produced by this code
 		 // double ArrayNumberofBins[16] = { 100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100}; /// this is for the plots not for the calcualtions
 	const int NChannels = 50;
 	const int NTS=10;// number of timeslices
@@ -60,7 +59,8 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 	                                                    {"1","2","3","4","5"}, //HD sections run only 1-4
 	                                                    {"1","2","3","4","5"} //EM sections run 1-5
 	                                                };
-													
+	double ArrayMaxXTH1F[NSIDE][NRPD] = {{ 90000000, 140000000,  5000000,  40000000,  6000000,  8000000,  5000000,  5000000,  2000000,  2000000,  1500000,  1100000,  24000000,  14000000,  10000000,  5000000},
+									     { 30000000, 140000000,  5000000,  60000000,  2500000,  200000,  20000000,  3000000,  1100000,  1500000,  2000000,  1500000,  22000000,  22000000,  5500000,  1100000}}; /// this is for the plots not for the calcualtions (note must be greater than 1000 otherwise will interefere with * 100 weiughting and seg fault 4/11/19 5:19)
 	//Begin constant are for the function	from header file EM_Beam_Position_Cut_and_Value	
 	double EM_CUT_P_Xmin = .5; 			
 	double EM_CUT_P_Xmax = 1.5;           
@@ -132,7 +132,7 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 	//s stands for side
 		for( int c = 0; c < 16; c++){
 		//c stands for channel
-			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776Weighted_RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,MinXTH1F,ArrayMaxXTH1F[c]);
+			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776Weighted_RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,10/* MinXTH1F */,1 /* ArrayMaxXTH1F[s][c] */); /// lower bound is set higher than upper bound bc when rene burn designed this thing HE MADE THAT THE ONLY GOD DAMN WAY FOR IT TO AUTOFIT THE AXES .....
 			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,MinXTH1F,MaxXTH1F);
 	
 			/* fC_RPD_Array_Plot[s][c]      = new TH1F(Form("fC RPD%s _Array_Plot channel %d %d", stit[s], c+1, runnumber),Form("RPD%s ARRAY channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),ArrayNumberofBins[c],MinXTH1F,ArrayMaxXTH1F[c]);
@@ -339,9 +339,8 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 			c4->cd(); /// this resets and clears the canvas idky blame rene burn...
 			gPad->SetLogy();
 			//cout << "here4" << endl;
-			
+			//fC_RPD[i][j]->SetCanExtend(TH1::kAllAxes);
 			fC_RPD[i][j/*-1*/]->SetLineColor(B);
-			fC_RPD[i][j]->GetXaxis()->SetRange(0,1000); /// added to force root to set the axis to what i want
 			fC_RPD[i][j]->Draw("hist e"); //->Draw("same");
 			
 			//lt->DrawLatexNDC(0.5,0.5, Form("Channel_%d", j+1) ); // maay cause bug be wary
