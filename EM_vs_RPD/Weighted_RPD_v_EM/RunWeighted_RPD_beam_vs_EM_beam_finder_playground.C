@@ -184,7 +184,7 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 			cout << "NEMG " << NEMG << endl; */
 
 
-			if (PEMG != 0 && NEMG != 0){
+			if (PEMG != 0.0 && NEMG != 0.0){
 				RPD_v_EM_P_BEAM->Fill(PEMG, PXG);
 
 				RPD_v_EM_N_BEAM->Fill(NEMG, NXG);
@@ -280,7 +280,7 @@ void initRootStyle()
 	gStyle->SetPalette(1);
 	gStyle->SetOptStat(1); /////////////////////////SHOWS THE STATES BOX WHICH CONTAINS THE NUMBER OF ENTRIES///// 0 IS OFF
 	gStyle->SetOptTitle(1);
-	gStyle->SetOptFit(0);
+	gStyle->SetOptFit(1);
 
 	gStyle->SetTitleBorderSize(0);
 	gStyle->SetTitleFillColor(0);
