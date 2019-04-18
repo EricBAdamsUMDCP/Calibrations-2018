@@ -47,9 +47,9 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 	
 		  int NumberofProcessedRPDEvents = 0;
 	const double MinXTH1F = 0.0; // change thsi back as this messes up calcualtions
-	const int MaxXTH1F = 70000000 /*removed 0 zeros*/;
+	const int MaxXTH1F = 90000000 /*removed 0 zeros*/;
 	const int NumberOfBins = 10001; //number of bins in TH1F histograms produced by this code
-	    //  double ArrayMaxXTH1F[16] = { 1000 /* 5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000 */ }; /// this is for the plots not for the calcualtions (note must be greater than 1000 otherwise will interefere with * 100 weiughting and seg fault 4/11/19 5:19)
+	     double ArrayMaxXTH1F[16] = { 1000, 5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000 */ }; /// this is for the plots not for the calcualtions (note must be greater than 1000 otherwise will interefere with * 100 weiughting and seg fault 4/11/19 5:19)
 		 // double ArrayNumberofBins[16] = { 100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100}; /// this is for the plots not for the calcualtions
 	const int NChannels = 50;
 	const int NTS=10;// number of timeslices
@@ -132,7 +132,7 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 	//s stands for side
 		for( int c = 0; c < 16; c++){
 		//c stands for channel
-			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,MinXTH1F,MaxXTH1F);
+			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776Weighted_RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,MinXTH1F,ArrayMaxXTH1F[c]);
 			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,MinXTH1F,MaxXTH1F);
 	
 			/* fC_RPD_Array_Plot[s][c]      = new TH1F(Form("fC RPD%s _Array_Plot channel %d %d", stit[s], c+1, runnumber),Form("RPD%s ARRAY channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),ArrayNumberofBins[c],MinXTH1F,ArrayMaxXTH1F[c]);
@@ -362,7 +362,7 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 			 c4->SaveAs(Form("ZDC_figures/Data_Weights326776/Solo_RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
 		} 
 		
-		for(int j=0 ; j < 16; j++){
+		 for(int j=0 ; j < 16; j++){
 			//block order output correct checked 4/8/19 4:42 (as best as I could but 99.99 % sure correct)
 			///c4->cd(RPDCorrectBlockOrderFORPLOTTING[i][j]); //MAY NEED TO CHANGE TO RIGHT cd !!!
 			//cout << (RPDCorrectBlockOrderFORPLOTTING[i][j]) << endl;
@@ -371,16 +371,16 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 			gPad->SetLogy();
 			//cout << "here4" << endl;
 			hsRPD[i][j] = new THStack("hsRPD","");
-			fC_RPD_Array_Plot[i][j/*-1*/]->SetLineColor(B);
+			fC_RPD[i][j/*-1*/]->SetLineColor(B);
 			/*
 			fC_RPD[i][j-1]->SetFillStyle(3001);
 			fC_RPD[i][j-1]->SetFillColorAlpha(kRed, 0.35);*/
-			hsRPD[i][j]->Add(fC_RPD_Array_Plot[i][j/*-1*/]);
-			fC_RPD_Pure_Array_Plot[i][j/*-1*/]->SetLineColor(A);
+			hsRPD[i][j]->Add(fC_RPD[i][j/*-1*/]);
+			fC_RPD_Pure[i][j/*-1*/]->SetLineColor(A);
 			/*
 			fC_RPD_Pure[i][j-1]->SetFillStyle(3001);
 			fC_RPD_Pure[i][j-1]->SetFillColorAlpha(kBlue, 0.35); */
-			hsRPD[i][j]->Add(fC_RPD_Pure_Array_Plot[i][j/*-1*/]);
+			hsRPD[i][j]->Add(fC_RPD_Pure[i][j/*-1*/]);
 			//cout << "here5" << endl;
 			/* gROOT->SetStyle("Plain");   
 			gStyle->SetPalette(1); /////// CRITICAL THIS DOES NOTHING OTHER THAN SLOW DOWN THE FILLING OF THE DIVIDED HISTO SO YOU CAN SEE WHAT ORDER IT IS FILLING IN, IT IS FILLING IN CORRECTLY AS STATED BY THE ARRAY
@@ -407,7 +407,7 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 			 */
 			 
 			 c4->SaveAs(Form("ZDC_figures/Data_Weights326776/RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
-		} 
+		}  
 		
 		//c4->SaveAs(Form("ZDC_figures/Data_Weights326776/RPD_Data_Weights_326776_10_0_%s_ALLQB_%d.png",stit2[i], runnumber));// this is the culprit and caused the loop to keep going
 		
