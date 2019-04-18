@@ -98,7 +98,7 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 	//WEIGHTS ARE FROM JEFFS GEANT 10_0 .txt (or something like that)
 	float Jeffsweights[NSIDE][NRPD] = {
 	                                   {0.2292, 0.4652, 0.0147, 0.1123, 0.0238, 0.0246, 0.0068, 0.0118, 0.0046, 0.0050, 0.0037, 0.0027, 0.0370, 0.0341, 0.0159, 0.0086}, //neg
-	                                   {0.2292, 0.4652, 0.0147, 0.1123, 0.0238, 0.0068, 0.0246, 0.0118, 0.0046, 0.0050, 0.0037, 0.0027, 0.0370, 0.0341, 0.0159, 0.0086}  //pos 
+	                                   {0.2292, 0.4652, 0.0147, 0.1123, 0.0238, 0.0068, 0.0246, 0.0118, 0.0046, 0.0050, 0.0037, 0.0027, 0.0370, 0.0341, 0.0159, 0.0086}  //pos //organized in QB correct order
 									  }; //these weights are constructed from jeffs geant code output for x position + 1 cm and y position 0 approximating the measured beam position of 9.4 and 9.6 cm (side based)
 
 	float DATAWeightsFromRun_326776[NSIDE][NRPD] = { //data weights from run 326776 v3 many
@@ -210,16 +210,16 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 			///FUNCTION --> returns value 1 true is in range 0 is not
 			///output of FUNCTION deterimines if stuff below runs! How to make work?
 			/// if (FUNCTION == 1) {stuff}
-			
+			int QuartzBlockOrdering = RPDCorrectBlockOrder[side][channel];
 			//EM cut off un comment to reactivate
 			if (/* EM_Beam_Position_Cut_and_Value(TS_Four, TS_Five, n, side, type, channel, EM_CUT_P_Xmin, EM_CUT_P_Xmax, EM_CUT_N_Xmin, EM_CUT_N_Xmax, 0, 0) == 1 */ true){ //logic dictates the EM position function tells us beam position and then a cut is applied
 				if (type == 3){
 					double Weighted_fC_of_TS456_Summed = ((TS_Four + TS_Five + TS_Six) *  DATAWeightsFromRun_326776[side][channel]); // weighting applied here as improves efficiency
-					if (/* (fC_of_TS456_Summed > 50) && */ (fC_of_TS45_Summed/fC_of_TS456_Summed > .8) && (TS_Seven <= TS_Five) && (TS_One/TS_Zero < 1000) && (TS_Zero != 0)){
+					if ((fC_of_TS456_Summed > 50) && (fC_of_TS45_Summed/fC_of_TS456_Summed > .8) && (TS_Seven <= TS_Five) && (TS_One/TS_Zero < 1000) && (TS_Zero != 0)){
 						NumberofProcessedRPDEvents++;
 							
 						///for math calcualting values use histograms as u KNOW EXACTLY WHAT the weights are coming from!!
-						fC_RPD[side][channel]->Fill((fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel] * 100 /* 100 is to make sure all weights are not fractions that reduce while others increase #*/)/*Jeffsweights[side][channel]*/); 
+						fC_RPD[side][channel]->Fill((fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][QuartzBlockOrdering] * 100 /* 100 is to make sure all weights are not fractions that reduce while others increase #*/)/*Jeffsweights[side][channel]*/); 
 						fC_RPD_Pure[side][channel]->Fill(fC_of_TS456_Summed * 100); /// DELETE THE 100?
 						///.........
 						
