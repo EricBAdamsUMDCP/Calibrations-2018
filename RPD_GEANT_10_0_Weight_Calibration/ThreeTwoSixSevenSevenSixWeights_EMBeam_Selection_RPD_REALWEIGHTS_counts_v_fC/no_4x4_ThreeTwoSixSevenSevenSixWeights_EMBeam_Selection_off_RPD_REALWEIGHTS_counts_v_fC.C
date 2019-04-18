@@ -49,8 +49,8 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 	const double MinXTH1F = 0.0; // change thsi back as this messes up calcualtions
 	const int MaxXTH1F = 70000000 /*removed 0 zeros*/;
 	const int NumberOfBins = 10001; //number of bins in TH1F histograms produced by this code
-	      double ArrayMaxXTH1F[16] = { 1000 /* 5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000 */ }; /// this is for the plots not for the calcualtions (note must be greater than 1000 otherwise will interefere with * 100 weiughting and seg fault 4/11/19 5:19)
-		  double ArrayNumberofBins[16] = { 100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100}; /// this is for the plots not for the calcualtions
+	    //  double ArrayMaxXTH1F[16] = { 1000 /* 5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000 */ }; /// this is for the plots not for the calcualtions (note must be greater than 1000 otherwise will interefere with * 100 weiughting and seg fault 4/11/19 5:19)
+		 // double ArrayNumberofBins[16] = { 100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100}; /// this is for the plots not for the calcualtions
 	const int NChannels = 50;
 	const int NTS=10;// number of timeslices
 	const int NRPD=16; 
@@ -135,8 +135,8 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,MinXTH1F,MaxXTH1F);
 			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,MinXTH1F,MaxXTH1F);
 	
-			fC_RPD_Array_Plot[s][c]      = new TH1F(Form("fC RPD%s _Array_Plot channel %d %d", stit[s], c+1, runnumber),Form("RPD%s ARRAY channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),ArrayNumberofBins[c],MinXTH1F,ArrayMaxXTH1F[c]);
-			fC_RPD_Pure_Array_Plot[s][c] = new TH1F(Form("fC RPD%s _Array_Plot Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s ARRAY Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),ArrayNumberofBins[c],MinXTH1F,ArrayMaxXTH1F[c]);
+			/* fC_RPD_Array_Plot[s][c]      = new TH1F(Form("fC RPD%s _Array_Plot channel %d %d", stit[s], c+1, runnumber),Form("RPD%s ARRAY channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),ArrayNumberofBins[c],MinXTH1F,ArrayMaxXTH1F[c]);
+			fC_RPD_Pure_Array_Plot[s][c] = new TH1F(Form("fC RPD%s _Array_Plot Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s ARRAY Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),ArrayNumberofBins[c],MinXTH1F,ArrayMaxXTH1F[c]); */
 		}
 	}
 	
@@ -225,13 +225,13 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 						
 						
 						/// FOR ACUTALLY PLOTTING NOW CAN CONTROL XMAX! 😊
-						if ( /* Weighted_fC_of_TS456_Summed >50 && */  Weighted_fC_of_TS456_Summed < 2000){
+						/* if (   Weighted_fC_of_TS456_Summed < 2000){
 							fC_RPD_Array_Plot[side][channel]->Fill((Weighted_fC_of_TS456_Summed)); ///removed *100 /// ERIC NOTE DATA WEIGHTS SCRE UP CUT !!! NEED TO APPLY DATA WEIGTS OUTSIDE
 						}
 						if (fC_of_TS456_Summed < 2000){ /// WARNING I HAVE SET THIS 1000 Fc CUT OFF BC ROOT IS BEING DUMB AND THIS IS THE ONLY WAY i KNOW HOW TO FIGHT IT 
 							//fC_RPD_Pure_Array_Plot[side][channel]->Fill(fC_of_TS456_Summed); 
 							fC_RPD_Array_Plot[side][channel]->Fill((fC_of_TS456_Summed));
-						}
+						} */
 						///..........
 					}
 				}
@@ -340,9 +340,9 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 			gPad->SetLogy();
 			//cout << "here4" << endl;
 			
-			fC_RPD_Array_Plot[i][j/*-1*/]->SetLineColor(B);
-			fC_RPD_Array_Plot[i][j]->GetXaxis()->SetRange(0,1000); /// added to force root to set the axis to what i want
-			fC_RPD_Array_Plot[i][j]->Draw("hist e x0"); //->Draw("same");
+			fC_RPD[i][j/*-1*/]->SetLineColor(B);
+			fC_RPD[i][j]->GetXaxis()->SetRange(0,1000); /// added to force root to set the axis to what i want
+			fC_RPD[i][j]->Draw("hist e"); //->Draw("same");
 			
 			//lt->DrawLatexNDC(0.5,0.5, Form("Channel_%d", j+1) ); // maay cause bug be wary
 			//hs->SetTitle(Form("Channel_%d", j + 1));
