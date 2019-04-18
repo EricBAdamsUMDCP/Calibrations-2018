@@ -79,13 +79,17 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 	TH2F* RPD_v_EM_P_BEAM;
 	TH2F* RPD_v_EM_N_BEAM;
 
-
+	TH1F* EMP;
+	TH1F* EMN;
+	
 	//THStack* hsRPD[2][16](EXAMPLE);
 
 
 	RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 
+	EMP = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("EMP_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EMN = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("EMN_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 
 	//DECLARING NEW THStack FOR PLOTTING MANY HISTOS ON SAME PAD//
 	//THStack* hs = new THStack("tHIS ONE", "");
@@ -184,7 +188,9 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 				RPD_v_EM_P_BEAM->Fill(PEMG, PXG);
 
 				RPD_v_EM_N_BEAM->Fill(NEMG, NXG);
-
+				
+				EMP->Fill(PEMG);
+				EMN->Fill(NEMG);
 
 			}
 		}
@@ -225,7 +231,7 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	//CREATING HISTOGRAMS FOR 4x4 and 5x5 for RPD pos and neg and ZDC pos and neg for fC versus TS//
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	TCanvas * c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 1500);
+	TCanvas * c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 2000);
 	//TPad* newpad = new TPad("newpad", "a transparent pad", 0, 0, 1, 1);
 	//newpad->SetFillStyle(4000);
 	//newpad->Draw();
@@ -236,7 +242,7 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 	//title->Draw();
 	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPD_Beam_Position_v_EM_%s_%d.png", runnumber, stit2[0], runnumber));
 
-	TCanvas * c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 1500);
+	TCanvas * c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
 	RPD_v_EM_P_BEAM->Draw("colz");
 	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
 	title2->SetFillColor(16);
@@ -244,7 +250,21 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 	title2->Draw(); */
 	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPD_Beam_Position_v_EM_%s_%d.png", runnumber, stit2[1], runnumber));
 
+	TCanvas * c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
+	EMP->Draw("hist e");
+	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
+	title2->SetFillColor(16);
+	title2->SetTextSize(2);
+	title2->Draw(); */
+	c3->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/EM_%s_%d.png", runnumber, stit2[1], runnumber));
 
+	TCanvas * c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 1500);
+	EMN->Draw("hist e");
+	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
+	title2->SetFillColor(16);
+	title2->SetTextSize(2);
+	title2->Draw(); */
+	c4->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/EM_%s_%d.png", runnumber, stit2[0], runnumber));
 
 	f2.Write();
 
