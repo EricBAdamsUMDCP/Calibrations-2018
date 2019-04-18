@@ -166,8 +166,8 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 			PXG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
 			NXG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give");
 
-			PYG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "Y", "Give");
-			NYG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "Y", "Give");
+			//PYG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "Y", "Give");
+			//NYG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "Y", "Give");
 
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
 			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
@@ -180,13 +180,13 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776) {
 			cout << "NEMG " << NEMG << endl; */
 
 
+			if (PEMG != 0 && NEMG != 0){
+				RPD_v_EM_P_BEAM->Fill(PEMG, PXG);
 
-			RPD_v_EM_P_BEAM->Fill(PEMG, PYG);
-
-			RPD_v_EM_N_BEAM->Fill(NEMG, PXG);
+				RPD_v_EM_N_BEAM->Fill(NEMG, NXG);
 
 
-
+			}
 		}
 
 
