@@ -119,50 +119,52 @@ double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int
 
 	}
 
-	double WeightedAvg_Pos;
-	double WeightedAvg_Neg;
+	
 	
 	if (type == 3 /*RPD*/) {
-		if (EMChannelP[0] > 0 && EMChannelP[1] > 0 && EMChannelP[2] > 0 && EMChannelP[3] > 0 && EMChannelP[4] > 0){
+		if (EMChannelP[0] > 0 && EMChannelP[1] > 0 && EMChannelP[2] > 0 && EMChannelP[3] > 0 && EMChannelP[4] > 0 && EMChannelN[0] > 0 && EMChannelN[1] > 0 && EMChannelN[2] > 0 && EMChannelN[3] > 0 && EMChannelN[4] > 0){
+			double WeightedAvg_Pos;
+			double WeightedAvg_Neg;
+			
 			sumEMPos = (EMChannelP[0] + EMChannelP[1] + EMChannelP[2] + EMChannelP[3] + EMChannelP[4]);
 			sumWeightEMPos = ((EMChannelP[0] * EM[0]) + (EMChannelP[1] * EM[1]) + (EMChannelP[2] * EM[2]) + (EMChannelP[3] * EM[3]) + (EMChannelP[4] * EM[4]));
-			
+			WeightedAvg_Pos = (sumWeightEMPos / sumEMPos);
 			//cout << "EMChannelP[0], EMChannelP[1], EMChannelP[2],  EMChannelP[3],  EMChannelP[4] " << EMChannelP[0] << " " << EMChannelP[1] << " " << EMChannelP[2] << " " << EMChannelP[3] << " " << EMChannelP[4];
-		}
-		if (EMChannelN[0] > 0 && EMChannelN[1] > 0 && EMChannelN[2] > 0 && EMChannelN[3] > 0 && EMChannelN[4] > 0){	
+		
+		
 			sumEMNeg = (EMChannelN[0] + EMChannelN[1] + EMChannelN[2] + EMChannelN[3] + EMChannelN[4]);
 			sumWeightEMNeg = ((EMChannelN[0] * EM[0]) + (EMChannelN[1] * EM[1]) + (EMChannelN[2] * EM[2]) + (EMChannelN[3] * EM[3]) + (EMChannelN[4] * EM[4]));
-			
+			WeightedAvg_Neg = (sumWeightEMNeg / sumEMNeg);
 			//cout << "EMChannelN[0], EMChannelN[1], EMChannelN[2],  EMChannelN[3],  EMChannelN[4] " << EMChannelN[0] << " " << EMChannelN[1] << " " << EMChannelN[2] << " " << EMChannelN[3] << " " << EMChannelN[4];
+		
+		
+	
+			//cout << "WeightedAvg_Pos " << WeightedAvg_Pos << endl;
+			//cout << "WeightedAvg_Neg " << WeightedAvg_Neg << endl;
+			//cout << "n" << n << endl;
+			
+			
+			
+			
+			if ((EM_CUT_N_Xmin < WeightedAvg_Neg) && (WeightedAvg_Neg < EM_CUT_N_Xmax)) { N_EM_Return = 1; }
+			if ((EM_CUT_P_Xmin < WeightedAvg_Pos) && (WeightedAvg_Pos < EM_CUT_P_Xmax)) { P_EM_Return = 1; }
+			//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
+			if (N != 1 && P != 1) {
+				if (P_EM_Return == 1 && N_EM_Return == 1) {
+					//cout << "conditions are met!" << endl;
+					return 1;
+				} // software outputs value of one if both beams are in acceptable windows
+			}
+			else if (P_EM_Return == 1 && N_EM_Return == 1) {
+				if (N == 1 && P != 1) {
+					return WeightedAvg_Neg;
+				} //if N input is 1 returns EM neg side beam position
+				if (P == 1 && N != 1) {
+					return WeightedAvg_Pos;
+				} //if P input is 1 returns EM pos side beam position
+			}
+			/// note: The program will preferentially select N input = 1 over P input!!!
 		}
-		WeightedAvg_Pos = (sumWeightEMPos / sumEMPos);
-		WeightedAvg_Neg = (sumWeightEMNeg / sumEMNeg);
-		//cout << "WeightedAvg_Pos " << WeightedAvg_Pos << endl;
-		//cout << "WeightedAvg_Neg " << WeightedAvg_Neg << endl;
-		//cout << "n" << n << endl;
-		
-		
-		
-		
-		if ((EM_CUT_N_Xmin < WeightedAvg_Neg) && (WeightedAvg_Neg < EM_CUT_N_Xmax)) { N_EM_Return = 1; }
-		if ((EM_CUT_P_Xmin < WeightedAvg_Pos) && (WeightedAvg_Pos < EM_CUT_P_Xmax)) { P_EM_Return = 1; }
-		//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
-		if (N != 1 && P != 1) {
-			if (P_EM_Return == 1 && N_EM_Return == 1) {
-				//cout << "conditions are met!" << endl;
-				return 1;
-			} // software outputs value of one if both beams are in acceptable windows
-		}
-		else if (P_EM_Return == 1 && N_EM_Return == 1) {
-			if (N == 1 && P != 1) {
-				return WeightedAvg_Neg;
-			} //if N input is 1 returns EM neg side beam position
-			if (P == 1 && N != 1) {
-				return WeightedAvg_Pos;
-			} //if P input is 1 returns EM pos side beam position
-		}
-		/// note: The program will preferentially select N input = 1 over P input!!!
-
 
 	}	///spits our weighted position for either Neg or Pos side
 
