@@ -126,17 +126,19 @@ double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int
 		if (EMChannelP[0] > 0 && EMChannelP[1] > 0 && EMChannelP[2] > 0 && EMChannelP[3] > 0 && EMChannelP[4] > 0){
 			sumEMPos = (EMChannelP[0] + EMChannelP[1] + EMChannelP[2] + EMChannelP[3] + EMChannelP[4]);
 			sumWeightEMPos = ((EMChannelP[0] * EM[0]) + (EMChannelP[1] * EM[1]) + (EMChannelP[2] * EM[2]) + (EMChannelP[3] * EM[3]) + (EMChannelP[4] * EM[4]));
-			cout << "WeightedAvg_Pos " << WeightedAvg_Pos << endl;
-			cout << "EMChannelP[0], EMChannelP[1], EMChannelP[2],  EMChannelP[3],  EMChannelP[4] " << EMChannelP[0] << " " << EMChannelP[1] << " " << EMChannelP[2] << " " << EMChannelP[3] << " " << EMChannelP[4];
+			
+			//cout << "EMChannelP[0], EMChannelP[1], EMChannelP[2],  EMChannelP[3],  EMChannelP[4] " << EMChannelP[0] << " " << EMChannelP[1] << " " << EMChannelP[2] << " " << EMChannelP[3] << " " << EMChannelP[4];
 		}
 		if (EMChannelN[0] > 0 && EMChannelN[1] > 0 && EMChannelN[2] > 0 && EMChannelN[3] > 0 && EMChannelN[4] > 0){	
 			sumEMNeg = (EMChannelN[0] + EMChannelN[1] + EMChannelN[2] + EMChannelN[3] + EMChannelN[4]);
 			sumWeightEMNeg = ((EMChannelN[0] * EM[0]) + (EMChannelN[1] * EM[1]) + (EMChannelN[2] * EM[2]) + (EMChannelN[3] * EM[3]) + (EMChannelN[4] * EM[4]));
-			cout << "WeightedAvg_Neg " << WeightedAvg_Neg << endl;
-			cout << "EMChannelN[0], EMChannelN[1], EMChannelN[2],  EMChannelN[3],  EMChannelN[4] " << EMChannelN[0] << " " << EMChannelN[1] << " " << EMChannelN[2] << " " << EMChannelN[3] << " " << EMChannelN[4];
+			
+			//cout << "EMChannelN[0], EMChannelN[1], EMChannelN[2],  EMChannelN[3],  EMChannelN[4] " << EMChannelN[0] << " " << EMChannelN[1] << " " << EMChannelN[2] << " " << EMChannelN[3] << " " << EMChannelN[4];
 		}
 		WeightedAvg_Pos = (sumWeightEMPos / sumEMPos);
 		WeightedAvg_Neg = (sumWeightEMNeg / sumEMNeg);
+		//cout << "WeightedAvg_Pos " << WeightedAvg_Pos << endl;
+		//cout << "WeightedAvg_Neg " << WeightedAvg_Neg << endl;
 		//cout << "n" << n << endl;
 		
 		
