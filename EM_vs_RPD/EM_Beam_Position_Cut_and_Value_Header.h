@@ -46,7 +46,7 @@ double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int
 
 	static double EMChannelP[NCH];
 	static double EMChannelN[NCH];
-	double sumEMPos, SumEMNeg, sumWeightEMPos, sumWeightEMNeg;
+	double sumEMPos, sumEMNeg, sumWeightEMPos, sumWeightEMNeg;
 	int	   P_EM_Return = 0;
 	int	   N_EM_Return = 0;
 
