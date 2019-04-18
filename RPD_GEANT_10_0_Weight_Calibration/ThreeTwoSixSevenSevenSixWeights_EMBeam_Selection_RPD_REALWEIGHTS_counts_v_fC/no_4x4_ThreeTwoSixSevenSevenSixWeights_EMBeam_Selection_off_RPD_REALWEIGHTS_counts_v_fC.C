@@ -49,7 +49,7 @@ void no_4x4_ThreeTwoSixSevenSevenSixWeights_EMBeam_Selection_off_RPD_REALWEIGHTS
 	const double MinXTH1F = 0.0; // change thsi back as this messes up calcualtions
 	const int MaxXTH1F = 90000000 /*removed 0 zeros*/;
 	const int NumberOfBins = 10001; //number of bins in TH1F histograms produced by this code
-	     double ArrayMaxXTH1F[16] = { 1000, 5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000 */ }; /// this is for the plots not for the calcualtions (note must be greater than 1000 otherwise will interefere with * 100 weiughting and seg fault 4/11/19 5:19)
+	     double ArrayMaxXTH1F[16] = { 5000, 5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000,  5000}; /// this is for the plots not for the calcualtions (note must be greater than 1000 otherwise will interefere with * 100 weiughting and seg fault 4/11/19 5:19)
 		 // double ArrayNumberofBins[16] = { 100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100}; /// this is for the plots not for the calcualtions
 	const int NChannels = 50;
 	const int NTS=10;// number of timeslices
