@@ -34,11 +34,11 @@ using namespace std;
 void initRootStyle();
 ///home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/RPD_Beam_Position_Finder/*AOD_zdc_digi_tree_326776_many_3*/AOD_zdc_digi_tree_327126_many
 //main function macro
-void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
+void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776) {
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: RunWeighted_RPD_beam_vs_EM_beam_finder_playground.C 4/15/19 5:15" << endl;
-	cout << "Dataset = " << Dataset << ".root"<< endl;
+	cout << "Running SOFTWARE: RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground.C 4/15/19 5:15" << endl;
+	cout << "Dataset = " << Dataset << ".root" << endl;
 
 
 	TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
@@ -65,9 +65,9 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 	double RPDYMax = 3;
 	double EM_CUT_Xmin = -4;
 	double EM_CUT_Xmax = 4;
-	
-	
-	
+
+
+
 	/// END Variable and constant declaration ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/// Begin Histogram Declaration ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,13 +79,13 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 	TH2F* RPD_v_EM_P_BEAM;
 	TH2F* RPD_v_EM_N_BEAM;
 
-	
+
 	//THStack* hsRPD[2][16](EXAMPLE);
 
 
 	RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
-	
+
 
 	//DECLARING NEW THStack FOR PLOTTING MANY HISTOS ON SAME PAD//
 	//THStack* hs = new THStack("tHIS ONE", "");
@@ -107,14 +107,17 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 	TLeaf* nHFneg = (TLeaf*)ZDCDigiTree->GetLeaf("nHFneg");
 	TLeaf* nHFpos = (TLeaf*)ZDCDigiTree->GetLeaf("nHFpos");
 
-	
-	double PXG =0;
-	double NXG =0;
-	
-	double PEMG =0;
-	double NEMG =0;
-	
-	
+
+	double PXG = 0;
+	double NXG = 0;
+
+	double PYG = 0;
+	double NYG = 0;
+
+	double PEMG = 0;
+	double NEMG = 0;
+
+
 
 	for (int iTS = 0; iTS < NTS; iTS++) {
 		fCleaf[iTS] = (TLeaf*)ZDCDigiTree->GetLeaf(Form("nfC%d", iTS));
@@ -133,7 +136,7 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 			int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
 			int type = (int)(sectionLeaf->GetValue(n)) - 1;
 			int channel = (int)(channelLeaf->GetValue(n)) - 1;
-			
+
 
 			/// Begin filling timeslices with fC (discrimination is by channel number iteration)
 
@@ -141,53 +144,58 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 			//this is used below to keep values at 0 or greater
 			//50 fC nosie cuttoff
 
-			double TS_Zero  = (fCleaf[0]->GetValue(n) < 50) ? 0 : (fCleaf[0]->GetValue(n));
-			double TS_One   = (fCleaf[1]->GetValue(n) < 50) ? 0 : (fCleaf[1]->GetValue(n));
-			double TS_Two   = (fCleaf[2]->GetValue(n) < 50) ? 0 : (fCleaf[2]->GetValue(n));
+			double TS_Zero = (fCleaf[0]->GetValue(n) < 50) ? 0 : (fCleaf[0]->GetValue(n));
+			double TS_One = (fCleaf[1]->GetValue(n) < 50) ? 0 : (fCleaf[1]->GetValue(n));
+			double TS_Two = (fCleaf[2]->GetValue(n) < 50) ? 0 : (fCleaf[2]->GetValue(n));
 			double TS_Three = (fCleaf[3]->GetValue(n) < 50) ? 0 : (fCleaf[3]->GetValue(n));
-			double TS_Four  = (fCleaf[4]->GetValue(n) < 50) ? 0 : (fCleaf[4]->GetValue(n));
-			double TS_Five  = (fCleaf[5]->GetValue(n) < 50) ? 0 : (fCleaf[5]->GetValue(n));
-			double TS_Six   = (fCleaf[6]->GetValue(n) < 50) ? 0 : (fCleaf[6]->GetValue(n));
+			double TS_Four = (fCleaf[4]->GetValue(n) < 50) ? 0 : (fCleaf[4]->GetValue(n));
+			double TS_Five = (fCleaf[5]->GetValue(n) < 50) ? 0 : (fCleaf[5]->GetValue(n));
+			double TS_Six = (fCleaf[6]->GetValue(n) < 50) ? 0 : (fCleaf[6]->GetValue(n));
 			double TS_Seven = (fCleaf[7]->GetValue(n) < 50) ? 0 : (fCleaf[7]->GetValue(n));
 			double TS_Eight = (fCleaf[8]->GetValue(n) < 50) ? 0 : (fCleaf[8]->GetValue(n));
-			double TS_Nine  = (fCleaf[9]->GetValue(n) < 50) ? 0 : (fCleaf[9]->GetValue(n));
+			double TS_Nine = (fCleaf[9]->GetValue(n) < 50) ? 0 : (fCleaf[9]->GetValue(n));
 
 			/// END filling timeslices with fC (discrimination is by channel number iteration)
 
 			// Declare variables for sums of TS fCs (456 is main signal of RPD and 45 is main signal of EM and HAD)
 			//double fC_of_TS45_Summed = TS_Four + TS_Five;
 			//double fC_of_TS456_Summed = TS_Four + TS_Five + TS_Six;
-			
+
 			//RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, double TS_Five, double TS_Six, double TS_Seven, int n, int side, int type, int channel, double RPDXmin, double RPDXmax, double RPDYMin, double RPDYMax, const std::string& PosorNeg, const std::string& XorY, const std::string& CheckorGive);
-			                                                                                                                                                               
-			PXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
-			NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give");
-			
+
+			PXG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
+			NXG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give");
+
+			PYG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "Y", "Give");
+			NYG = RPD_Beam_Position_Finder(TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "Y", "Give");
+
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
-			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
-			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 0, 1);
-			
-			
+			//PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
+			//NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 0, 1);
+
+
 			/* cout << "PXG " << PXG << endl;
 			cout << "NXG " << NXG << endl;
 			cout << "PEMG " << PEMG << endl;
 			cout << "NEMG " << NEMG << endl; */
-			
-			
-			
-			RPD_v_EM_P_BEAM->Fill( PEMG, PXG);
-			
-			RPD_v_EM_N_BEAM->Fill( NEMG, NXG);
-				
+
+
+
+			RPD_NegY_v_PosY->Fill(NYG, PYG);
+
+			RPD_NegX_v_PosX->Fill(NXG, PXG);
+
+
+
 		}
-		
-		
-		
+
+
+
 		if (i % 100000 == 0) cout << i << " events are processed." << endl;
 	}
 
-	
-		
+
+
 
 
 	/// END filling variables with DATA/fC LOOP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,39 +221,39 @@ void RunWeighted_RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 	///////////////////////////////////////
 
 	TFile f2("ROOT_RPD_Beam_Position_Finder.root", "RECREATE");
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	//CREATING HISTOGRAMS FOR 4x4 and 5x5 for RPD pos and neg and ZDC pos and neg for fC versus TS//
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	TCanvas* c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 1500);
+	TCanvas * c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 1500);
 	//TPad* newpad = new TPad("newpad", "a transparent pad", 0, 0, 1, 1);
 	//newpad->SetFillStyle(4000);
 	//newpad->Draw();
-	RPD_v_EM_P_BEAM->Draw("colz");
+	RPD_NegY_v_PosY->Draw("colz");
 	//TPaveLabel* title = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[1], runnumber));
 	//title->SetFillColor(16);
 	//title->SetTextSize(2);
 	//title->Draw();
-	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/RPD_%s_Beam_Position_v_EM_%d.png", runnumber, stit2[1], runnumber));
-	
-	TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 1500);
-	RPD_v_EM_N_BEAM->Draw("colz");
+	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPDY_%s_Beam_Position_v_RPDy_%s_%d.png", runnumber, stit2[0], stit2[1], runnumber));
+
+	TCanvas * c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 1500);
+	RPD_NegX_v_PosX->Draw("colz");
 	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
 	title2->SetFillColor(16);
 	title2->SetTextSize(2);
 	title2->Draw(); */
-	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/RPD_%s_Beam_Position_v_EM_%d.png", runnumber, stit2[0], runnumber));
-	
-	
-	
+	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_Finder_%d/RPDX_%s_Beam_Position_v_RPDX_%s_%d.png", runnumber, stit2[0], stit2[1], runnumber));
+
+
+
 	f2.Write();
-	
+
 	return;
 }
-	
-	
-	void initRootStyle()
-	{
+
+
+void initRootStyle()
+{
 	//  using namespace RooFit ;
 
 	gROOT->SetStyle("Plain");
