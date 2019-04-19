@@ -20,7 +20,7 @@ double jeffsweights_P20_0;
 double jeffsweights_P30_0;
 double jeffsweights_P40_0;
 
-// how the fuck do i make a fucntion return an array
+// how the heck do i make a fucntion return an array
 switch (Value){
 	case -3:
 		double y = -1*(x +3);
