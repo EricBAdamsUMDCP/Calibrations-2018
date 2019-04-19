@@ -97,10 +97,10 @@ void WeightCalculatorusingJeffs10_0Weights(int runnumber=326776)
 	                                   {0.2292, 0.4652, 0.0147, 0.1123, 0.0238, 0.0068, 0.0246, 0.0118, 0.0046, 0.0050, 0.0037, 0.0027, 0.0370, 0.0341, 0.0159, 0.0086}  //pos  (in block order)
 									  }; //these weights are constructed from jeffs geant code output for x position + 1 cm and y position 0 approximating the measured beam position of 9.4 and 9.6 cm (side based)
 
-	float DATAWeightsFromRun_326776[NSIDE][NRPD] = { //data weights from run 326776 v3 many
-													{3.47739, 6.60942, 0.247125, 2.27794, 0.300449, 0.335989, 0.103448, 0.204801, 0.0670038, 0.0731469, 0.054854, 0.0500585, 0.677206, 0.601912, 0.272565, 0.168236}, //neg
-													{3.66906, 8.89194, 0.20407, 1.65145, 0.428617, 0.105179, 0.321009, 0.159772, 0.09413, 0.0873638, 0.0664756, 0.0505492, 0.564331, 0.50565, 0.249457, 0.137384} //pos
-												   }; 
+	float DATAWeightsFromRun_326776[NSIDE][NRPD] = {///testing new weights might actually be correct due too quartz block ordering issue
+													{3.39726  ,7.07844	,0.247214 ,1.92548	,0.44108 ,0.426838 ,0.137877 ,0.230744 ,0.0580657,0.0727995,0.0677315,0.0409478,0.505317 ,0.499022 ,0.280635 ,0.122337},
+													{4.11798  ,6.0687 	,0.204047 ,1.76127 ,0.445609 ,0.10001 ,0.332942, 0.18884 ,0.0828367,0.102349 ,0.0564283,0.0432092,0.572129,0.595776,0.235725 ,0.164413}
+												   };
 
 	double RPD_Pos_TS456[NRPD] = {0}; //initializing all values to 0
 	double RPD_Neg_TS456[NRPD] = {0}; //initializing all values to 0

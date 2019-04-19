@@ -273,7 +273,7 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 	gStyle->SetPalette(1);
 	gStyle->SetOptStat(1); /////////////////////////SHOWS THE STATES BOX WHICH CONTAINS THE NUMBER OF ENTRIES///// 0 IS OFF
 	gStyle->SetOptTitle(1);
-	gStyle->SetOptFit(0);
+	gStyle->SetOptFit(1);
 
 	gStyle->SetTitleBorderSize(0);
 	gStyle->SetTitleFillColor(0);
