@@ -88,8 +88,8 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 	RPD_NegY_v_PosY = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("326776WeightedRPD_NegY_v_PosY_%d_NBins_%d_MB_2; NegRPD cm; PosRPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	RPD_NegX_v_PosX = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("326776WeightedRPD_NegX_v_PosX_%d_NBins_%d_MB_2; NegRPD cm; PosRPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	
-	EMP = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("326776WeightedRPD_NegY_v_PosY_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
-	EMN = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("326776WeightedRPD_NegX_v_PosX_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EMP = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("EMPos_%d_Nbins_%d; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EMN = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("EMNeg_%d_Nbins_%d; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 
 	//DECLARING NEW THStack FOR PLOTTING MANY HISTOS ON SAME PAD//
 	//THStack* hs = new THStack("tHIS ONE", "");
@@ -174,8 +174,8 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 			NYG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "Y", "Give", runnumber);
 			
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
-			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
-			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 0, 1);
+			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -4, 4, 1, 0);
+			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -4, 4, 0, 1);
 			
 			
 			/* cout << "PXG " << PXG << endl;
