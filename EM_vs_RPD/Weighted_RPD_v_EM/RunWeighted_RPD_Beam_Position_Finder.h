@@ -36,6 +36,7 @@ You can do it, attend LPC CMS DAS in the winter.
 #include <string> // Eric Added
 
 #include <stdexcept>
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeights.h"
 // I am a chemist not an englishist I cant spell
 
 #ifndef RunWeighted_RPD_Beam_Position_Finder_Function
@@ -43,7 +44,7 @@ You can do it, attend LPC CMS DAS in the winter.
 
 double RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, double TS_Five, double TS_Six, double TS_Seven, int n, 
                                 int side, int type, int channel, double RPDXmin, double RPDXmax, double RPDYmin, double RPDYmax,
-                                const std::string& PosorNeg, const std::string& XorY, const std::string& CheckorGive) {
+                                const std::string& PosorNeg, const std::string& XorY, const std::string& CheckorGive, int runnumber) {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-3 min///////////3 max/////////-3 min///////////3 max// Pos does Pos side...// X gives X axis of that side.../////Give = return actual value // 
 		/// ERROR MESSAGES////
 	
@@ -166,28 +167,28 @@ double RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, d
 	if (type == 3) {
 		if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (TS_Seven <= TS_Five) && (TS_One / TS_Zero < 1000) && (TS_Zero != 0)) {
 			if (side == 0) {
-
+				//header func definition RunWeightsReturnValue( runnumber, side, channel)
 				/// should i use histogram bins instead here because it will be the same data as upposed to 2 different ????
-				if (channel == 11 || channel == 15 || channel == 2 || channel == 6) { RPD_ROW_N[0] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}
-				if (channel == 8  || channel == 12 || channel == 1 || channel == 5) { RPD_ROW_N[1] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}
-				if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_N[2] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}
-				if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_N[3] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}			//R0
+				if (channel == 11 || channel == 15 || channel == 2 || channel == 6) { RPD_ROW_N[0] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
+				if (channel == 8  || channel == 12 || channel == 1 || channel == 5) { RPD_ROW_N[1] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
+				if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_N[2] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
+				if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_N[3] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R0
 																															  							          				//R1
-				if (channel == 10 || channel == 9  || channel == 8  || channel == 11) { RPD_COL_N[0] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}			//R2             
-				if (channel == 14 || channel == 13 || channel == 12 || channel == 15) { RPD_COL_N[1] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}			//R3							
-				if (channel == 3  || channel == 0  || channel == 1  || channel == 2)  { RPD_COL_N[2] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}			  //C3 C2 C1 C0					
-				if (channel == 7  || channel == 4  || channel == 5  || channel == 6)  { RPD_COL_N[3] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}
+				if (channel == 10 || channel == 9  || channel == 8  || channel == 11) { RPD_COL_N[0] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R2             
+				if (channel == 14 || channel == 13 || channel == 12 || channel == 15) { RPD_COL_N[1] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R3							
+				if (channel == 3  || channel == 0  || channel == 1  || channel == 2)  { RPD_COL_N[2] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			  //C3 C2 C1 C0					
+				if (channel == 7  || channel == 4  || channel == 5  || channel == 6)  { RPD_COL_N[3] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
 			}                                                                                                                                            
 			else {                                                                                                                                        
-				if (channel == 11 || channel == 15 || channel == 2 || channel == 5) { RPD_ROW_P[0] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}
-				if (channel == 8  || channel == 12 || channel == 1 || channel == 6) { RPD_ROW_P[1] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}
-				if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_P[2] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}
-				if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_P[3] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}			//R0
+				if (channel == 11 || channel == 15 || channel == 2 || channel == 5) { RPD_ROW_P[0] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
+				if (channel == 8  || channel == 12 || channel == 1 || channel == 6) { RPD_ROW_P[1] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
+				if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_P[2] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
+				if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_P[3] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R0
 																															 							              			//R1
-				if (channel == 10 || channel == 9  || channel == 8  || channel == 11) { RPD_COL_P[0] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}			//R2             
-				if (channel == 14 || channel == 13 || channel == 12 || channel == 15) { RPD_COL_P[1] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}			//R3							
-				if (channel == 3  || channel == 0  || channel == 1  || channel == 2)  { RPD_COL_P[2] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}			  //C3 C2 C1 C0					
-				if (channel == 7  || channel == 4  || channel == 6  || channel == 5)  { RPD_COL_P[3] += fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel];}
+				if (channel == 10 || channel == 9  || channel == 8  || channel == 11) { RPD_COL_P[0] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R2             
+				if (channel == 14 || channel == 13 || channel == 12 || channel == 15) { RPD_COL_P[1] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R3							
+				if (channel == 3  || channel == 0  || channel == 1  || channel == 2)  { RPD_COL_P[2] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			  //C3 C2 C1 C0					
+				if (channel == 7  || channel == 4  || channel == 6  || channel == 5)  { RPD_COL_P[3] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
 			}
 		}
 	}
