@@ -42,6 +42,9 @@ double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int
 	const int NCH = 5;
 	float EM[NCH] = { -4,-2,0,2,4 };
 	
+	const int NSIDE = 2;
+	const int NCH = 5;
+	
 	float EMweigths[NSIDE][NCH] = {
 								   {1.45,1.64,1.00,0.72,0.76},
                                    {2.39,1.73,1.00,0.70,0.63}

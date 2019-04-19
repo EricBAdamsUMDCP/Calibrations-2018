@@ -40,11 +40,12 @@ You can do it, attend LPC CMS DAS in the winter.
 double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) {
 	// every time this function is called the variables are not set, right....?
 	const int NCH = 5;
+	const int NSIDE = 2;
 	float EM[NCH] = { -4,-2,0,2,4 };
 	
 	float EMweigths[NSIDE][NCH] = {
-								   {1.45,1.64,1.00,0.72,0.76},
-                                   {2.39,1.73,1.00,0.70,0.63}
+								   {1, 1, 1, 1, 1/* 1.45,1.64,1.00,0.72,0.76 */},
+                                   {1, 1, 1, 1, 1/* 2.39,1.73,1.00,0.70,0.63 */}
 								  };
 	
 	if ( TS_Four > 100 && TS_Five > 100){

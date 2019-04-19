@@ -12,15 +12,14 @@
 #include <cstdio>
 #include "TStyle.h"
 #include "TLegend.h"
-#include "CMS_lumi.h" // make a file path for all software
 #include "THStack.h" // ERIC ADDED
 #include "TPaveLabel.h" //Eric ADDDED
 #include <cstring> //colin added
 #include <string> // Eric Added
 //#include "EM_Beam_Position_Cut_and_Value_function.h" //custom header written by Eric A to measure beam position
-#include "EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
 //#include "RPD_Beam_Position_Finder.h" //custom header written by Eric A to measure RPD beam postion in X and Y
-#include "RunWeighted_RPD_Beam_Position_Finder.h"
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
 using namespace std;
 
 // I am a chemist not an englishist I cant spell
