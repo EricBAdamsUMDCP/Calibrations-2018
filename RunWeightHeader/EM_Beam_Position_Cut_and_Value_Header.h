@@ -122,13 +122,12 @@ double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int
 					break;
 				}
 			}
-	
 		}
 	
 		
 		
 		if (type == 3 /*RPD*/) {
-			if (EMChannelP[0] > 0 && EMChannelP[1] > 0 && EMChannelP[2] > 0 && EMChannelP[3] > 0 && EMChannelP[4] > 0 && EMChannelN[0] > 0 && EMChannelN[1] > 0 && EMChannelN[2] > 0 && EMChannelN[3] > 0 && EMChannelN[4] > 0){
+			if (EMChannelP[0] != 0 && EMChannelP[1] != 0 && EMChannelP[2] != 0 && EMChannelP[3] != 0 && EMChannelP[4] != 0 && EMChannelN[0] != 0 && EMChannelN[1] != 0 && EMChannelN[2] != 0 && EMChannelN[3] != 0 && EMChannelN[4] != 0){
 				double WeightedAvg_Pos;
 				double WeightedAvg_Neg;
 				

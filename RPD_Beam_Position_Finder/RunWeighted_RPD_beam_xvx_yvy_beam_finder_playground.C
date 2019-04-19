@@ -12,15 +12,15 @@
 #include <cstdio>
 #include "TStyle.h"
 #include "TLegend.h"
-#include "CMS_lumi.h" // make a file path for all software
 #include "THStack.h" // ERIC ADDED
 #include "TPaveLabel.h" //Eric ADDDED
 #include <cstring> //colin added
 #include <string> // Eric Added
 //#include "EM_Beam_Position_Cut_and_Value_function.h" //custom header written by Eric A to measure beam position
-#include "EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
+//#include "EM_Beam_Position_Cut_and_Value_function.h" //custom header written by Eric A to measure beam position
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
 //#include "RPD_Beam_Position_Finder.h" //custom header written by Eric A to measure RPD beam postion in X and Y
-#include "RunWeighted_RPD_Beam_Position_Finder.h"
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
 using namespace std;
 
 // I am a chemist not an englishist I cant spell
@@ -85,8 +85,8 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 	//THStack* hsRPD[2][16](EXAMPLE);
 
 
-	RPD_NegY_v_PosY = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("326776WeightedRPD_NegY_v_PosY_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
-	RPD_NegX_v_PosX = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("326776WeightedRPD_NegX_v_PosX_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
+	RPD_NegY_v_PosY = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("326776WeightedRPD_NegY_v_PosY_%d_NBins_%d_MB_2; NegRPD cm; PosRPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
+	RPD_NegX_v_PosX = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("326776WeightedRPD_NegX_v_PosX_%d_NBins_%d_MB_2; NegRPD cm; PosRPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	
 	EMP = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("326776WeightedRPD_NegY_v_PosY_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 	EMN = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("326776WeightedRPD_NegX_v_PosX_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
@@ -167,11 +167,11 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 			
 			//RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, double TS_Five, double TS_Six, double TS_Seven, int n, int side, int type, int channel, double RPDXmin, double RPDXmax, double RPDYMin, double RPDYMax, const std::string& PosorNeg, const std::string& XorY, const std::string& CheckorGive);
 			                                                                                                                                                               
-			PXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
-			NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give");
-			
-			PYG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "Y", "Give");
-			NYG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "Y", "Give");
+			PXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give", runnumber);
+			NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", runnumber);
+			                                                                                                                                                                   
+			PYG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "Y", "Give", runnumber);
+			NYG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "Y", "Give", runnumber);
 			
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
 			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
@@ -188,10 +188,11 @@ void RunWeighted_RPD_beam_xvx_yvy_beam_finder_playground(int runnumber = 326776 
 			RPD_NegY_v_PosY->Fill( NYG, PYG);
 			
 			RPD_NegX_v_PosX->Fill( NXG, PXG);
-			
-			EMP->Fill(PEMG);
-			EMN->Fill(NEMG);
-				
+		
+			if ( PEMG !=0 & NEMG !=0){
+				EMP->Fill(PEMG);
+				EMN->Fill(NEMG);
+			}	
 		}
 		
 		
