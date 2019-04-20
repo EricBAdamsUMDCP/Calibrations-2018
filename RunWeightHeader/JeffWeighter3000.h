@@ -10,8 +10,10 @@
 
 //I am a chemist not an englishist I can't spell
 
-void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT, int side, double OutPut_Weightedjeffsweights[16]){ // make sure you enter the right side for what u want
+void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT, int side, double *OutPut_Weightedjeffsweights[16]){ // make sure you enter the right side for what u want
 	
+/// PUT IN THING TO KILL OFF THE OLD MEMEORY ADRESSES
+
 	// note if YOU PASS IN AN ARRAY >>>NOT EQUAL TO 16 GOD HELP YOU<<< WITH WHATEVER STRANGENESS HAPPENS, YOU'LL LIKELY GET A SEG FAULT... IF YOU'RE LUCKY.
 
 	// The side can be set y the user or automated by the code it is nested inide

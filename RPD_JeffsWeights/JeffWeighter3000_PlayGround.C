@@ -36,7 +36,7 @@ void initRootStyle();
 void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: JeffWeighter3000_PlayGround.C 4/20/2019 3:54:15 PM" << endl;
+	cout << "Running SOFTWARE: JeffWeighter3000_PlayGround.C 4/20/2019 4:48:36 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 
@@ -163,20 +163,22 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
 			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
 			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 0, 1);
-			
+
 			
 			/* cout << "PXG " << PXG << endl;
 			cout << "NXG " << NXG << endl;
 			cout << "PEMG " << PEMG << endl;
 			cout << "NEMG " << NEMG << endl; */
 			
-			double /***/OutPut_WeightedjeffsweightsPos[16]; //maybe need corrin
+			double OutPut_WeightedjeffsweightsPos[16]; //maybe need corrin
 
 
-			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos[16]);
+			JeffWeighter3000_OutputsArray( PEMG, 1, &OutPut_WeightedjeffsweightsPos);
+
+			//PUT IN THING TO KILL OFF OLD MEMORY ADRESSES
 
 			for (int i = 0; i <16; i++){
-			cout << "OutPut_WeightedjeffsweightsPos " << i <<OutPut_WeightedjeffsweightsPos[i] << endl;
+			cout << "OutPut_WeightedjeffsweightsPos " << i << ": " << OutPut_WeightedjeffsweightsPos[i] << endl;
 			}
 
 			RPD_v_EM_P_BEAM->Fill( PEMG, PXG);
