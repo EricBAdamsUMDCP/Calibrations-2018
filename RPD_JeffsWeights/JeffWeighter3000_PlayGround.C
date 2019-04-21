@@ -170,10 +170,10 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 			cout << "PEMG " << PEMG << endl;
 			cout << "NEMG " << NEMG << endl; */
 			
-			double OutPut_WeightedjeffsweightsPos[16]; //maybe need corrin
+			double OutPut_WeightedjeffsweightsPos[16]={0}; //maybe need corrin
 
 
-			JeffWeighter3000_OutputsArray( PEMG, 1, &OutPut_WeightedjeffsweightsPos);
+			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
 
 			//PUT IN THING TO KILL OFF OLD MEMORY ADRESSES
 

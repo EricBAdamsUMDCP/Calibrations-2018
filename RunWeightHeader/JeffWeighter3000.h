@@ -8,9 +8,10 @@
 #ifndef JeffWeighter3000
 #define JeffWeighter3000
 
+
 //I am a chemist not an englishist I can't spell
 
-void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT, int side, double *OutPut_Weightedjeffsweights[16]){ // make sure you enter the right side for what u want
+void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT, int side, double (&OutPut_Weightedjeffsweights)[16]){ // make sure you enter the right side for what u want
 	
 /// PUT IN THING TO KILL OFF THE OLD MEMEORY ADRESSES
 
