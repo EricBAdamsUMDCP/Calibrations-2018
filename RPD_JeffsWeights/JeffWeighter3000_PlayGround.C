@@ -164,7 +164,7 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
 			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
 			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 0, 1);
-
+			// bug test this to see if its running when neg for pos and pos for neg
 			
 			/* cout << "PXG " << PXG << endl;
 			cout << "NXG " << NXG << endl;
@@ -180,13 +180,15 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 				
 		}
 		
+		
 		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
-
+	
 			//PUT IN THING TO KILL OFF OLD MEMORY ADRESSES
-
+		cout << "event " << i << endl;
 		for (int i = 0; i <16; i++){
 			cout << "OutPut_WeightedjeffsweightsPos " << i << ": " << OutPut_WeightedjeffsweightsPos[i] << endl;
 		}
+		
 		
 		if (i % 100000 == 0) cout << i << " events are processed." << endl;
 	}

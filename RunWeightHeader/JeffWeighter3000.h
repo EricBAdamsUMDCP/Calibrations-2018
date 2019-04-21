@@ -25,7 +25,10 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 		void THE_MACRO_FUNCTION_NAME(){
 		other stuff for things...
 	
+		outside of the main loop: double OutPut_WeightedjeffsweightsPos[16]={0};
+
 		EM_Beam_Position_Cut_and_Value_OUTPUT = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0); // pos side
+		
 		// you must use the 
 	
 		double OutPut_Weightedjeffsweights[16];

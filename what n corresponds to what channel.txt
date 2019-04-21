@@ -1,0 +1,58 @@
+em -
+n  0 side  0 channel  0
+n  1 side  0 channel  1
+n  2 side  0 channel  2
+n  3 side  0 channel  3
+n  4 side  0 channel  4
+had -
+n  5 side  0 channel  0
+n  6 side  0 channel  1
+n  7 side  0 channel  2
+n  8 side  0 channel  3
+em +
+n  9 side  1 channel  0
+n  10 side  1 channel  1
+n  11 side  1 channel  2
+n  12 side  1 channel  3
+n  13 side  1 channel  4
+Had +
+n  14 side  1 channel  0
+n  15 side  1 channel  1
+n  16 side  1 channel  2
+n  17 side  1 channel  3
+
+RPD neg
+n  18 side  0 channel  0
+n  19 side  0 channel  1
+n  20 side  0 channel  2
+n  21 side  0 channel  3
+n  22 side  0 channel  4
+n  23 side  0 channel  5
+n  24 side  0 channel  6
+n  25 side  0 channel  7
+n  26 side  0 channel  8
+n  27 side  0 channel  9
+n  28 side  0 channel  10
+n  29 side  0 channel  11
+n  30 side  0 channel  12
+n  31 side  0 channel  13
+n  32 side  0 channel  14
+n  33 side  0 channel  15
+
+RPD pos
+n  34 side  1 channel  0
+n  35 side  1 channel  1
+n  36 side  1 channel  2
+n  37 side  1 channel  3
+n  38 side  1 channel  4
+n  39 side  1 channel  5
+n  40 side  1 channel  6
+n  41 side  1 channel  7
+n  42 side  1 channel  8
+n  43 side  1 channel  9
+n  44 side  1 channel  10
+n  45 side  1 channel  11
+n  46 side  1 channel  12
+n  47 side  1 channel  13
+n  48 side  1 channel  14
+n  49 side  1 channel  15
