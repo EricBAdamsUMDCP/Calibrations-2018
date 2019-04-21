@@ -72,21 +72,21 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 			y = -1*(x +3);
 			z =  (1 - y); 
 				for ( int i = 0; i < 16; i++){
-					OutPut_Weightedjeffsweights[i] = jeffsweights_N40_0[i][side]*y + jeffsweights_N30_0[i][side]*z;
+					OutPut_Weightedjeffsweights[i] = jeffsweights_N40_0[side][i]*y + jeffsweights_N30_0[side][i]*z;
 				}
 		break;
 		case -2:
 			y = -1*(x +2);
 			z =  (1 - y); 
 				for ( int i = 0; i < 16; i++){
-					OutPut_Weightedjeffsweights[i] = jeffsweights_N30_0[i][side]*y + jeffsweights_N20_0[i][side]*z;
+					OutPut_Weightedjeffsweights[i] = jeffsweights_N30_0[side][i]*y + jeffsweights_N20_0[side][i]*z;
 				}
 		break;
 		case -1:
 			y = -1*(x +1);
 			z =  (1 - y); 
 				for ( int i = 0; i < 16; i++){
-					OutPut_Weightedjeffsweights[i] = jeffsweights_N20_0[i][side]*y + jeffsweights_N10_0[i][side]*z;
+					OutPut_Weightedjeffsweights[i] = jeffsweights_N20_0[side][i]*y + jeffsweights_N10_0[side][i]*z;
 				}
 		break;
 		case 0:
@@ -94,7 +94,7 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 				y = -1*(x);
 				z =  (1 - y); 
 					for ( int i = 0; i < 16; i++){
-						OutPut_Weightedjeffsweights[i] = jeffsweights_N10_0[i][side]*y + jeffsweights_00_0[i][side]*z;
+						OutPut_Weightedjeffsweights[i] = jeffsweights_N10_0[side][i]*y + jeffsweights_00_0[side][i]*z;
 					}
 			break;
 			}
@@ -102,7 +102,7 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 				y = x;
 				z =  (1 - y); 
 					for ( int i = 0; i < 16; i++){
-						OutPut_Weightedjeffsweights[i] = jeffsweights_00_0[i][side]*z + jeffsweights_P10_0[i][side]*y;
+						OutPut_Weightedjeffsweights[i] = jeffsweights_00_0[side][i]*z + jeffsweights_P10_0[side][i]*y;
 					}
 			break;
 			}
@@ -111,21 +111,21 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 			y = x - 1;
 			z =  (1 - y); 
 				for ( int i = 0; i < 16; i++){
-					OutPut_Weightedjeffsweights[i] = jeffsweights_P10_0[i][side]*z + jeffsweights_P20_0[i][side]*y;
+					OutPut_Weightedjeffsweights[i] = jeffsweights_P10_0[side][i]*z + jeffsweights_P20_0[side][i]*y;
 				}// FOR THE POS SIDE SWITCH Y AND Z
 		break;
 		case 2:
 			y = x - 2;
 			z =  (1 - y); 
 				for ( int i = 0; i < 16; i++){
-					OutPut_Weightedjeffsweights[i] = jeffsweights_P20_0[i][side]*z + jeffsweights_P30_0[i][side]*y;
+					OutPut_Weightedjeffsweights[i] = jeffsweights_P20_0[side][i]*z + jeffsweights_P30_0[side][i]*y;
 				}
 		break;
 		case 3:
 			y = x - 3;
 			z =  (1 - y); 
 				for ( int i = 0; i < 16; i++){
-					OutPut_Weightedjeffsweights[i] = jeffsweights_P30_0[i][side]*z + jeffsweights_P40_0[i][side]*y;
+					OutPut_Weightedjeffsweights[i] = jeffsweights_P30_0[side][i]*z + jeffsweights_P40_0[side][i]*y;
 				}
 		break;
 		

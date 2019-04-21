@@ -111,6 +111,7 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 	double PEMG =0;
 	double NEMG =0;
 	
+	double OutPut_WeightedjeffsweightsPos[16]={0};
 	
 
 	for (int iTS = 0; iTS < NTS; iTS++) {
@@ -169,17 +170,9 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 			cout << "NXG " << NXG << endl;
 			cout << "PEMG " << PEMG << endl;
 			cout << "NEMG " << NEMG << endl; */
+
+
 			
-			double OutPut_WeightedjeffsweightsPos[16]={0}; //maybe need corrin
-
-
-			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
-
-			//PUT IN THING TO KILL OFF OLD MEMORY ADRESSES
-
-			for (int i = 0; i <16; i++){
-			cout << "OutPut_WeightedjeffsweightsPos " << i << ": " << OutPut_WeightedjeffsweightsPos[i] << endl;
-			}
 
 			RPD_v_EM_P_BEAM->Fill( PEMG, PXG);
 			
@@ -187,7 +180,13 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 				
 		}
 		
-		
+		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+
+			//PUT IN THING TO KILL OFF OLD MEMORY ADRESSES
+
+		for (int i = 0; i <16; i++){
+			cout << "OutPut_WeightedjeffsweightsPos " << i << ": " << OutPut_WeightedjeffsweightsPos[i] << endl;
+		}
 		
 		if (i % 100000 == 0) cout << i << " events are processed." << endl;
 	}
