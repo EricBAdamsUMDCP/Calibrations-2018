@@ -63,7 +63,7 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 	double 	 jeffsweights_P40_0[NSIDE][NRPD] = {{ 24628,  25680,  9801,  14050, 256842, 560669, 22983, 103692,   1404, 	 1346,  1397,  1227,   4591,   5171,  3876,  2869}/*Neg*/, { 24628,  25680,  9801, 103692, 256842, 560669, 22983,  14050,   1404, 	 1346,  1397,  1227,   4591,   5171,  3876,  2869}/*Pos*/};              
 	
 	for ( int i = 0; i < 16; i++){
-		OutPut_Weightedjeffsweights[i] = 0; // sets all of weighted jeffs weights to zero
+		OutPut_Weightedjeffsweights[i] = 0; // sets all of weighted jeffs weights to zero and prevents bad values from being passed and just kills the data in defense
 	}
 
 	double y;
@@ -99,6 +99,12 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 					for ( int i = 0; i < 16; i++){
 						OutPut_Weightedjeffsweights[i] = jeffsweights_N10_0[side][i]*y + jeffsweights_00_0[side][i]*z;
 					}
+				}
+			break;
+			if (x == 0){
+					for ( int i = 0; i < 16; i++){
+						OutPut_Weightedjeffsweights[i] = jeffsweights_00_0[side][i];
+					}
 			break;
 			}
 			if (x > 0){
@@ -131,6 +137,12 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 					OutPut_Weightedjeffsweights[i] = jeffsweights_P30_0[side][i]*z + jeffsweights_P40_0[side][i]*y;
 				}
 		break;
+
+		default:
+			for ( int i = 0; i < 16; i++){
+					OutPut_Weightedjeffsweights[i] = 0; //this default case wipes any event in which the Em beam position failed to return a value and sets it as 0
+					// the idea is this will zero the RPD fC values and nothing will be recorded
+				}
 		
 	}
 	

@@ -162,16 +162,18 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 			NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
 			
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
-			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
-			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 0, 1);
+			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -4, 4, 1, 0);
+			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -4, 4, 0, 1);
 			// bug test this to see if its running when neg for pos and pos for neg
 			
+//////////////ZERO ZERO BUG IS BACK FIX THAT !!!!!!!!!!!!!!!!!!!!!!
+
 			/* cout << "PXG " << PXG << endl;
 			cout << "NXG " << NXG << endl;
 			cout << "PEMG " << PEMG << endl;
 			cout << "NEMG " << NEMG << endl; */
 
-
+ 
 			
 
 			RPD_v_EM_P_BEAM->Fill( PEMG, PXG);
@@ -180,6 +182,17 @@ void JeffWeighter3000_PlayGround(int runnumber = 326776 ){
 				
 		}
 		
+		cout << PEMG << endl;
+
+		if (PEMG < 0){
+			cout << "negative" << endl;
+		}
+		else if (PEMG > 0){
+			cout << "Positive" << endl;
+		}
+		else {
+			cout << "ZERO" << endl;
+		}
 		
 		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
 	
