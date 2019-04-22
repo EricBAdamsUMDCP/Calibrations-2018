@@ -172,10 +172,11 @@ void RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 			
 			
 		// may be calling to many times the fill need to research may be another cause of zero zero also how doesEM function remeber its other value?	
-			RPD_v_EM_P_BEAM->Fill( PEMG, PXG);
-			
-			RPD_v_EM_N_BEAM->Fill( NEMG, NXG);
+			if ( PEMG != -10 && NEMG != -10){ //-10 is the bad value meaning something is bad and the event was rejected.
+				RPD_v_EM_P_BEAM->Fill( PEMG, PXG);
 				
+				RPD_v_EM_N_BEAM->Fill( NEMG, NXG);
+			}
 		}
 		
 		

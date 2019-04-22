@@ -100,8 +100,8 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 						for ( int i = 0; i < 16; i++){
 							OutPut_Weightedjeffsweights[i] = jeffsweights_N10_0[side][i]*y + jeffsweights_00_0[side][i]*z;
 						}
-					}
 				break;
+					}
 				if (x == 0){
 						for ( int i = 0; i < 16; i++){
 							OutPut_Weightedjeffsweights[i] = jeffsweights_00_0[side][i];
