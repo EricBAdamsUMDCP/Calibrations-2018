@@ -171,7 +171,7 @@ void RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 			cout << "NEMG " << NEMG << endl; */
 			
 			
-			
+		// may be calling to many times the fill need to research may be another cause of zero zero also how doesEM function remeber its other value?	
 			RPD_v_EM_P_BEAM->Fill( PEMG, PXG);
 			
 			RPD_v_EM_N_BEAM->Fill( NEMG, NXG);
