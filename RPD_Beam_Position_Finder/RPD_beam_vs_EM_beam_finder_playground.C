@@ -12,14 +12,13 @@
 #include <cstdio>
 #include "TStyle.h"
 #include "TLegend.h"
-#include "CMS_lumi.h" // make a file path for all software
 #include "THStack.h" // ERIC ADDED
 #include "TPaveLabel.h" //Eric ADDDED
 #include <cstring> //colin added
 #include <string> // Eric Added
 //#include "EM_Beam_Position_Cut_and_Value_function.h" //custom header written by Eric A to measure beam position
-#include "EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
-#include "RPD_Beam_Position_Finder.h" //custom header written by Eric A to measure RPD beam postion in X and Y
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
 using namespace std;
 
 // I am a chemist not an englishist I cant spell
@@ -157,8 +156,8 @@ void RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 			
 			//RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, double TS_Five, double TS_Six, double TS_Seven, int n, int side, int type, int channel, double RPDXmin, double RPDXmax, double RPDYMin, double RPDYMax, const std::string& PosorNeg, const std::string& XorY, const std::string& CheckorGive);
 			                                                                                                                                                               
-			PXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
-			NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give");
+			PXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give", 326776);
+			NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
 			
 			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
 			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -3, 3, 1, 0);
