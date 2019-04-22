@@ -35,7 +35,7 @@ void initRootStyle();
 void RPD_beam_vs_EM_beam_finder_playground(int runnumber = 326776 ){
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: RPD_beam_vs_EM_beam_finder_playground.C 4/15/19 5:15" << endl;
+	cout << "Running SOFTWARE: RPD_beam_vs_EM_beam_finder_playground.C 4/22/2019 6:22:23 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 
