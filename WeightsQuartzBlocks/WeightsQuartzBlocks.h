@@ -31,20 +31,36 @@ RPDblockfunctiontousetheweights
 }
 */
 
+//
+//weighted quartz block array should be fed a ternary for only type == 3 of if less than 50 set to 0.
+
 #ifndef WeightsQuartzBlocks
 #define WeightsQuartzBlocks
 
 //note this sotware is only intended to run on one side of the rpd once per event
 //make sure the QB array and jeffs weight match for that side
-//NOTE THE JEFF WEIGHTER OUTPUT THE WEIGHTS IN THE CORRECT RPD QUARTZ BLOCK ORDER ALL YOU MUST DO IS FEED IT CHANEL 1-16
+//NOTE THE JEFF WEIGHTER OUTPUT THE WEIGHTS IN THE CORRECT RPD QUARTZ BLOCK ORDER ALL YOU MUST DO IS FEED IT CHANEL 1-16 (do not order them!!! the weighter has already done this)
 void ReturnsWeightedQBArray( double Jeffweighter3000ReturnedArray[16], double QuartzBlockArray[16], int side, double (&WeightedQuartzBlockArray)[16]){
+	//safety errors????
 
 	if ( Jeffweighter3000ReturnedArray[0] != -10 && Jeffweighter3000ReturnedArray[15] != -10){ //checks or bad evnet if so 
-	
-		for (int i = 0; i < 16; i++){
-			WeightedQuartzBlockArray[i] = (Jeffweighter3000ReturnedArray[i] * QuartzBlockArray[i]);
-		}
+	const int NRPD = 16;
+	double RPDblockfCSum = 0;
+	double RPDDataWeight[NRPD];
+	double CalculatedWeight[NRPD];
 
+		for (int i = 0; i < 16; i++){
+		RPDblockfCSum += QuartzBlockArray[i];
+		}
+		///////////////////////////////////  \/ factor to make the data work////////
+		// Jeffweighter3000ReturnedArray = CalculatedWeight * RPDDataWeight		  //
+		// CalculatedWeight[i] = Jeffweighter3000ReturnedArray[i]/RPDDataWeight[i]//
+		////////////////////////////////////////////////////////////////////////////
+		for (int i = 0; i < 16; i++){
+			RPDDataWeight[i] = (QuartzBlockArray[i]/RPDblockfCSum);
+			CalculatedWeight[i] = (Jeffweighter3000ReturnedArray[i]/RPDDataWeight[i]);
+			WeightedQuartzBlockArray[i] = (CalculatedWeight[i] * QuartzBlockArray[i]);
+		}
 	}
 	else{
 		for (int i = 0; i < 16; i++){
