@@ -170,23 +170,23 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 
 			double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
 
-			// filling arrays with th data per channl side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
+			// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
 
-			if (type == EM){
-				for (int TS = 0; TS < NTS; TS++){
-					RawDataEM[side][channel][a] = TS_ARRAY[a]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
+				if (type == EM){
+					for (int TS = 0; TS < NTS; TS++){
+						RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
+					}
 				}
-			}
-			else if (type == HAD){
-				for (int TS = 0; TS < NTS; TS++){
-					RawDataHAD[side][channel][a] = TS_ARRAY[a]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
+				else if (type == HAD){
+					for (int TS = 0; TS < NTS; TS++){
+						RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
+					}
 				}
-			}
-			else if (type == RPD){
-				for (int TS = 0; TS < NTS; TS++){
-					RawDataRPD[side][channel][a] = TS_ARRAY[a];  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+				else if (type == RPD){
+					for (int TS = 0; TS < NTS; TS++){
+						RawDataRPD[side][channel][TS] = TS_ARRAY[TS];  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+					}
 				}
-			}
 
 
 		} // <<<< i moved the bracket this code will fail until i fix the functions
