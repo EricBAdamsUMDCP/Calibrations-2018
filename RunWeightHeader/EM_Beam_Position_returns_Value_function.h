@@ -35,7 +35,7 @@ You can do it, attend LPC CMS DAS in the winter.
 
  
 /////////////////////////////////////////////////////Side/Ch/TS////
-double EM_Beam_Position_Cut_and_Value(double RawDataEM[2][5][10], const std::string& PosorNeg) {
+double EM_Beam_Position_Value(double RawDataEM[2][5][10], const std::string& PosorNeg) {
 	//errors
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
 		throw std::runtime_error("ERROR: PosorNeg must be set to Pos or Neg, input variable 2, EM_Beam_Position_returns_Value.h");

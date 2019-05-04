@@ -16,7 +16,8 @@
 #include "TPaveLabel.h" //Eric ADDDED
 #include <cstring> //colin added
 #include <string> // Eric Added
-//#include "EM_Beam_Position_Cut_and_Value_function.h" //custom header written by Eric A to measure beam position
+
+//function headers
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h" // custom header writte by Eric A
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/JeffWeighter3000.h" //custom header written by Eric A to measure RPD beam postion in X and Y
@@ -24,20 +25,14 @@ using namespace std;
 
 // I am a chemist not an englishist I cant spell
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!TS456 are not channels BUT TIME SLICES SO THIS IS TIME SLICES 4, 5, & 6 fC SUMMED !!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
-
-//function headers
 void initRootStyle();
 ///home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/RPD_Beam_Position_Finder/*AOD_zdc_digi_tree_326776_many_3*/AOD_zdc_digi_tree_327126_many
-//main function macro
-void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
+
+void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776){
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 4/23/2019 8:31:58 PM" << endl;
+	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 5/3/2019 10:48:04 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 
@@ -88,23 +83,22 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 
 	/// Begin Histogram Declaration ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/////////////////////////////////////////
-	//DECLARING HISTOGRAMS FOR fC VERSUS TS//
-	///////////////////////////////////////// 
+	////////////////////////
+	//DECLARING HISTOGRAMS//
+	////////////////////////
 
-	TH2F* RPD_v_EM_P_BEAM;
-	TH2F* RPD_v_EM_N_BEAM;
-
-	
-	//THStack* hsRPD[2][16](EXAMPLE);
+	TH1F* EM_P_BEAM;
+	TH1F* EM_N_BEAM;
 
 
-	RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
-	RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
-	
+	//TH2F* RPD_v_EM_P_BEAM;
+	//TH2F* RPD_v_EM_N_BEAM;
 
-	//DECLARING NEW THStack FOR PLOTTING MANY HISTOS ON SAME PAD//
-	//THStack* hs = new THStack("tHIS ONE", "");
+	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+
+	//RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
+	//RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 
 	/// END Histogram Declaration ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -124,13 +118,13 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 	TLeaf* nHFpos = (TLeaf*)ZDCDigiTree->GetLeaf("nHFpos");
 
 	
-	double PXG =0;
-	double NXG =0;
+	double PXG = 0;
+	double NXG = 0;
 	
-	double PEMG =0;
-	double NEMG =0;
+	double PEMG = 0;
+	double NEMG = 0;
 	
-	double OutPut_WeightedjeffsweightsPos[NRPD]={0};
+	double OutPut_WeightedjeffsweightsPos[NRPD] = {0};
 
 
 	for (int iTS = 0; iTS < NTS; iTS++) {
@@ -140,24 +134,16 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 
 	/// END Declaring TLeaf... /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/// Begin filling variables with DATA/fC LOOP https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
+	/// Begin filling variables with DATA/fC LOOP 
+	// https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
 
 	for (int i = 0; i < ZDCDigiTree->GetEntries(); i++) {
 		ZDCDigiTree->GetEntry(i);
-		double QuartzBlockArrayPos[NRPD] = {0};
-		double QuartzBlockArrayNeg[NRPD] = {0};
-
-		for (int l = 0; l < 16; l++){ //SAFETY PRECAUTION TO ENSURE EACH EVENT STARTS FRESH
-			QuartzBlockArrayPos[l] = 0;
-			QuartzBlockArrayNeg[l] = 0;
-		}
 
 		for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
 			int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
 			int type = (int)(sectionLeaf->GetValue(n)) - 1;
 			int channel = (int)(channelLeaf->GetValue(n)) - 1;
-			
-			double TS_ARRAY[NTS] = { -10, -10, -10, -10, -10, -10, -10, -10, -10, -10};
 
 			/// Begin filling timeslices with fC (discrimination is by channel number iteration)
 
@@ -165,91 +151,49 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 			//this is used below to keep values at 0 or greater
 			//40 fC nosie cuttoff
 
-			double TS_Zero  = (fCleaf[0]->GetValue(n) < 40) ? 0 : (fCleaf[0]->GetValue(n));
-			double TS_One   = (fCleaf[1]->GetValue(n) < 40) ? 0 : (fCleaf[1]->GetValue(n));
-			double TS_Two   = (fCleaf[2]->GetValue(n) < 40) ? 0 : (fCleaf[2]->GetValue(n));
-			double TS_Three = (fCleaf[3]->GetValue(n) < 40) ? 0 : (fCleaf[3]->GetValue(n));
-			double TS_Four  = (fCleaf[4]->GetValue(n) < 40) ? 0 : (fCleaf[4]->GetValue(n));
-			double TS_Five  = (fCleaf[5]->GetValue(n) < 40) ? 0 : (fCleaf[5]->GetValue(n));
-			double TS_Six   = (fCleaf[6]->GetValue(n) < 40) ? 0 : (fCleaf[6]->GetValue(n));
-			double TS_Seven = (fCleaf[7]->GetValue(n) < 40) ? 0 : (fCleaf[7]->GetValue(n));
-			double TS_Eight = (fCleaf[8]->GetValue(n) < 40) ? 0 : (fCleaf[8]->GetValue(n));
-			double TS_Nine  = (fCleaf[9]->GetValue(n) < 40) ? 0 : (fCleaf[9]->GetValue(n));
+			double TS_Zero  = (fCleaf[0]->GetValue(n) <= 40) ? 0 : (fCleaf[0]->GetValue(n));
+			double TS_One   = (fCleaf[1]->GetValue(n) <= 40) ? 0 : (fCleaf[1]->GetValue(n));
+			double TS_Two   = (fCleaf[2]->GetValue(n) <= 40) ? 0 : (fCleaf[2]->GetValue(n));
+			double TS_Three = (fCleaf[3]->GetValue(n) <= 40) ? 0 : (fCleaf[3]->GetValue(n));
+			double TS_Four  = (fCleaf[4]->GetValue(n) <= 40) ? 0 : (fCleaf[4]->GetValue(n));
+			double TS_Five  = (fCleaf[5]->GetValue(n) <= 40) ? 0 : (fCleaf[5]->GetValue(n));
+			double TS_Six   = (fCleaf[6]->GetValue(n) <= 40) ? 0 : (fCleaf[6]->GetValue(n));
+			double TS_Seven = (fCleaf[7]->GetValue(n) <= 40) ? 0 : (fCleaf[7]->GetValue(n));
+			double TS_Eight = (fCleaf[8]->GetValue(n) <= 40) ? 0 : (fCleaf[8]->GetValue(n));
+			double TS_Nine  = (fCleaf[9]->GetValue(n) <= 40) ? 0 : (fCleaf[9]->GetValue(n));
 
 			//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
 
-			TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
+			double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
 
 			// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
 
-				if (type == EM){
-					for (int TS = 0; TS < NTS; TS++){
-						RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
-					}
-				}
-				else if (type == HAD){
-					for (int TS = 0; TS < NTS; TS++){
-						RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
-					}
-				}
-				else (type == RPD){
-					for (int TS = 0; TS < NTS; TS++){
-						RawDataRPD[side][channel][TS] = TS_ARRAY[TS];  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
-					}
-				}
-
-
-		} // <<<< i moved the bracket this code will fail until i fix the functions
-
-
-			// TO MAKE A TEMPLATE I HAVE AN IDEA STORE THE FC CALUES IN CHANNEL AND SIDE AND TYPE WHICH ARE CALLED LATER THAT WAY 
-			// THEN I CAN PASS THE ARRAYS IN SAVING SPACE THIS WILL MAKE THINGS MORE CONSISTENT AND RELIABLE
-			//double RawData[0][side][channel] RawData[1][side][channel] RawData[3][side][channel]
-			// the nmake a note table of what side type and channel for which detector foreasier performance
-
-			/// END filling timeslices with fC (discrimination is by channel number iteration)
-
-			// Declare variables for sums of TS fCs (456 is main signal of RPD and 45 is main signal of EM and HAD)
-			//double fC_of_TS45_Summed = TS_Four + TS_Five;
-			//double fC_of_TS456_Summed = TS_Four + TS_Five + TS_Six;
-			
-			//RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, double TS_Five, double TS_Six, double TS_Seven, int n, int side, int type, int channel, double RPDXmin, double RPDXmax, double RPDYMin, double RPDYMax, const std::string& PosorNeg, const std::string& XorY, const std::string& CheckorGive);
-				
-			                                                                                                                                                               
-	//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
-	//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
-	
-	//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
-	
-	PEMG = EM_Beam_Position_Cut_and_Value( RawDataEM, EM_CUT_Xmin, EM_CUT_Xmax);
-	NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -4, 4, 0, 1);
-	// bug test this to see if its running when neg for pos and pos for neg
-			
-///////////////ZERO ZERO BUG IS BACK FIX THAT !!!!!!!!!!!!!!!!!!!!!!
-	
-			/* cout << "PXG " << PXG << endl;
-			cout << "NXG " << NXG << endl;
-			cout << "PEMG " << PEMG << endl;
-			cout << "NEMG " << NEMG << endl; */
-	
- 	
-			
-	
-			RPD_v_EM_P_BEAM->Fill( PEMG, PXG);
-			
-			RPD_v_EM_N_BEAM->Fill( NEMG, NXG);
-			
-			if (( type == 3 && (TS_Four + TS_Five)/(TS_Four + TS_Five + TS_Six) > .8) && (TS_Seven <= TS_Five) && (TS_One/TS_Zero < 1000) && (TS_Zero != 0)){
-				if (side == 1){
-					QuartzBlockArrayPos[channel] = (TS_Four + TS_Five + TS_Six);
-				}
-				else if (side == 0){
-					QuartzBlockArrayNeg[channel] = (TS_Four + TS_Five + TS_Six);
+			if (type == EM){
+				for (int TS = 0; TS < NTS; TS++){
+					RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
 				}
 			}
-			
-				
-		
+			else if (type == HAD){
+				for (int TS = 0; TS < NTS; TS++){
+					RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
+				}
+			}
+			else if (type == RPD){
+				for (int TS = 0; TS < NTS; TS++){
+					RawDataRPD[side][channel][TS] = TS_ARRAY[TS];  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+				}
+			}
+		}
+
+		//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
+		//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
+	
+		PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
+		NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
+		// bug test this to see if its running when neg for pos and pos for neg
+	
+		EM_P_BEAM->Fill( PEMG);	
+		EM_N_BEAM->Fill( NEMG);
 		
 		cout << PEMG << endl;
 
@@ -273,12 +217,8 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 		
 		
 		if (i % 100000 == 0) cout << i << " events are processed." << endl;
-			}
 	}
-
-	
-		
-
+}
 
 	/// END filling variables with DATA/fC LOOP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -290,14 +230,6 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 	/// END filling sums with data put into histograms...
 
 
-	//////////////////////////////////////////
-	//CREATING NORMALIZATION OF REAL WEIGHTS//
-	//////////////////////////////////////////
-
-
-
-
-
 	///////////////////////////////////////
 	// Formatting and drawing histograms //
 	///////////////////////////////////////
@@ -307,33 +239,29 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	//CREATING HISTOGRAMS FOR 4x4 and 5x5 for RPD pos and neg and ZDC pos and neg for fC versus TS//
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	TCanvas* c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 1500);
+	TCanvas* c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 2000);
 	//TPad* newpad = new TPad("newpad", "a transparent pad", 0, 0, 1, 1);
 	//newpad->SetFillStyle(4000);
 	//newpad->Draw();
-	RPD_v_EM_P_BEAM->Draw("colz");
+	EM_P_BEAM->Draw("hist e");
 	//TPaveLabel* title = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[1], runnumber));
 	//title->SetFillColor(16);
 	//title->SetTextSize(2);
 	//title->Draw();
-	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/RPD_%s_Beam_Position_v_EM_%d.png", runnumber, stit2[1], runnumber));
+	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d.png", runnumber, stit2[1], runnumber));
 	
-	TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 1500);
-	RPD_v_EM_N_BEAM->Draw("colz");
+	TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
+	EM_P_BEAM->Draw("hist e");
 	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
 	title2->SetFillColor(16);
 	title2->SetTextSize(2);
 	title2->Draw(); */
-	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/RPD_%s_Beam_Position_v_EM_%d.png", runnumber, stit2[0], runnumber));
+	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d.png", runnumber, stit2[0], runnumber));
 	
 	
 	
 	f2.Write();
-	
-	return;
-}
-	
-	
+
 	void initRootStyle()
 	{
 	//  using namespace RooFit ;
@@ -342,7 +270,7 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 	gStyle->SetPalette(1);
 	gStyle->SetOptStat(1); /////////////////////////SHOWS THE STATES BOX WHICH CONTAINS THE NUMBER OF ENTRIES///// 0 IS OFF
 	gStyle->SetOptTitle(1);
-	gStyle->SetOptFit(0);
+	gStyle->SetOptFit(1);
 
 	gStyle->SetTitleBorderSize(0);
 	gStyle->SetTitleFillColor(0);
