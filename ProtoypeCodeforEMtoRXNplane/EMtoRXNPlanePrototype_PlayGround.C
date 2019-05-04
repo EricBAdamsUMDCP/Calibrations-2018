@@ -17,7 +17,7 @@
 #include <cstring> //colin added
 #include <string> // Eric Added
 //#include "EM_Beam_Position_Cut_and_Value_function.h" //custom header written by Eric A to measure beam position
-#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_Cut_and_Value_Header.h" // custom header writte by Eric A
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h" // custom header writte by Eric A
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/JeffWeighter3000.h" //custom header written by Eric A to measure RPD beam postion in X and Y
 using namespace std;
@@ -27,6 +27,7 @@ using namespace std;
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!TS456 are not channels BUT TIME SLICES SO THIS IS TIME SLICES 4, 5, & 6 fC SUMMED !!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 
 //function headers
@@ -70,11 +71,19 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 	double EM = 0;
 	double HAD = 1;
 	double RPD = 3;
-						
-	double  RawDataEM[NSIDE][NEM][NTS];//???
-	double RawDataHAD[NSIDE][NHAD][NTS];// these are used to store the raw data 
-	double RawDataRPD[NSIDE][NRPD][NTS];
+			
+
+/////////////these arrays serve the purpoose of storing data so it can be stored later and used event by event//////////////////////////////////////////////////////////////////////			
+    double   RawDataEM[NSIDE][NEM][NTS] = {{{0}, {0}, {0}, {0}, {0}},   //neg
+										   {{0}, {0}, {0}, {0}, {0}}}; // pos // these are used to store the raw data 
+
+	double RawDataHAD[NSIDE][NHAD][NTS] = {{{0}, {0}, {0}, {0}},   //neg
+	                                       {{0}, {0}, {0}, {0}}}; // pos // these are used to store the raw data 
+
+	double RawDataRPD[NSIDE][NRPD][NTS] = { {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}},    //neg  // these are used to store the raw data 
+										    {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}} }; //pos
 	
+
 	/// END Variable and constant declaration ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/// Begin Histogram Declaration ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,6 +157,7 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 			int type = (int)(sectionLeaf->GetValue(n)) - 1;
 			int channel = (int)(channelLeaf->GetValue(n)) - 1;
 			
+			double TS_ARRAY[NTS] = { -10, -10, -10, -10, -10, -10, -10, -10, -10, -10};
 
 			/// Begin filling timeslices with fC (discrimination is by channel number iteration)
 
@@ -166,9 +176,9 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 			double TS_Eight = (fCleaf[8]->GetValue(n) < 40) ? 0 : (fCleaf[8]->GetValue(n));
 			double TS_Nine  = (fCleaf[9]->GetValue(n) < 40) ? 0 : (fCleaf[9]->GetValue(n));
 
-			//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENT8IRE EVENTS THAT HAVE A ts OF 0????
+			//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
 
-			double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
+			TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
 
 			// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
 
@@ -182,7 +192,7 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 						RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
 					}
 				}
-				else if (type == RPD){
+				else (type == RPD){
 					for (int TS = 0; TS < NTS; TS++){
 						RawDataRPD[side][channel][TS] = TS_ARRAY[TS];  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
 					}
@@ -206,13 +216,14 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776 ){
 			//RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, double TS_Five, double TS_Six, double TS_Seven, int n, int side, int type, int channel, double RPDXmin, double RPDXmax, double RPDYMin, double RPDYMax, const std::string& PosorNeg, const std::string& XorY, const std::string& CheckorGive);
 				
 			                                                                                                                                                               
-			PXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give", 326776);
-			NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
-			
-			//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
-			PEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -4, 4, 1, 0);
-			NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -4, 4, 0, 1);
-			// bug test this to see if its running when neg for pos and pos for neg
+	//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
+	//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
+	
+	//double EM_Beam_Position_Cut_and_Value(double TS_Four, double TS_Five, int n, int side, int type, int channel, double EM_CUT_P_Xmin, double EM_CUT_P_Xmax, double EM_CUT_N_Xmin, double EM_CUT_N_Xmax, int P, int N) 
+	
+	PEMG = EM_Beam_Position_Cut_and_Value( RawDataEM, EM_CUT_Xmin, EM_CUT_Xmax);
+	NEMG = EM_Beam_Position_Cut_and_Value( TS_Four, TS_Five, n, side, type, channel, EM_CUT_Xmin, EM_CUT_Xmax, -4, 4, 0, 1);
+	// bug test this to see if its running when neg for pos and pos for neg
 			
 ///////////////ZERO ZERO BUG IS BACK FIX THAT !!!!!!!!!!!!!!!!!!!!!!
 	
