@@ -29,7 +29,9 @@ using namespace std;
 void initRootStyle();
 ///home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/RPD_Beam_Position_Finder/*AOD_zdc_digi_tree_326776_many_3*/AOD_zdc_digi_tree_327126_many
 
-void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776){
+int runnumber = 326776;
+
+void EMtoRXNPlanePrototype_PlayGround(){
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
 	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 5/3/2019 10:48:04 PM" << endl;
@@ -195,7 +197,7 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776){
 		EM_P_BEAM->Fill( PEMG);	
 		EM_N_BEAM->Fill( NEMG);
 		
-		cout << PEMG << endl;
+		/*cout << PEMG << endl;
 
 		if (PEMG < 0){
 			cout << "negative" << endl;
@@ -205,20 +207,20 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776){
 		}
 		else {
 			cout << "ZERO" << endl;
-		}
+		}*/
 		
-		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+		/*JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
 	
 			//PUT IN THING TO KILL OFF OLD MEMORY ADRESSES
 		cout << "event " << i << endl;
 		for (int i = 0; i <16; i++){
 			cout << "OutPut_WeightedjeffsweightsPos " << i << ": " << OutPut_WeightedjeffsweightsPos[i] << endl;
-		}
+		}*/
 		
 		
 		if (i % 100000 == 0) cout << i << " events are processed." << endl;
 	}
-}
+
 
 	/// END filling variables with DATA/fC LOOP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -251,7 +253,7 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776){
 	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d.png", runnumber, stit2[1], runnumber));
 	
 	TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
-	EM_P_BEAM->Draw("hist e");
+	EM_N_BEAM->Draw("hist e");
 	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
 	title2->SetFillColor(16);
 	title2->SetTextSize(2);
@@ -261,6 +263,7 @@ void EMtoRXNPlanePrototype_PlayGround(int runnumber = 326776){
 	
 	
 	f2.Write();
+}
 
 	void initRootStyle()
 	{
