@@ -42,7 +42,7 @@ You can do it, attend LPC CMS DAS in the winter.
 #ifndef RunWeighted_RPD_Beam_Position_Finder_Function
 #define RunWeighted_RPD_Beam_Position_Finder_Function
 
-double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][5][10], double OutPut_Weightedjeffsweights[16], double EM_BEAM_POSITION, const std::string& PosorNeg, const std::string& XorY) {
+double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPut_Weightedjeffsweights[16], double EM_BEAM_POSITION, const std::string& PosorNeg, const std::string& XorY) {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-3 min///////////3 max/////////-3 min///////////3 max// Pos does Pos side...// X gives X axis of that side.../////Give = return actual value // 
 		/// ERROR MESSAGES////
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
