@@ -127,6 +127,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double NEMG = 0;
 	
 	double OutPut_WeightedjeffsweightsPos[NRPD] = {0};
+	double OutPut_WeightedjeffsweightsNeg[NRPD] = {0};
 
 
 	for (int iTS = 0; iTS < NTS; iTS++) {
@@ -183,6 +184,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 			else if (type == RPD){
 				for (int TS = 0; TS < NTS; TS++){
 					RawDataRPD[side][channel][TS] = TS_ARRAY[TS];  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
 				}
 			}
 		}
@@ -201,6 +203,13 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		if (NEMG != -10){
 		EM_N_BEAM->Fill( NEMG);
 		}
+
+		JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
+		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+
+		//cout << "X beam" << " " << RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X") << endl;
+
+		// PUT IN JEFF WEIGHTER 3000
 
 		/*cout << PEMG << endl;
 

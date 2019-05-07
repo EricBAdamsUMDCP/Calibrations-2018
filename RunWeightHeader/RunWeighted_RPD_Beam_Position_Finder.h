@@ -27,7 +27,7 @@ You can do it, attend LPC CMS DAS in the winter.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 4/12/19 */
 
-//added line to test if github is working
+// last edited (if I remebered to change this... 5/7/2019 11:49:39 AM)
 
 #include <sstream>
 #include <iostream>
@@ -36,48 +36,28 @@ You can do it, attend LPC CMS DAS in the winter.
 #include <string> // Eric Added
 
 #include <stdexcept>
-#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeights.h"
+//#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeights.h"
 // I am a chemist not an englishist I cant spell
 
 #ifndef RunWeighted_RPD_Beam_Position_Finder_Function
 #define RunWeighted_RPD_Beam_Position_Finder_Function
 
-double RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, double TS_Five, double TS_Six, double TS_Seven, int n, 
-                                int side, int type, int channel, double RPDXmin, double RPDXmax, double RPDYmin, double RPDYmax,
-                                const std::string& PosorNeg, const std::string& XorY, const std::string& CheckorGive, int runnumber) {
+double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][5][10], double OutPut_Weightedjeffsweights[16], double EM_BEAM_POSITION, const std::string& PosorNeg, const std::string& XorY) {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-3 min///////////3 max/////////-3 min///////////3 max// Pos does Pos side...// X gives X axis of that side.../////Give = return actual value // 
 		/// ERROR MESSAGES////
-	
-	if (CheckorGive != "Check" && CheckorGive != "Give") {
-		throw std::runtime_error("ERROR: CheckorGive must be set to Check or Give, input variable 17, RPD_Beam_Position_Finder.h");
-	}
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
 		throw std::runtime_error("ERROR: PosorNeg must be set to Pos or Neg, input variable 15, RPD_Beam_Position_Finder.h");
 	}
 	if (XorY != "X" && XorY != "Y") {
 		throw std::runtime_error("ERROR: XorY must be set to X or Y, input variable 16, RPD_Beam_Position_Finder.h");
 	}
-	if (RPDXmin < -3.0 || RPDXmax > 3.0 || RPDYmin < -3.0 || RPDYmax > 3.0) {
-		throw std::runtime_error("ERROR: RPD bounds Max and Min must not exceed 3 or be inferior to -3 (the bounds of the RPD quartz block centers), input variables 11-14, RPD_Beam_Position_Finder.h");
-	}
-	
-
-	if (n > 49) {
-		throw std::runtime_error("Hey they were only 49 channels in the 2018 PbPb run, this will throw off the clock cycle ARE YOU SURE YOU WANT A VALUE GREATER THAN 50???, INPUT VARIABLE 7, RPD_Beam_Position_Finder.h");
-	}
-	if (n < 0) {
-		throw std::runtime_error("n cannot be less than zero, you cannot have a negative number of channels..., input variable 7, RPD_Beam_Position_Finder.h");
-	}
-
 	/// Begin Variable and constant decleration//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	const int NChannels = 50;
-	const int NTS = 10;// number of timeslices
 	const int NRPD = 16;
 	const int NRPDColnRow = 4;
 	const int NSIDE = 2;
 	double AxisRPD[NRPDColnRow] = { -3.0, -1.0, 1.0, 3.0 };
-
+	double valuereturned = -10;
 	/////////////////////////////////////////////
 	//Begin ARRAY declaration for RPD constants//
 	/////////////////////////////////////////////
@@ -105,36 +85,6 @@ double RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, d
 	};
 
 
-	//WEIGHTS ARE FROM JEFFS GEANT 10_0 .txt (or something like that)
-	float Jeffsweights[NSIDE][NRPD] = {
-										{0.2292, 0.4652, 0.0147, 0.1123, 0.0238, 0.0246, 0.0068, 0.0118, 0.0046, 0.0050, 0.0037, 0.0027, 0.0370, 0.0341, 0.0159, 0.0086}, //neg
-										{0.2292, 0.4652, 0.0147, 0.1123, 0.0238, 0.0068, 0.0246, 0.0118, 0.0046, 0.0050, 0.0037, 0.0027, 0.0370, 0.0341, 0.0159, 0.0086}  //pos 
-	}; //these weights are constructed from jeffs geant code output for x position + 1 cm and y position 0 approximating the measured beam position of 9.4 and 9.6 cm (side based)
-
-	float DATAWeightsFromRun_326776[NSIDE][NRPD] = {///testing new weights might actually be correct due too quartz block ordering issue
-													{3.39726  ,7.07844	,0.247214 ,1.92548	,0.44108 ,0.426838 ,0.137877 ,0.230744 ,0.0580657,0.0727995,0.0677315,0.0409478,0.505317 ,0.499022 ,0.280635 ,0.122337},
-													{4.11798  ,6.0687 	,0.204047 ,1.76127 ,0.445609 ,0.10001 ,0.332942, 0.18884 ,0.0828367,0.102349 ,0.0564283,0.0432092,0.572129,0.595776,0.235725 ,0.164413}
-												   };
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/* float DATAWeightsFromRun_326776[NSIDE][NRPD] = { //data weights from run 326776 v3 many
-													{3.47739, 6.60942, 0.247125, 2.27794, 0.300449, 0.335989, 0.103448, 0.204801, 0.0670038, 0.0731469, 0.054854, 0.0500585, 0.677206, 0.601912, 0.272565, 0.168236}, //neg
-													{3.66906, 8.89194, 0.20407, 1.65145, 0.428617, 0.105179, 0.321009, 0.159772, 0.09413, 0.0873638, 0.0664756, 0.0505492, 0.564331, 0.50565, 0.249457, 0.137384} //pos
-	};
- */
 
 	float RPD_COL_P[NRPDColnRow];
 	float RPD_ROW_P[NRPDColnRow];
@@ -144,138 +94,149 @@ double RPD_Beam_Position_Finder(double TS_Zero, double TS_One, double TS_Four, d
 
 	/// END Variable and constant declaration ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	if (EM_BEAM_POSITION != -10 && OutPut_Weightedjeffsweights[15] != -10 && OutPut_Weightedjeffsweights[0] != -10){ // -10  is the value returned by function if something is wrong with the data. This indicates it should skip an event
+	
+		//iterates through all channels of both ZDC + and -
+	
+	
+		   // Declare variables for sums of TS fCs (456 is main signal of RPD and 45 is main signal of EM and HAD)
+		double fC_of_TS45_Summed = 0;
+		double fC_of_TS456_Summed = 0;
+	
+	
+	
+	//// neeed TO INCLUDE AND WRITE A TRANSLATOR TO TURN INPUT RAW DATA INTO CORRECT BLOCK ORDER
+		
+		if (PosorNeg == "Neg") {
+			for (int channel = 0; channel < 15; channel++){
+				//remeber TS start at 0 DONT SUBTRACT
+				fC_of_TS45_Summed  = RawDataRPD[0][channel][4] + RawDataRPD[0][channel][5];
+				fC_of_TS456_Summed = RawDataRPD[0][channel][4] + RawDataRPD[0][channel][5] + RawDataRPD[0][channel][6];
 
+				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {
+					if (XorY == "Y"){
 
-	//void * memset ( void * ptr, int value, size_t num );
-	if (n == 0) {
-		memset(RPD_COL_P, 0, sizeof(RPD_COL_P)); //every event reinitialize array to 0 ON THE BYTE LEVEL (Logic will not work for values other than 0)!!!
-		memset(RPD_ROW_P, 0, sizeof(RPD_ROW_P));
-		memset(RPD_COL_N, 0, sizeof(RPD_COL_N));
-		memset(RPD_ROW_N, 0, sizeof(RPD_ROW_N));
-	}
+						if (channel == 11 || channel == 15 || channel == 2 || channel == 6) { RPD_ROW_N[0]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
+						if (channel == 8  || channel == 12 || channel == 1 || channel == 5) { RPD_ROW_N[1]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
+						if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_N[2]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
+						if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_N[3]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			//R0
+					}		///////////////////////////////////////////////// IS THE ORDERING OF THE OUTPUT JEFF ARRAYS MATH DATA??																									 										//R1
+					else if (XorY == "X"){
 
-	//iterates through all channels of both ZDC + and -
-
-
-	   // Declare variables for sums of TS fCs (456 is main signal of RPD and 45 is main signal of EM and HAD)
-	double fC_of_TS45_Summed = TS_Four + TS_Five;
-	double fC_of_TS456_Summed = TS_Four + TS_Five + TS_Six;
-
-
-
-
-	if (type == 3) {
-		if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (TS_Seven <= TS_Five) && (TS_One / TS_Zero < 1000) && (TS_Zero != 0)) {
-			if (side == 0) {
-				//header func definition RunWeightsReturnValue( runnumber, side, channel)
-				/// should i use histogram bins instead here because it will be the same data as upposed to 2 different ????
-				if (channel == 11 || channel == 15 || channel == 2 || channel == 6) { RPD_ROW_N[0] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
-				if (channel == 8  || channel == 12 || channel == 1 || channel == 5) { RPD_ROW_N[1] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
-				if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_N[2] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
-				if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_N[3] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R0
-																															  							          				//R1
-				if (channel == 10 || channel == 9  || channel == 8  || channel == 11) { RPD_COL_N[0] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R2             
-				if (channel == 14 || channel == 13 || channel == 12 || channel == 15) { RPD_COL_N[1] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R3							
-				if (channel == 3  || channel == 0  || channel == 1  || channel == 2)  { RPD_COL_N[2] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			  //C3 C2 C1 C0					
-				if (channel == 7  || channel == 4  || channel == 5  || channel == 6)  { RPD_COL_N[3] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
-			}                                                                                                                                            
-			else {                                                                                                                                        
-				if (channel == 11 || channel == 15 || channel == 2 || channel == 5) { RPD_ROW_P[0] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
-				if (channel == 8  || channel == 12 || channel == 1 || channel == 6) { RPD_ROW_P[1] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
-				if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_P[2] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
-				if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_P[3] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R0
-																															 							              			//R1
-				if (channel == 10 || channel == 9  || channel == 8  || channel == 11) { RPD_COL_P[0] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R2             
-				if (channel == 14 || channel == 13 || channel == 12 || channel == 15) { RPD_COL_P[1] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			//R3							
-				if (channel == 3  || channel == 0  || channel == 1  || channel == 2)  { RPD_COL_P[2] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}			  //C3 C2 C1 C0					
-				if (channel == 7  || channel == 4  || channel == 6  || channel == 5)  { RPD_COL_P[3] += fC_of_TS456_Summed * RunWeightsReturnValue( runnumber, side, channel);}
-			}
-		}
-	}
-
-	double sumWeightRPD_P_X, sumRPD_P_X, sumWeightRPD_P_Y, sumRPD_P_Y, sumWeightRPD_N_X, sumRPD_N_X, sumWeightRPD_N_Y, sumRPD_N_Y;
-
-	if (RPD_COL_P[0] > 0 && RPD_COL_P[1] > 0 && RPD_COL_P[2] > 0 && RPD_COL_P[3] > 0) {
-
-		sumWeightRPD_P_X = (RPD_COL_P[0] * AxisRPD[0]) + (RPD_COL_P[1] * AxisRPD[1]) + (RPD_COL_P[2] * AxisRPD[2]) + (RPD_COL_P[3] * AxisRPD[3]);
-		sumRPD_P_X = (RPD_COL_P[0]) + (RPD_COL_P[1]) + (RPD_COL_P[2]) + (RPD_COL_P[3]);
-	}
-	if (RPD_ROW_P[0] > 0 && RPD_ROW_P[1] > 0 && RPD_ROW_P[2] > 0 && RPD_ROW_P[3] > 0) {
-
-		sumWeightRPD_P_Y = (RPD_ROW_P[0] * AxisRPD[3]) + (RPD_ROW_P[1] * AxisRPD[2]) + (RPD_ROW_P[2] * AxisRPD[1]) + (RPD_ROW_P[3] * AxisRPD[0]);
-		sumRPD_P_Y = (RPD_ROW_P[0]) + (RPD_ROW_P[1]) + (RPD_ROW_P[2]) + (RPD_ROW_P[3]);
-	}
-	if (RPD_COL_N[0] > 0 && RPD_COL_N[1] > 0 && RPD_COL_N[2] > 0 && RPD_COL_N[3] > 0) {
-
-		sumWeightRPD_N_X = (RPD_COL_N[0] * AxisRPD[0]) + (RPD_COL_N[1] * AxisRPD[1]) + (RPD_COL_N[2] * AxisRPD[2]) + (RPD_COL_N[3] * AxisRPD[3]);
-		sumRPD_N_X = (RPD_COL_N[0]) + (RPD_COL_N[1]) + (RPD_COL_N[2]) + (RPD_COL_N[3]);
-	}
-	if (RPD_ROW_N[0] > 0 && RPD_ROW_N[1] > 0 && RPD_ROW_N[2] > 0 && RPD_ROW_N[3] > 0) {
-
-		sumWeightRPD_N_Y = (RPD_ROW_N[0] * AxisRPD[3]) + (RPD_ROW_N[1] * AxisRPD[2]) + (RPD_ROW_N[2] * AxisRPD[1]) + (RPD_ROW_N[3] * AxisRPD[0]);
-		sumRPD_N_Y = (RPD_ROW_N[0]) + (RPD_ROW_N[1]) + (RPD_ROW_N[2]) + (RPD_ROW_N[3]);
-	}
-
-	double WeightedAverageRPD_P_X = (sumWeightRPD_P_X / sumRPD_P_X);
-	double WeightedAverageRPD_P_Y = (sumWeightRPD_P_Y / sumRPD_P_Y);
-
-	double WeightedAverageRPD_N_X = (sumWeightRPD_N_X / sumRPD_N_X);
-	double WeightedAverageRPD_N_Y = (sumWeightRPD_N_Y / sumRPD_N_Y);
-
-	/// below used for debugging purposes
-	/* if((sumWeightRPD_N_X/sumRPD_N_X) == -1.0 || (sumWeightRPD_N_X/sumRPD_N_X) == -3.0 || (sumWeightRPD_N_X/sumRPD_N_X) == 1.0 || (sumWeightRPD_N_X/sumRPD_N_X) == 3.0){ //couts to let user know if any zeros are returned
-	cout <<  "sumWeightRPD_P_X " <<  sumWeightRPD_P_X << endl;
-	cout << (RPD_COL_P[0] * AxisRPD[0]) << "  " << (RPD_COL_P[1] * AxisRPD[1]) << "  " << (RPD_COL_P[2] * AxisRPD[2]) << "  " << (RPD_COL_P[3] * AxisRPD[3]) << endl;
-	cout << "sumRPD_P_X " << sumRPD_P_X << endl;
-	cout << (RPD_COL_P[0]) << "  " << (RPD_COL_P[1]) << "  " << (RPD_COL_P[2]) << "  " << (RPD_COL_P[3]) << endl;
-	} */
-	/// above used for debugging purposes
-
-
-	if (PosorNeg == "Pos") {
-		if (XorY == "X") {
-			if (RPDXmin < WeightedAverageRPD_P_X < RPDXmax) {
-				if (CheckorGive == "Check") {
-					return 1;
+						if (channel == 10 || channel == 9  || channel == 8  || channel == 11) { RPD_COL_N[0] += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			//R2             
+						if (channel == 14 || channel == 13 || channel == 12 || channel == 15) { RPD_COL_N[1] += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			//R3							
+						if (channel == 3  || channel == 0  || channel == 1  || channel == 2)  { RPD_COL_N[2] += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			  //C3 C2 C1 C0					
+						if (channel == 7  || channel == 4  || channel == 5  || channel == 6)  { RPD_COL_N[3] += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
+					}
 				}
-				if (CheckorGive == "Give") {
-					return  WeightedAverageRPD_P_X;
+			}
+		}                                                                                                                                            
+		else if (PosorNeg == "Pos") { 
+			for (int channel = 0; channel < 15; channel++){
+
+				fC_of_TS45_Summed  = RawDataRPD[1][channel][4] + RawDataRPD[1][channel][5];
+				fC_of_TS456_Summed = RawDataRPD[1][channel][4] + RawDataRPD[1][channel][5] + RawDataRPD[1][channel][6];  
+
+				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[1][channel][7] <= RawDataRPD[1][channel][5]) && (RawDataRPD[1][channel][1] / RawDataRPD[1][channel][0] < 1000) && (RawDataRPD[1][channel][0] != 0)) {
+					if (XorY == "Y"){
+
+						if (channel == 11 || channel == 15 || channel == 2 || channel == 5) { RPD_ROW_P[0]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
+						if (channel == 8  || channel == 12 || channel == 1 || channel == 6) { RPD_ROW_P[1]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
+						if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_P[2]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
+						if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_P[3]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			//R0
+					}	
+					else if (XorY == "X"){	
+																															 							                 	//R1
+						if (channel == 10 || channel == 9  || channel == 8  || channel == 11) { RPD_COL_P[0] += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			//R2             
+						if (channel == 14 || channel == 13 || channel == 12 || channel == 15) { RPD_COL_P[1] += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			//R3							
+						if (channel == 3  || channel == 0  || channel == 1  || channel == 2)  { RPD_COL_P[2] += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			  //C3 C2 C1 C0					
+						if (channel == 7  || channel == 4  || channel == 6  || channel == 5)  { RPD_COL_P[3] += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
+					}
 				}
 			}
 		}
-		if (XorY == "Y") {
-			if (RPDYmin < WeightedAverageRPD_P_Y < RPDYmax) {
-				if (CheckorGive == "Check") {
-					return 1;
+		
+		double WeightedAverageRPD_P_X = -10;
+		double WeightedAverageRPD_P_Y = -10;
+		double WeightedAverageRPD_N_X = -10;
+		double WeightedAverageRPD_N_Y = -10;
+		double sumWeightRPD_P_X, sumRPD_P_X, sumWeightRPD_P_Y, sumRPD_P_Y, sumWeightRPD_N_X, sumRPD_N_X, sumWeightRPD_N_Y, sumRPD_N_Y;
+	
+		if (PosorNeg == "Pos"){
+			if (XorY == "X"){
+				if (RPD_COL_P[0] != 0.0 && RPD_COL_P[1] != 0.0 && RPD_COL_P[2] != 0.0 && RPD_COL_P[3] != 0.0) {
+			
+					sumWeightRPD_P_X = (RPD_COL_P[0] * AxisRPD[0]) + (RPD_COL_P[1] * AxisRPD[1]) + (RPD_COL_P[2] * AxisRPD[2]) + (RPD_COL_P[3] * AxisRPD[3]);
+					sumRPD_P_X = (RPD_COL_P[0]) + (RPD_COL_P[1]) + (RPD_COL_P[2]) + (RPD_COL_P[3]);
+	
+					WeightedAverageRPD_P_X = (sumWeightRPD_P_X / sumRPD_P_X);
+	
+					valuereturned = WeightedAverageRPD_P_X;
 				}
-				if (CheckorGive == "Give") {
-					return  WeightedAverageRPD_P_Y;
+				else {
+					valuereturned = -10;
+				}
+			}
+			else if (XorY == "Y"){
+				if (RPD_ROW_P[0] != 0.0 && RPD_ROW_P[1] != 0.0 && RPD_ROW_P[2] != 0.0 && RPD_ROW_P[3] != 0.0) {
+			
+					sumWeightRPD_P_Y = (RPD_ROW_P[0] * AxisRPD[3]) + (RPD_ROW_P[1] * AxisRPD[2]) + (RPD_ROW_P[2] * AxisRPD[1]) + (RPD_ROW_P[3] * AxisRPD[0]);
+					sumRPD_P_Y = (RPD_ROW_P[0]) + (RPD_ROW_P[1]) + (RPD_ROW_P[2]) + (RPD_ROW_P[3]);
+	
+					WeightedAverageRPD_P_Y = (sumWeightRPD_P_Y / sumRPD_P_Y);
+	
+					valuereturned = WeightedAverageRPD_P_Y;
+				}
+				else{
+					valuereturned = -10;
 				}
 			}
 		}
+		else if (PosorNeg == "Neg"){
+			if (XorY == "X"){
+				if (RPD_COL_N[0] != 0.0 && RPD_COL_N[1] != 0.0 && RPD_COL_N[2] != 0.0 && RPD_COL_N[3] != 0.0) {
+			
+					sumWeightRPD_N_X = (RPD_COL_N[0] * AxisRPD[0]) + (RPD_COL_N[1] * AxisRPD[1]) + (RPD_COL_N[2] * AxisRPD[2]) + (RPD_COL_N[3] * AxisRPD[3]);
+					sumRPD_N_X = (RPD_COL_N[0]) + (RPD_COL_N[1]) + (RPD_COL_N[2]) + (RPD_COL_N[3]);
+	
+					WeightedAverageRPD_N_X = (sumWeightRPD_N_X / sumRPD_N_X);
+	
+					valuereturned = WeightedAverageRPD_N_X;
+				}
+				else{
+					valuereturned = -10;
+				}
+			}
+			else if (XorY == "Y"){
+				if (RPD_ROW_N[0] != 0.0 && RPD_ROW_N[1] != 0.0 && RPD_ROW_N[2] != 0.0 && RPD_ROW_N[3] != 0.0) {
+			
+					sumWeightRPD_N_Y = (RPD_ROW_N[0] * AxisRPD[3]) + (RPD_ROW_N[1] * AxisRPD[2]) + (RPD_ROW_N[2] * AxisRPD[1]) + (RPD_ROW_N[3] * AxisRPD[0]);
+					sumRPD_N_Y = (RPD_ROW_N[0]) + (RPD_ROW_N[1]) + (RPD_ROW_N[2]) + (RPD_ROW_N[3]);
+	
+					WeightedAverageRPD_N_Y = (sumWeightRPD_N_Y / sumRPD_N_Y);
+	
+					valuereturned = WeightedAverageRPD_N_Y;
+				}
+				else{
+					valuereturned = -10;
+				}
+			}
+		}
+
+		/// below used for debugging purposes
+		/* if((sumWeightRPD_N_X/sumRPD_N_X) == -1.0 || (sumWeightRPD_N_X/sumRPD_N_X) == -3.0 || (sumWeightRPD_N_X/sumRPD_N_X) == 1.0 || (sumWeightRPD_N_X/sumRPD_N_X) == 3.0){ //couts to let user know if any zeros are returned
+		cout <<  "sumWeightRPD_P_X " <<  sumWeightRPD_P_X << endl;
+		cout << (RPD_COL_P[0] * AxisRPD[0]) << "  " << (RPD_COL_P[1] * AxisRPD[1]) << "  " << (RPD_COL_P[2] * AxisRPD[2]) << "  " << (RPD_COL_P[3] * AxisRPD[3]) << endl;
+		cout << "sumRPD_P_X " << sumRPD_P_X << endl;
+		cout << (RPD_COL_P[0]) << "  " << (RPD_COL_P[1]) << "  " << (RPD_COL_P[2]) << "  " << (RPD_COL_P[3]) << endl;
+		} */
+		/// above used for debugging purposes
 	}
-	if (PosorNeg == "Neg") {
-		if (XorY == "X") {
-			if (RPDXmin < WeightedAverageRPD_N_X < RPDXmax) {
-				if (CheckorGive == "Check") {
-					return 1;
-				}
-				if (CheckorGive == "Give") {
-					return WeightedAverageRPD_N_X;
-				}
-			}
-		}
-		if (XorY == "Y") {
-			if (RPDYmin < WeightedAverageRPD_N_Y < RPDYmax) {
-				if (CheckorGive == "Check") {
-					return 1;
-				}
-				if (CheckorGive == "Give") {
-					return WeightedAverageRPD_N_Y;
-				}
-			}
-		}
+	else if (EM_BEAM_POSITION == -10 || OutPut_Weightedjeffsweights[15] == -10 || OutPut_Weightedjeffsweights[0] == -10){
+		valuereturned = -10;
 	}
+
+	return valuereturned;
 }
 
 #endif

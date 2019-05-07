@@ -28,8 +28,10 @@ void EM_TS_DIST(int runnumber=326776){
 
   int iPeriod = 0;
 
-  TCanvas *c1 = new TCanvas();
+ 
   TH1::SetDefaultSumw2();
+
+cout << "running software EM_TS_DIST.C 5/7/2019 12:30:42 PM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
@@ -42,7 +44,7 @@ void EM_TS_DIST(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
- cout << "runninng software EM_TS_DIST.C     5/7/2019 9:32:21 AM" << endl;
+ 
   
 
   TH1F* em[2][5];
@@ -51,7 +53,7 @@ void EM_TS_DIST(int runnumber=326776){
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 5; ich++){
       em[iside][ich]   = new TH1F(Form("em %s %d",stit2[iside],ich+1),Form("EM%s channel %d",stit[iside],ich+1),10,0,9);
-      emfC[iside][ich] = new TH1F(Form("emfC %s %d",stit2[iside],ich+1),Form("EMfC%s channel %d",stit[iside],ich+1),10000,0,100);
+      emfC[iside][ich] = new TH1F(Form("emfC %s %d",stit2[iside],ich+1),Form("EMfC%s channel %d",stit[iside],ich+1),500,0,2000);
     }
   }
 
@@ -117,23 +119,27 @@ void EM_TS_DIST(int runnumber=326776){
   ///////////////////////////////////////
 
 
-  //c1->SetLogy();
+  
 
   TFile f2("em.root","RECREATE"); 
 
 
+  TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
   TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
+
+  c2->SetLogy();
 
   for(int iside = 0; iside < 2; iside++)
     for(int ich = 0; ich < 5; ich++){
+      c3->SetLogy();
       em[iside][ich]->SetLineColor(4);
       em[iside][ich]->Draw("hist e");
-      //c1->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.pdf",stit2[iside],ich+1));
-      c1->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
+      c3->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
       f2.Write();
     }
   for(int iside = 0; iside < 2; iside++)
     for(int ich = 0; ich < 5; ich++){
+      c2->SetLogy();
       emfC[iside][ich]->SetLineColor(4);
       emfC[iside][ich]->Draw("hist e");
       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
