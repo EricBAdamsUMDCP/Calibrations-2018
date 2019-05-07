@@ -57,7 +57,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 	const int NRPDColnRow = 4;
 	const int NSIDE = 2;
 	double AxisRPD[NRPDColnRow] = { -3.0, -1.0, 1.0, 3.0 };
-	double valuereturned = -10;
+	double valuereturned;
 	/////////////////////////////////////////////
 	//Begin ARRAY declaration for RPD constants//
 	/////////////////////////////////////////////
@@ -156,10 +156,10 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 			}
 		}
 		
-		double WeightedAverageRPD_P_X = -10;
-		double WeightedAverageRPD_P_Y = -10;
-		double WeightedAverageRPD_N_X = -10;
-		double WeightedAverageRPD_N_Y = -10;
+		double WeightedAverageRPD_P_X /*= -10*/;
+		double WeightedAverageRPD_P_Y /*= -10*/;
+		double WeightedAverageRPD_N_X /*= -10*/;
+		double WeightedAverageRPD_N_Y /*= -10*/;
 		double sumWeightRPD_P_X, sumRPD_P_X, sumWeightRPD_P_Y, sumRPD_P_Y, sumWeightRPD_N_X, sumRPD_N_X, sumWeightRPD_N_Y, sumRPD_N_Y;
 	
 		if (PosorNeg == "Pos"){
@@ -174,7 +174,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 					valuereturned = WeightedAverageRPD_P_X;
 				}
 				else {
-					valuereturned = -10;
+					valuereturned = -101;
 				}
 			}
 			else if (XorY == "Y"){

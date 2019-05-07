@@ -198,18 +198,26 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		
 
 		if ( PEMG != -10){
-		EM_P_BEAM->Fill( PEMG);	
+			EM_P_BEAM->Fill( PEMG);	
 		}
 		if (NEMG != -10){
-		EM_N_BEAM->Fill( NEMG);
+			EM_N_BEAM->Fill( NEMG);
 		}
 
 		JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
 		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
 
+		/*for (int i = 0; i <15; i++){
+			cout << i << ": " << OutPut_WeightedjeffsweightsPos[i] << " EM: " << PEMG << endl;
+		}
+*/
 		double chicken = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
 
-		cout << "X beam" << " " << chicken << endl;
+		if (chicken != -10){
+		EM_N_BEAM->Fill( chicken);
+		}
+
+		//cout << "X beam" << " " << chicken << endl;
 
 		// PUT IN JEFF WEIGHTER 3000
 
