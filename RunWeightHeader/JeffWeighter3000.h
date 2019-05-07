@@ -13,7 +13,7 @@
 
 //I am a chemist not an englishist I can't spell
 
-void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT, int side, double (&OutPut_Weightedjeffsweights)[16]){ // make sure you enter the right side for what u want
+void JeffWeighter3000_OutputsArray( double EM_Beam_Position_OUTPUT, int side, double (&OutPut_Weightedjeffsweights)[16]){ // make sure you enter the right side for what u want
 	
 /// PUT IN THING TO KILL OFF THE OLD MEMEORY ADRESSES
 
@@ -42,11 +42,11 @@ void JeffWeighter3000_OutputsArray( double EM_Beam_Position_Cut_and_Value_OUTPUT
 		}
 	*/
 
-	if ( EM_Beam_Position_Cut_and_Value_OUTPUT != -10 && EM_Beam_Position_Cut_and_Value_OUTPUT <= 4 && EM_Beam_Position_Cut_and_Value_OUTPUT >= -4 ){
+	if ( EM_Beam_Position_OUTPUT != -10 && EM_Beam_Position_OUTPUT <= 4 && EM_Beam_Position_OUTPUT >= -4 ){
 		const int NRPD = 16;
 		const int NSIDE = 2;
 	
-		double x = EM_Beam_Position_Cut_and_Value_OUTPUT;
+		double x = EM_Beam_Position_OUTPUT;
 		
 		int Value = x; // this is used to truncate the value for decision making
 		

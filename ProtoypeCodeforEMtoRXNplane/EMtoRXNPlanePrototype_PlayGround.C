@@ -34,7 +34,7 @@ int runnumber = 326776;
 void EMtoRXNPlanePrototype_PlayGround(){
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 5/3/2019 10:48:04 PM" << endl;
+	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 5/6/2019 1:45:10 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 
@@ -49,7 +49,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	const int MaxXTH2F = 4;
 	const int MinYTH2F = -4;
 	const int MaxYTH2F = 4;
-	const int NumberOfBins = 128; //number of bins in TH1F histograms produced by this code
+	const int NumberOfBins = 64; //number of bins in TH1F histograms produced by this code
 	const int NChannels = 50;
 	const int NTS = 10;// number of timeslices
 	const int NRPD = 16;
@@ -96,8 +96,8 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	//TH2F* RPD_v_EM_P_BEAM;
 	//TH2F* RPD_v_EM_N_BEAM;
 
-	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
-	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 
 	//RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	//RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
@@ -193,10 +193,15 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
 		NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
 		// bug test this to see if its running when neg for pos and pos for neg
-	
-		EM_P_BEAM->Fill( PEMG);	
-		EM_N_BEAM->Fill( NEMG);
 		
+
+		if ( PEMG != -10){
+		EM_P_BEAM->Fill( PEMG);	
+		}
+		if (NEMG != -10){
+		EM_N_BEAM->Fill( NEMG);
+		}
+
 		/*cout << PEMG << endl;
 
 		if (PEMG < 0){
