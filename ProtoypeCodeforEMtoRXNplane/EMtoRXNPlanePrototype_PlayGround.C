@@ -96,8 +96,8 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	//TH2F* RPD_v_EM_P_BEAM;
 	//TH2F* RPD_v_EM_N_BEAM;
 
-	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
-	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 
 	//RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	//RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
@@ -154,16 +154,16 @@ void EMtoRXNPlanePrototype_PlayGround(){
 			//this is used below to keep values at 0 or greater
 			//40 fC nosie cuttoff
 
-			double TS_Zero  = (fCleaf[0]->GetValue(n) <= 40) ? 0 : (fCleaf[0]->GetValue(n));
-			double TS_One   = (fCleaf[1]->GetValue(n) <= 40) ? 0 : (fCleaf[1]->GetValue(n));
-			double TS_Two   = (fCleaf[2]->GetValue(n) <= 40) ? 0 : (fCleaf[2]->GetValue(n));
-			double TS_Three = (fCleaf[3]->GetValue(n) <= 40) ? 0 : (fCleaf[3]->GetValue(n));
-			double TS_Four  = (fCleaf[4]->GetValue(n) <= 40) ? 0 : (fCleaf[4]->GetValue(n));
-			double TS_Five  = (fCleaf[5]->GetValue(n) <= 40) ? 0 : (fCleaf[5]->GetValue(n));
-			double TS_Six   = (fCleaf[6]->GetValue(n) <= 40) ? 0 : (fCleaf[6]->GetValue(n));
-			double TS_Seven = (fCleaf[7]->GetValue(n) <= 40) ? 0 : (fCleaf[7]->GetValue(n));
-			double TS_Eight = (fCleaf[8]->GetValue(n) <= 40) ? 0 : (fCleaf[8]->GetValue(n));
-			double TS_Nine  = (fCleaf[9]->GetValue(n) <= 40) ? 0 : (fCleaf[9]->GetValue(n));
+			double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
+			double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));
+			double TS_Two   = (fCleaf[2]->GetValue(n) <= 0) ? 0 : (fCleaf[2]->GetValue(n));
+			double TS_Three = (fCleaf[3]->GetValue(n) <= 0) ? 0 : (fCleaf[3]->GetValue(n));
+			double TS_Four  = (fCleaf[4]->GetValue(n) <= 0) ? 0 : (fCleaf[4]->GetValue(n));
+			double TS_Five  = (fCleaf[5]->GetValue(n) <= 0) ? 0 : (fCleaf[5]->GetValue(n));
+			double TS_Six   = (fCleaf[6]->GetValue(n) <= 0) ? 0 : (fCleaf[6]->GetValue(n));
+			double TS_Seven = (fCleaf[7]->GetValue(n) <= 0) ? 0 : (fCleaf[7]->GetValue(n));
+			double TS_Eight = (fCleaf[8]->GetValue(n) <= 0) ? 0 : (fCleaf[8]->GetValue(n));
+			double TS_Nine  = (fCleaf[9]->GetValue(n) <= 0) ? 0 : (fCleaf[9]->GetValue(n));
 
 			//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
 
@@ -176,12 +176,12 @@ void EMtoRXNPlanePrototype_PlayGround(){
 					RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
 				}
 			}
-			else if (type == HAD){
+			else if (type == HAD){ //figure out what cutoff for HAD
 				for (int TS = 0; TS < NTS; TS++){
 					RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
 				}
 			}
-			else if (type == RPD){
+			else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
 				for (int TS = 0; TS < NTS; TS++){
 					RawDataRPD[side][channel][TS] = TS_ARRAY[TS];  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
 					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
@@ -213,9 +213,9 @@ void EMtoRXNPlanePrototype_PlayGround(){
 */
 		double chicken = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
 
-		if (chicken != -10){
+	/*	if (chicken != -10){
 		EM_N_BEAM->Fill( chicken);
-		}
+		}*/
 
 		//cout << "X beam" << " " << chicken << endl;
 
@@ -274,7 +274,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	//title->SetFillColor(16);
 	//title->SetTextSize(2);
 	//title->Draw();
-	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d.png", runnumber, stit2[1], runnumber));
+	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d_10fC.png", runnumber, stit2[1], runnumber));
 	
 	TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
 	EM_N_BEAM->Draw("hist e");
@@ -282,7 +282,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	title2->SetFillColor(16);
 	title2->SetTextSize(2);
 	title2->Draw(); */
-	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d.png", runnumber, stit2[0], runnumber));
+	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d_10fC.png", runnumber, stit2[0], runnumber));
 	
 	
 	

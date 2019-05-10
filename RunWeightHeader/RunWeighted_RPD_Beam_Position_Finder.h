@@ -108,7 +108,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 	//// neeed TO INCLUDE AND WRITE A TRANSLATOR TO TURN INPUT RAW DATA INTO CORRECT BLOCK ORDER
 		
 		if (PosorNeg == "Neg") {
-			for (int channel = 0; channel < 15; channel++){
+			for (int channel = 0; channel < NRPD; channel++){
 				//remeber TS start at 0 DONT SUBTRACT
 				fC_of_TS45_Summed  = RawDataRPD[0][channel][4] + RawDataRPD[0][channel][5];
 				fC_of_TS456_Summed = RawDataRPD[0][channel][4] + RawDataRPD[0][channel][5] + RawDataRPD[0][channel][6];
@@ -132,7 +132,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 			}
 		}                                                                                                                                            
 		else if (PosorNeg == "Pos") { 
-			for (int channel = 0; channel < 15; channel++){
+			for (int channel = 0; channel < NRPD; channel++){
 
 				fC_of_TS45_Summed  = RawDataRPD[1][channel][4] + RawDataRPD[1][channel][5];
 				fC_of_TS456_Summed = RawDataRPD[1][channel][4] + RawDataRPD[1][channel][5] + RawDataRPD[1][channel][6];  
@@ -156,10 +156,10 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 			}
 		}
 		
-		double WeightedAverageRPD_P_X /*= -10*/;
-		double WeightedAverageRPD_P_Y /*= -10*/;
-		double WeightedAverageRPD_N_X /*= -10*/;
-		double WeightedAverageRPD_N_Y /*= -10*/;
+		double WeightedAverageRPD_P_X;
+		double WeightedAverageRPD_P_Y;
+		double WeightedAverageRPD_N_X;
+		double WeightedAverageRPD_N_Y;
 		double sumWeightRPD_P_X, sumRPD_P_X, sumWeightRPD_P_Y, sumRPD_P_Y, sumWeightRPD_N_X, sumRPD_N_X, sumWeightRPD_N_Y, sumRPD_N_Y;
 	
 		if (PosorNeg == "Pos"){

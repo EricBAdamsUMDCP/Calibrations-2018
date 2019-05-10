@@ -23,7 +23,7 @@ Double_t sumOfGauss(Double_t*, Double_t*);
 TH1F* spectrum_noise;
 
 
-void EM_TS_DIST(int runnumber=326776){
+void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   initRootStyle();
 
   int iPeriod = 0;
@@ -49,6 +49,8 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
 
   TH1F* em[2][5];
   TH1F* emfC[2][5];
+  TH1F* HAD[2][4];
+  TH1F* HADfC[2][4];
   TH1F* RATIOemfC_OnetoThree[2];
   TH1F* RATIOemfC_TwotoThree[2];
   TH1F* RATIOemfC_FourtoThree[2];
@@ -57,6 +59,8 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   TH2F* RATIOPN_TwotoThree;
   TH2F* RATIOPN_FourtoThree;
   TH2F* RATIOPN_FivetoThree;
+  TH2F* PEMvTotalE;
+  TH2F* NEMvTotalE;
 
  /* for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 5; ich++){
@@ -65,8 +69,14 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
     }
   }*/
 
-
   for(int iside = 0; iside < 2; iside++){
+    for(int ich = 0; ich < 4; ich++){
+      HAD[iside][ich]   = new TH1F(Form("HAD %s %d",stit2[iside],ich+1),Form("HAD%s channel %d",stit[iside],ich+1),10,0,9);
+      HADfC[iside][ich] = new TH1F(Form("HADfC %s %d",stit2[iside],ich+1),Form("HADfC%s channel %d fC",stit[iside],ich+1),50,20000,200);
+    }
+  }
+
+  /*for(int iside = 0; iside < 2; iside++){
         RATIOemfC_OnetoThree[iside]  = new TH1F(Form("emfCRATIO %s 1/3",stit2[iside]),Form("EMfC%s channels 1/3 fC",stit[iside]),40,0,2);
         RATIOemfC_TwotoThree[iside]  = new TH1F(Form("emfCRATIO %s 2/3",stit2[iside]),Form("EMfC%s channels 2/3 fC",stit[iside]),40,0,2);
         RATIOemfC_FourtoThree[iside] = new TH1F(Form("emfCRATIO %s 4/3",stit2[iside]),Form("EMfC%s channels 4/3 fC",stit[iside]),40,0,2);
@@ -76,7 +86,11 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   RATIOPN_OnetoThree  = new TH2F(("RATIOPN_OnetoThree "),("RATIOPN_OnetoThree; Pos; Neg"),  40, 0, 2, 40, 0, 2);
   RATIOPN_TwotoThree  = new TH2F(("RATIOPN_TwotoThree "),("RATIOPN_TwotoThree; Pos; Neg"),  40, 0, 2, 40, 0, 2);
   RATIOPN_FourtoThree = new TH2F(("RATIOPN_FourtoThree"),("RATIOPN_FourtoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);
-  RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);
+  RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
+
+  PEMvTotalE = new TH2F(("PEMvTotalE"),("PEMvTotalE; Sum HAD + .1 EM (fC); EM (fC)"), 20, 0, 200, 20, 0, 200);
+  NEMvTotalE = new TH2F(("NEMvTotalE"),("NEMvTotalE; Sum HAD + .1 EM (fC); EM (fC)"), 20, 0, 200, 20, 0, 200);
+
 
   const int NTS=10;            // number of timeslices
   TLeaf* bxidLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("bxid");
@@ -103,21 +117,22 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
     ZDCDigiTree->GetEntry(i);
 
     double EM_TS_45[NSIDE][5] = {0};
+    double HAD_TS_45[NSIDE][4] = {0};
 
     for(int n = 0; n < 50; n++){
       int side = (int)((zsideLeaf->GetValue(n)+1)/2.0);
       int type = (int)(sectionLeaf->GetValue(n))-1;
       int channel = (int)(channelLeaf->GetValue(n))-1;
      
-      if (type == 0){
+      int cutoff = 0;
 
-        double TS_fC[NTS] = {(fCleaf[0]->GetValue(n) < 10) ? 0 : (fCleaf[0]->GetValue(n)), (fCleaf[1]->GetValue(n) < 10) ? 0 : (fCleaf[1]->GetValue(n)),
-        (fCleaf[2]->GetValue(n) < 10) ? 0 : (fCleaf[2]->GetValue(n)), (fCleaf[3]->GetValue(n) < 10) ? 0 : (fCleaf[3]->GetValue(n)), (fCleaf[4]->GetValue(n) < 10) ? 0 : (fCleaf[4]->GetValue(n)), 
-        (fCleaf[5]->GetValue(n) < 10) ? 0 : (fCleaf[5]->GetValue(n)), (fCleaf[6]->GetValue(n) < 10) ? 0 : (fCleaf[6]->GetValue(n)), (fCleaf[7]->GetValue(n) < 10) ? 0 : (fCleaf[7]->GetValue(n)), 
-        (fCleaf[8]->GetValue(n) < 10) ? 0 : (fCleaf[8]->GetValue(n)), (fCleaf[9]->GetValue(n) < 10) ? 0 : (fCleaf[9]->GetValue(n))};
+        double TS_fC[NTS] = {(fCleaf[0]->GetValue(n) < cutoff) ? 0 : (fCleaf[0]->GetValue(n)), (fCleaf[1]->GetValue(n) < cutoff) ? 0 : (fCleaf[1]->GetValue(n)),
+        (fCleaf[2]->GetValue(n) < cutoff) ? 0 : (fCleaf[2]->GetValue(n)), (fCleaf[3]->GetValue(n) < cutoff) ? 0 : (fCleaf[3]->GetValue(n)), (fCleaf[4]->GetValue(n) < cutoff) ? 0 : (fCleaf[4]->GetValue(n)), 
+        (fCleaf[5]->GetValue(n) < cutoff) ? 0 : (fCleaf[5]->GetValue(n)), (fCleaf[6]->GetValue(n) < cutoff) ? 0 : (fCleaf[6]->GetValue(n)), (fCleaf[7]->GetValue(n) < cutoff) ? 0 : (fCleaf[7]->GetValue(n)), 
+        (fCleaf[8]->GetValue(n) < cutoff) ? 0 : (fCleaf[8]->GetValue(n)), (fCleaf[9]->GetValue(n) < cutoff) ? 0 : (fCleaf[9]->GetValue(n))};
          
   
-  
+      if (type == 0){
         EM_TS_45[side][channel] = TS_fC[4] + TS_fC[5];
 
 /*        if (side == 0){
@@ -133,8 +148,28 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
           }
         }*/
       }
+      if (type == 1){ //HAD
+        HAD_TS_45[side][channel] = TS_fC[4] + TS_fC[5];
+
+          if (side == 0){
+          for(int iTS = 0; iTS < 10; iTS++){
+             HAD[side][channel]->Fill(iTS, TS_fC[iTS]);
+             HADfC[side][channel]->Fill(TS_fC[iTS]);
+          }
+        }
+        else if (side == 1){
+          for(int iTS = 0; iTS < 10; iTS++){
+             HAD[side][channel]->Fill(iTS, TS_fC[iTS]); 
+             HADfC[side][channel]->Fill(TS_fC[iTS]);
+          }
+        }
+      }
     }
     //channel 3 is decided to be comparator
+
+////////////////Begin EM/////////////////////////////////////////////////////////////////////////////////////////
+  double P_SumEMfC = EM_TS_45[1][0] + EM_TS_45[1][1] + EM_TS_45[1][2] + EM_TS_45[1][3] + EM_TS_45[1][4];
+  double N_SumEMfC = EM_TS_45[0][0] + EM_TS_45[0][1] + EM_TS_45[0][2] + EM_TS_45[0][3] + EM_TS_45[0][4];
 
   double P_OnetoThree  = (EM_TS_45[1][0]/EM_TS_45[1][2]);
   double P_TwotoThree  = (EM_TS_45[1][1]/EM_TS_45[1][2]);
@@ -161,6 +196,21 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   if (P_TwotoThree != 1 && N_TwotoThree != 1)  {RATIOPN_TwotoThree->Fill(P_TwotoThree, N_TwotoThree);}
   if (P_FourtoThree != 1 && N_FourtoThree != 1){RATIOPN_FourtoThree->Fill(P_FourtoThree,N_FourtoThree);}
   if (P_FivetoThree != 1 && N_FivetoThree != 1){RATIOPN_FivetoThree->Fill(P_FivetoThree,N_FivetoThree);}
+  ////////////End EM////////////////////////////////////////////////////////////////////////////////////////////
+
+  ////////////Begin HAD/////////////////////////////////////////////////////////////////////////////////////////
+
+  double P_SumHADfC = HAD_TS_45[1][0] + HAD_TS_45[1][1] + HAD_TS_45[1][2] + HAD_TS_45[1][3];
+  double N_SumHADfC = HAD_TS_45[0][0] + HAD_TS_45[0][1] + HAD_TS_45[0][2] + HAD_TS_45[0][3];
+
+  ////////////End HAD//////////////////////////////////////////////////////////////////////////////////////////
+
+  ////////////Begin HAD and EM (only if both are used)/////////////////////////////////////////////////////////
+
+  PEMvTotalE->Fill((P_SumHADfC + .1*P_SumEMfC), P_SumEMfC);
+  NEMvTotalE->Fill((P_SumHADfC + .1*P_SumEMfC), P_SumEMfC);
+
+  ////////////End HAD and EM (only if both are used)//////////////////////////////////////////////////////////
 
     if(i % 100000 == 0) std::cout << i << " events are processed." << std::endl;
   }
@@ -180,7 +230,7 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
 
   //c2->SetLogy();
 
- /* for(int iside = 0; iside < 2; iside++)
+ /* for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
     for(int ich = 0; ich < 5; ich++){
       c3->SetLogy();
       em[iside][ich]->SetLineColor(4);
@@ -188,7 +238,7 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
       c3->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
       f2.Write();
     }*/
-/*  for(int iside = 0; iside < 2; iside++)
+/*  for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
     for(int ich = 0; ich < 5; ich++){
       c2->SetLogy();
       emfC[iside][ich]->SetLineColor(4);
@@ -198,7 +248,7 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
     }
 */
 
-  RATIOemfC_OnetoThree[1]->Draw("hist e");
+  /*RATIOemfC_OnetoThree[1]->Draw("hist e"); //uncomment to get graphs
   c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels1by3_%d.png", "Pos",runnumber));
   RATIOemfC_TwotoThree[1]->Draw("hist e");
   c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels2by3_%d.png", "Pos",runnumber));
@@ -225,6 +275,25 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FourtoThree_%d.png",runnumber));
   RATIOPN_FivetoThree->Draw("colz");
   c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FivetoThree_%d.png",runnumber));
+*/
+
+  for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
+    for(int ich = 0; ich < 4; ich++){
+      HAD[iside][ich]->Draw("hist e");
+      c2->SaveAs(Form("ZDC_figures/had/HAD_%s_TS_%d_%d.png", stit2[iside], ich+1,runnumber));
+      HADfC[iside][ich]->Draw("hist e");
+      c2->SaveAs(Form("ZDC_figures/had/HAD_%s_fC_%d_%d.png", stit2[iside], ich+1,runnumber));
+    }
+  }
+
+  PEMvTotalE->Draw("Colz");
+  c2->SaveAs(Form("ZDC_figures/EM_HAD/PEMvTotalE_%d.png",runnumber));
+  NEMvTotalE->Draw("Colz");
+  c2->SaveAs(Form("ZDC_figures/EM_HAD/NEMvTotalE_%d.png",runnumber));
+
+
+
+
 
   /*TLegend* leg2 = new TLegend(0.50,0.65,0.70,0.85);
   leg2->SetTextFont(42);
