@@ -72,7 +72,7 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 4; ich++){
       HAD[iside][ich]   = new TH1F(Form("HAD %s %d",stit2[iside],ich+1),Form("HAD%s channel %d",stit[iside],ich+1),10,0,9);
-      HADfC[iside][ich] = new TH1F(Form("HADfC %s %d",stit2[iside],ich+1),Form("HADfC%s channel %d fC",stit[iside],ich+1),50,20000,200);
+      HADfC[iside][ich] = new TH1F(Form("HADfC %s %d",stit2[iside],ich+1),Form("HADfC%s channel %d fC",stit[iside],ich+1),50,0,20);
     }
   }
 
