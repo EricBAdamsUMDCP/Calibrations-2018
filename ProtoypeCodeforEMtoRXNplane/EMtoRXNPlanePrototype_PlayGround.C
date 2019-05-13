@@ -152,7 +152,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 			//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
 			//this is used below to keep values at 0 or greater
-			//40 fC nosie cuttoff
+			//40 fC nosie cuttoff 
 
 			double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
 			double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));

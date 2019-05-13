@@ -1,4 +1,4 @@
-/* EM Beam Position Code
+   /* EM Beam Position Code
 This header file is used to insert a function which will measure a weighted average
 of the beam position using the 5 channels of the EM section per each EM.
 

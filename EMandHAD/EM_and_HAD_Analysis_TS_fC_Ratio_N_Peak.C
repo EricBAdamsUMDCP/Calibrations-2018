@@ -31,7 +31,9 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
  
   TH1::SetDefaultSumw2();
 
-cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
+  //LOG THIS CODE IS HAITUS UNTIL WE HAVE A LARGER WORKING DATA SET AS FINDING THE NEUTRON PEAKS IS HARDER WHEN INCLUDING THE EM SECTION AND THE PEAKS ARE ALREADY HARD TO FIND, A CRAB JOB IS NECESSARY
+
+cout << "running software EM_TS_DIST.C 5/13/2019 4:16:14 PM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
@@ -44,13 +46,15 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
- 
+  int multiplicativevalue = 0;
   
 
   TH1F* em[2][5];
   TH1F* emfC[2][5];
   TH1F* HAD[2][4];
   TH1F* HADfC[2][4];
+  TH1F* P_HADSUM;
+  TH1F* N_HADSUM;
   TH1F* RATIOemfC_OnetoThree[2];
   TH1F* RATIOemfC_TwotoThree[2];
   TH1F* RATIOemfC_FourtoThree[2];
@@ -69,10 +73,13 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
     }
   }*/
 
+  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %d*P_SumEMfC", runnumber, multiplicativevalue),200,0,1000);
+  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %d*N_SumEMfC", runnumber, multiplicativevalue),200,0,1000);
+
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 4; ich++){
       HAD[iside][ich]   = new TH1F(Form("HAD %s %d",stit2[iside],ich+1),Form("HAD%s channel %d",stit[iside],ich+1),10,0,9);
-      HADfC[iside][ich] = new TH1F(Form("HADfC %s %d",stit2[iside],ich+1),Form("HADfC%s channel %d fC",stit[iside],ich+1),50,0,20);
+      HADfC[iside][ich] = new TH1F(Form("HADfC %s %d",stit2[iside],ich+1),Form("HADfC%s channel %d fC",stit[iside],ich+1),200,0,400000);
     }
   }
 
@@ -88,8 +95,8 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   RATIOPN_FourtoThree = new TH2F(("RATIOPN_FourtoThree"),("RATIOPN_FourtoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);
   RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
 
-  PEMvTotalE = new TH2F(("PEMvTotalE"),("PEMvTotalE; Sum HAD + .1 EM (fC); EM (fC)"), 20, 0, 200, 20, 0, 200);
-  NEMvTotalE = new TH2F(("NEMvTotalE"),("NEMvTotalE; Sum HAD + .1 EM (fC); EM (fC)"), 20, 0, 200, 20, 0, 200);
+  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE; Sum HAD + %d * EM (fC); EM (fC)", multiplicativevalue), 70, 0, 1000, 70, 0, 10000);
+  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE; Sum HAD + %d * EM (fC); EM (fC)", multiplicativevalue), 70, 0, 1000, 70, 0, 10000);
 
 
   const int NTS=10;            // number of timeslices
@@ -104,6 +111,9 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   
   TLeaf* adcLeaf[NTS];
   TLeaf* fCleaf[NTS];
+
+  int cutoff = 85;
+
 
   double w[2][2][5] = {
     {{1.0,1.0,1.0,1.0,1.0},{1.0,0.617/0.4,0.315/0.23,0.259/0.17,0.0}},  // negative side
@@ -124,7 +134,6 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
       int type = (int)(sectionLeaf->GetValue(n))-1;
       int channel = (int)(channelLeaf->GetValue(n))-1;
      
-      int cutoff = 0;
 
         double TS_fC[NTS] = {(fCleaf[0]->GetValue(n) < cutoff) ? 0 : (fCleaf[0]->GetValue(n)), (fCleaf[1]->GetValue(n) < cutoff) ? 0 : (fCleaf[1]->GetValue(n)),
         (fCleaf[2]->GetValue(n) < cutoff) ? 0 : (fCleaf[2]->GetValue(n)), (fCleaf[3]->GetValue(n) < cutoff) ? 0 : (fCleaf[3]->GetValue(n)), (fCleaf[4]->GetValue(n) < cutoff) ? 0 : (fCleaf[4]->GetValue(n)), 
@@ -207,8 +216,22 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
 
   ////////////Begin HAD and EM (only if both are used)/////////////////////////////////////////////////////////
 
-  PEMvTotalE->Fill((P_SumHADfC + .1*P_SumEMfC), P_SumEMfC);
-  NEMvTotalE->Fill((P_SumHADfC + .1*P_SumEMfC), P_SumEMfC);
+
+  if (P_SumEMfC > cutoff && P_SumHADfC > cutoff){
+    PEMvTotalE->Fill((P_SumHADfC + multiplicativevalue*P_SumEMfC), P_SumEMfC); //0.005
+    P_HADSUM->Fill((P_SumHADfC + multiplicativevalue*P_SumEMfC));
+  }
+  if (N_SumEMfC > cutoff && N_SumHADfC > cutoff){
+    NEMvTotalE->Fill((N_SumHADfC + multiplicativevalue*N_SumEMfC), N_SumEMfC); //0.005
+    N_HADSUM->Fill((N_SumHADfC + multiplicativevalue*N_SumEMfC));
+  }
+/*
+  if (P_SumHADfC > 100){
+  P_HADSUM->Fill((P_SumHADfC + .1*P_SumEMfC));
+  }
+  if (N_SumHADfC > 100){
+  N_HADSUM->Fill((N_SumHADfC + .1*N_SumEMfC));
+  }*/
 
   ////////////End HAD and EM (only if both are used)//////////////////////////////////////////////////////////
 
@@ -228,7 +251,13 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   //TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
   TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
 
-  //c2->SetLogy();
+  c2->SetLogz();
+  PEMvTotalE->Draw("Colz");
+  c2->SaveAs(Form("ZDC_figures/EM_HAD/PEMvTotalE_%d.png",runnumber));
+  NEMvTotalE->Draw("Colz");
+  c2->SaveAs(Form("ZDC_figures/EM_HAD/NEMvTotalE_%d.png",runnumber));
+
+  c2->SetLogy();
 
  /* for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
     for(int ich = 0; ich < 5; ich++){
@@ -277,19 +306,22 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FivetoThree_%d.png",runnumber));
 */
 
-  for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
+  P_HADSUM->Draw("hist e");
+   c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
+  N_HADSUM->Draw("hist e");
+   c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
+
+
+ /* for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
     for(int ich = 0; ich < 4; ich++){
       HAD[iside][ich]->Draw("hist e");
       c2->SaveAs(Form("ZDC_figures/had/HAD_%s_TS_%d_%d.png", stit2[iside], ich+1,runnumber));
       HADfC[iside][ich]->Draw("hist e");
       c2->SaveAs(Form("ZDC_figures/had/HAD_%s_fC_%d_%d.png", stit2[iside], ich+1,runnumber));
     }
-  }
+  }*/
 
-  PEMvTotalE->Draw("Colz");
-  c2->SaveAs(Form("ZDC_figures/EM_HAD/PEMvTotalE_%d.png",runnumber));
-  NEMvTotalE->Draw("Colz");
-  c2->SaveAs(Form("ZDC_figures/EM_HAD/NEMvTotalE_%d.png",runnumber));
+ 
 
 
 
@@ -335,7 +367,7 @@ void initRootStyle(){
 
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
-  gStyle->SetOptStat(0);
+  gStyle->SetOptStat(1);
   gStyle->SetOptTitle(1);
   gStyle->SetOptFit(1);
 
