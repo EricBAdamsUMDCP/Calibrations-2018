@@ -89,15 +89,21 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	//DECLARING HISTOGRAMS//
 	////////////////////////
 
-	TH1F* EM_P_BEAM;
-	TH1F* EM_N_BEAM;
+	//TH1F* EM_P_BEAM;
+	//TH1F* EM_N_BEAM;
+	TH2F* Pos_EMX_v_RPDX;
+	TH2F* Neg_EMX_v_RPDX;
 
 
 	//TH2F* RPD_v_EM_P_BEAM;
 	//TH2F* RPD_v_EM_N_BEAM;
 
-	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
-	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	//EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	//EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+
+	Pos_EMX_v_RPDX = new TH2F(Form("XRPD_EM_P_BEAM %d", runnumber), Form("P_RPDX_EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
+	Neg_EMX_v_RPDX = new TH2F(Form("XRPD_EM_N_BEAM %d", runnumber), Form("N_RPDX_EM_%d_NBins_%d_MB_2; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
+
 
 	//RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	//RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
@@ -129,6 +135,8 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double OutPut_WeightedjeffsweightsPos[NRPD] = {0};
 	double OutPut_WeightedjeffsweightsNeg[NRPD] = {0};
 
+	double P_RPD_Beam_Position_Value_X = 0;
+	double N_RPD_Beam_Position_Value_X = 0;
 
 	for (int iTS = 0; iTS < NTS; iTS++) {
 		fCleaf[iTS] = (TLeaf*)ZDCDigiTree->GetLeaf(Form("nfC%d", iTS));
@@ -196,22 +204,30 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
 		// bug test this to see if its running when neg for pos and pos for neg
 		
-
-		if ( PEMG != -10){
-			EM_P_BEAM->Fill( PEMG);	
-		}
-		if (NEMG != -10){
-			EM_N_BEAM->Fill( NEMG);
-		}
-
 		JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
 		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+
+		P_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
+		N_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "X");
+
+
+		if ( PEMG != -10 && P_RPD_Beam_Position_Value_X != -10){
+			
+			Pos_EMX_v_RPDX->Fill(PEMG, P_RPD_Beam_Position_Value_X);
+			//EM_P_BEAM->Fill( PEMG);	
+		}
+		if (NEMG != -10 && N_RPD_Beam_Position_Value_X != -10){
+			Neg_EMX_v_RPDX->Fill(NEMG, N_RPD_Beam_Position_Value_X);
+			//EM_N_BEAM->Fill( NEMG);
+		}
+
+
 
 		/*for (int i = 0; i <15; i++){
 			cout << i << ": " << OutPut_WeightedjeffsweightsPos[i] << " EM: " << PEMG << endl;
 		}
 */
-		double chicken = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
+
 
 	/*	if (chicken != -10){
 		EM_N_BEAM->Fill( chicken);
@@ -265,24 +281,31 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	//CREATING HISTOGRAMS FOR 4x4 and 5x5 for RPD pos and neg and ZDC pos and neg for fC versus TS//
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	TCanvas* c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 2000);
+		//TCanvas* c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 2000);
 	//TPad* newpad = new TPad("newpad", "a transparent pad", 0, 0, 1, 1);
 	//newpad->SetFillStyle(4000);
 	//newpad->Draw();
-	EM_P_BEAM->Draw("hist e");
+		//EM_P_BEAM->Draw("hist e");
 	//TPaveLabel* title = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[1], runnumber));
 	//title->SetFillColor(16);
 	//title->SetTextSize(2);
 	//title->Draw();
-	c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d_10fC.png", runnumber, stit2[1], runnumber));
+		//c1->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d_10fC.png", runnumber, stit2[1], runnumber));
 	
 	TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
-	EM_N_BEAM->Draw("hist e");
+	
+	Pos_EMX_v_RPDX->Draw("colz");
+	c2->SaveAs(Form("ZDC_figures/EMtoRXNPlanePrototype_PlayGround_%d/%s_XRPD_Beam_Position_v_EM_%d_10fC.png", runnumber, stit2[1], runnumber));
+
+	Neg_EMX_v_RPDX->Draw("colz");
+	c2->SaveAs(Form("ZDC_figures/EMtoRXNPlanePrototype_PlayGround_%d/%s_XRPD_Beam_Position_v_EM_%d_10fC.png", runnumber, stit2[0], runnumber));
+
+		//EM_N_BEAM->Draw("hist e");
 	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
 	title2->SetFillColor(16);
 	title2->SetTextSize(2);
 	title2->Draw(); */
-	c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d_10fC.png", runnumber, stit2[0], runnumber));
+		//c2->SaveAs(Form("ZDC_figures/RPD_Beam_Position_v_EM_Finder_%d/%s_Beam_Position_v_EM_%d_10fC.png", runnumber, stit2[0], runnumber));
 	
 	
 	
