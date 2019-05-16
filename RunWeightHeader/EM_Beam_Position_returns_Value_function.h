@@ -19,7 +19,7 @@ IF YOU FIND THE CODE HARD OR THIS CONFUSNG...
 You can do it, attend LPC CMS DAS in the winter.
 
 4/9/19 */
-//last edited(if I didn't forget to change this...): 5/3/2019 5:01:24 PM
+//last edited(if I didn't forget to change this...): 5/16/2019 10:47:07 AM
 
 //#include <iostream>
 //#include <cstdio>
@@ -44,7 +44,7 @@ double EM_Beam_Position_Value(double RawDataEM[2][5][10], const std::string& Pos
 
 	/// every time this function is called the variables are not set, right....?
 	const int NCH = 5;
-	float EM[NCH] = { -4,-2,0,2,4};
+	float EM[NCH] = { -3.6,-1.8,0,1.8,3.6};
 	static double EMChannelP[NCH] = {0};
 	static double EMChannelN[NCH] = {0};
 	double sumEMPos, sumEMNeg, sumWeightEMPos, sumWeightEMNeg;
@@ -54,17 +54,17 @@ double EM_Beam_Position_Value(double RawDataEM[2][5][10], const std::string& Pos
 	//ternary operators (look them up)
 
 	// says if the value of TS 4 and 5 are independently greater than 100 fC then sum Ts 4 and TS 5 and set it equal to that array memebr if theyy are not set that array member to 0!
-	EMChannelP[0] = (RawDataEM[1][0][3] > 10 && RawDataEM[1][0][4] > 10) ? (RawDataEM[1][0][3] + RawDataEM[1][0][4]) : 0.0;
-	EMChannelP[1] = (RawDataEM[1][1][3] > 10 && RawDataEM[1][1][4] > 10) ? (RawDataEM[1][1][3] + RawDataEM[1][1][4]) : 0.0;
-	EMChannelP[2] = (RawDataEM[1][2][3] > 10 && RawDataEM[1][2][4] > 10) ? (RawDataEM[1][2][3] + RawDataEM[1][2][4]) : 0.0;
-	EMChannelP[3] = (RawDataEM[1][3][3] > 10 && RawDataEM[1][3][4] > 10) ? (RawDataEM[1][3][3] + RawDataEM[1][3][4]) : 0.0;
-	EMChannelP[4] = (RawDataEM[1][4][3] > 10 && RawDataEM[1][4][4] > 10) ? (RawDataEM[1][4][3] + RawDataEM[1][4][4]) : 0.0; 
+	EMChannelP[0] = (RawDataEM[1][0][4] > 10 && RawDataEM[1][0][5] > 10) ? (RawDataEM[1][0][4] + RawDataEM[1][0][5]) : 0.0;
+	EMChannelP[1] = (RawDataEM[1][1][4] > 10 && RawDataEM[1][1][5] > 10) ? (RawDataEM[1][1][4] + RawDataEM[1][1][5]) : 0.0;
+	EMChannelP[2] = (RawDataEM[1][2][4] > 10 && RawDataEM[1][2][5] > 10) ? (RawDataEM[1][2][4] + RawDataEM[1][2][5]) : 0.0;
+	EMChannelP[3] = (RawDataEM[1][3][4] > 10 && RawDataEM[1][3][5] > 10) ? (RawDataEM[1][3][4] + RawDataEM[1][3][5]) : 0.0;
+	EMChannelP[4] = (RawDataEM[1][4][4] > 10 && RawDataEM[1][4][5] > 10) ? (RawDataEM[1][4][4] + RawDataEM[1][4][5]) : 0.0; 
  
-	EMChannelN[0] = (RawDataEM[0][0][3] > 10 && RawDataEM[0][0][4] > 10) ? (RawDataEM[0][0][3] + RawDataEM[0][0][4]) : 0.0;
-	EMChannelN[1] = (RawDataEM[0][1][3] > 10 && RawDataEM[0][1][4] > 10) ? (RawDataEM[0][1][3] + RawDataEM[0][1][4]) : 0.0;
-	EMChannelN[2] = (RawDataEM[0][2][3] > 10 && RawDataEM[0][2][4] > 10) ? (RawDataEM[0][2][3] + RawDataEM[0][2][4]) : 0.0;
-	EMChannelN[3] = (RawDataEM[0][3][3] > 10 && RawDataEM[0][3][4] > 10) ? (RawDataEM[0][3][3] + RawDataEM[0][3][4]) : 0.0;
-	EMChannelN[4] = (RawDataEM[0][4][3] > 10 && RawDataEM[0][4][4] > 10) ? (RawDataEM[0][4][3] + RawDataEM[0][4][4]) : 0.0;
+	EMChannelN[0] = (RawDataEM[0][0][4] > 10 && RawDataEM[0][0][5] > 10) ? (RawDataEM[0][0][4] + RawDataEM[0][0][5]) : 0.0;
+	EMChannelN[1] = (RawDataEM[0][1][4] > 10 && RawDataEM[0][1][5] > 10) ? (RawDataEM[0][1][4] + RawDataEM[0][1][5]) : 0.0;
+	EMChannelN[2] = (RawDataEM[0][2][4] > 10 && RawDataEM[0][2][5] > 10) ? (RawDataEM[0][2][4] + RawDataEM[0][2][5]) : 0.0;
+	EMChannelN[3] = (RawDataEM[0][3][4] > 10 && RawDataEM[0][3][5] > 10) ? (RawDataEM[0][3][4] + RawDataEM[0][3][5]) : 0.0;
+	EMChannelN[4] = (RawDataEM[0][4][4] > 10 && RawDataEM[0][4][5] > 10) ? (RawDataEM[0][4][4] + RawDataEM[0][4][5]) : 0.0;
 
 
 

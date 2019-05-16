@@ -116,10 +116,10 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {
 					if (XorY == "Y"){
 
-						if (channel == 11 || channel == 15 || channel == 2 || channel == 6) { RPD_ROW_N[0]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
-						if (channel == 8  || channel == 12 || channel == 1 || channel == 5) { RPD_ROW_N[1]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
-						if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_N[2]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
-						if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_N[3]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			//R0
+						if (channel == 11 || channel == 15 || channel == 2 || channel == 6) { RPD_ROW_N[0]   += fC_of_TS456_Summed /* * OutPut_Weightedjeffsweights[channel]*/;}
+						if (channel == 8  || channel == 12 || channel == 1 || channel == 5) { RPD_ROW_N[1]   += fC_of_TS456_Summed /* * OutPut_Weightedjeffsweights[channel]*/;}
+						if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_N[2]   += fC_of_TS456_Summed /* * OutPut_Weightedjeffsweights[channel]*/;}
+						if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_N[3]   += fC_of_TS456_Summed /* * OutPut_Weightedjeffsweights[channel]*/;}			//R0
 					}		///////////////////////////////////////////////// IS THE ORDERING OF THE OUTPUT JEFF ARRAYS MATH DATA??																									 										//R1
 					else if (XorY == "X"){
 
@@ -140,10 +140,10 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[1][channel][7] <= RawDataRPD[1][channel][5]) && (RawDataRPD[1][channel][1] / RawDataRPD[1][channel][0] < 1000) && (RawDataRPD[1][channel][0] != 0)) {
 					if (XorY == "Y"){
 
-						if (channel == 11 || channel == 15 || channel == 2 || channel == 5) { RPD_ROW_P[0]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
-						if (channel == 8  || channel == 12 || channel == 1 || channel == 6) { RPD_ROW_P[1]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
-						if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_P[2]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}
-						if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_P[3]   += fC_of_TS456_Summed * OutPut_Weightedjeffsweights[channel];}			//R0
+						if (channel == 11 || channel == 15 || channel == 2 || channel == 5) { RPD_ROW_P[0]   += fC_of_TS456_Summed /* * OutPut_Weightedjeffsweights[channel]*/;}
+						if (channel == 8  || channel == 12 || channel == 1 || channel == 6) { RPD_ROW_P[1]   += fC_of_TS456_Summed /* * OutPut_Weightedjeffsweights[channel]*/;}
+						if (channel == 9  || channel == 13 || channel == 0 || channel == 4) { RPD_ROW_P[2]   += fC_of_TS456_Summed /* * OutPut_Weightedjeffsweights[channel]*/;}
+						if (channel == 10 || channel == 14 || channel == 3 || channel == 7) { RPD_ROW_P[3]   += fC_of_TS456_Summed /* * OutPut_Weightedjeffsweights[channel]*/;}			//R0
 					}	
 					else if (XorY == "X"){	
 																															 							                 	//R1
@@ -188,7 +188,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 					valuereturned = WeightedAverageRPD_P_Y;
 				}
 				else{
-					valuereturned = -10;
+					valuereturned = -102;
 				}
 			}
 		}
@@ -204,7 +204,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 					valuereturned = WeightedAverageRPD_N_X;
 				}
 				else{
-					valuereturned = -10;
+					valuereturned = -103;
 				}
 			}
 			else if (XorY == "Y"){
@@ -218,7 +218,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 					valuereturned = WeightedAverageRPD_N_Y;
 				}
 				else{
-					valuereturned = -10;
+					valuereturned = -104;
 				}
 			}
 		}
@@ -233,7 +233,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 		/// above used for debugging purposes
 	}
 	else if (EM_BEAM_POSITION == -10 || OutPut_Weightedjeffsweights[15] == -10 || OutPut_Weightedjeffsweights[0] == -10){
-		valuereturned = -10;
+		valuereturned = -105;
 	}
 
 	return valuereturned;
