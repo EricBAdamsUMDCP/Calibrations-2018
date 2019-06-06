@@ -42,7 +42,10 @@ You can do it, attend LPC CMS DAS in the winter.
 #ifndef RunWeighted_RPD_Beam_Position_Finder_Function
 #define RunWeighted_RPD_Beam_Position_Finder_Function
 
-double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPut_Weightedjeffsweights[16], double EM_BEAM_POSITION, const std::string& PosorNeg, const std::string& XorY) {
+double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double TEST_OutPut_Weightedjeffsweights[16], double EM_BEAM_POSITION, const std::string& PosorNeg, const std::string& XorY) {
+	// >>>>>>>> remove TEST_ from TEST_OutPut_Weightedjeffsweights[16]
+
+	double OutPut_Weightedjeffsweights[16] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-3 min///////////3 max/////////-3 min///////////3 max// Pos does Pos side...// X gives X axis of that side.../////Give = return actual value // 
 		/// ERROR MESSAGES////
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
@@ -55,13 +58,13 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 
 	const int NRPD = 16;
 	const int NRPDColnRow = 4;
-	const int NSIDE = 2;
+	//const int NSIDE = 2;
 	double AxisRPD[NRPDColnRow] = { -3.0, -1.0, 1.0, 3.0 };
-	double valuereturned;
+	double valuereturned = -10;
 	/////////////////////////////////////////////
 	//Begin ARRAY declaration for RPD constants//
 	/////////////////////////////////////////////
-	int RPDCorrectBlockOrder[NSIDE][NRPD] = {
+	/*int RPDCorrectBlockOrder[NSIDE][NRPD] = {
 											 {11, 15, 2, 6, 8, 12, 1, 5, 9, 13, 0, 4, 10, 14, 3, 7}, //neg =0
 											 {11, 15, 2, 5, 8, 12, 1, 6, 9, 13, 0, 4, 10, 14, 3, 7}  //pos =1
 	};
@@ -82,7 +85,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double OutPu
 	int RPDCorrectBlockOrderFORPLOTTING[NSIDE][NRPD] = { /// made plots look much better but still have questions
 														{11, 7, 3, 15, 12, 4, 8, 16, 5, 9, 13, 1, 6, 10, 14, 2}, //neg =0
 														{11, 7, 3, 15, 12, 8, 4, 16, 5, 9, 13, 1, 6, 10, 14, 2}  //pos =1
-	};
+	};*/
 
 
 

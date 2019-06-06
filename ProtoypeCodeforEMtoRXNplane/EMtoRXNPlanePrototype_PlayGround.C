@@ -37,11 +37,13 @@ int runnumber = 326776;
 void EMtoRXNPlanePrototype_PlayGround(){
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 5/14/2019 5:03:45 PM" << endl;
+	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/6/2019 2:20:19 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
-
+	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
+	
 	TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+	
 	TTree* ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 
 
@@ -175,171 +177,258 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	/// Begin filling variables with DATA/fC LOOP 
 	// https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
 
-	for (int i = 0; i < ZDCDigiTree->GetEntries(); i++) {
-		ZDCDigiTree->GetEntry(i);
 
-		for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
-			int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
-			int type = (int)(sectionLeaf->GetValue(n)) - 1;
-			int channel = (int)(channelLeaf->GetValue(n)) - 1;
-
-			/// Begin filling timeslices with fC (discrimination is by channel number iteration)
-
-			//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
-			//this is used below to keep values at 0 or greater
-			//40 fC nosie cuttoff 
-
-			double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
-			double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));
-			double TS_Two   = (fCleaf[2]->GetValue(n) <= 0) ? 0 : (fCleaf[2]->GetValue(n));
-			double TS_Three = (fCleaf[3]->GetValue(n) <= 0) ? 0 : (fCleaf[3]->GetValue(n));
-			double TS_Four  = (fCleaf[4]->GetValue(n) <= 0) ? 0 : (fCleaf[4]->GetValue(n));
-			double TS_Five  = (fCleaf[5]->GetValue(n) <= 0) ? 0 : (fCleaf[5]->GetValue(n));
-			double TS_Six   = (fCleaf[6]->GetValue(n) <= 0) ? 0 : (fCleaf[6]->GetValue(n));
-			double TS_Seven = (fCleaf[7]->GetValue(n) <= 0) ? 0 : (fCleaf[7]->GetValue(n));
-			double TS_Eight = (fCleaf[8]->GetValue(n) <= 0) ? 0 : (fCleaf[8]->GetValue(n));
-			double TS_Nine  = (fCleaf[9]->GetValue(n) <= 0) ? 0 : (fCleaf[9]->GetValue(n));
-
-			//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
-
-			double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
-
-			// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
-
-			if (type == EM){
-				for (int TS = 0; TS < NTS; TS++){
-					RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
-				}
-			}
-			else if (type == HAD){ //figure out what cutoff for HAD
-				for (int TS = 0; TS < NTS; TS++){
-					RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
-				}
-			}
-			else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
-				for (int TS = 0; TS < NTS; TS++){
-					if (side == 0){
-						RawDataRPD[side][INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[channel]][TS] = TS_ARRAY[TS];
+	//for (int h = 0; h < 2; h) { //THIS FOR LOOKS NEEDS TO BE ACTIVATED WHEN PART 2 IS ACTIVATED
+		for (int i = 0; i < ZDCDigiTree->GetEntries(); i++) {
+			ZDCDigiTree->GetEntry(i);
+	
+			for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
+				int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
+				int type = (int)(sectionLeaf->GetValue(n)) - 1;
+				int channel = (int)(channelLeaf->GetValue(n)) - 1;
+	
+				/// Begin filling timeslices with fC (discrimination is by channel number iteration)
+	
+				//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
+				//this is used below to keep values at 0 or greater
+				//40 fC nosie cuttoff 
+	
+				double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
+				double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));
+				double TS_Two   = (fCleaf[2]->GetValue(n) <= 0) ? 0 : (fCleaf[2]->GetValue(n));
+				double TS_Three = (fCleaf[3]->GetValue(n) <= 0) ? 0 : (fCleaf[3]->GetValue(n));
+				double TS_Four  = (fCleaf[4]->GetValue(n) <= 0) ? 0 : (fCleaf[4]->GetValue(n));
+				double TS_Five  = (fCleaf[5]->GetValue(n) <= 0) ? 0 : (fCleaf[5]->GetValue(n));
+				double TS_Six   = (fCleaf[6]->GetValue(n) <= 0) ? 0 : (fCleaf[6]->GetValue(n));
+				double TS_Seven = (fCleaf[7]->GetValue(n) <= 0) ? 0 : (fCleaf[7]->GetValue(n));
+				double TS_Eight = (fCleaf[8]->GetValue(n) <= 0) ? 0 : (fCleaf[8]->GetValue(n));
+				double TS_Nine  = (fCleaf[9]->GetValue(n) <= 0) ? 0 : (fCleaf[9]->GetValue(n));
+	
+				//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
+	
+				double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
+	
+				// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
+	
+				if (type == EM){
+					for (int TS = 0; TS < NTS; TS++){
+						RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
 					}
-					else{
-						RawDataRPD[side][channel][TS] = TS_ARRAY[TS];
-					}	  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
-					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
+				}
+				else if (type == HAD){ //figure out what cutoff for HAD
+					for (int TS = 0; TS < NTS; TS++){
+						RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
+					}
+				}
+				else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
+					for (int TS = 0; TS < NTS; TS++){
+						if (side == 0){
+							RawDataRPD[side][INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[channel]][TS] = TS_ARRAY[TS];
+						}
+						else{
+							RawDataRPD[side][channel][TS] = TS_ARRAY[TS];
+						}	  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+						//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
+					}
 				}
 			}
-		}
-
-		//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
-		//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
 	
-		PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
-		NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
-		// bug test this to see if its running when neg for pos and pos for neg
+			//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
+			//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
 		
-		JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
-		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+			PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
+			NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
+			// bug test this to see if its running when neg for pos and pos for neg
+			
+			
 
-
-
-		P_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
-		N_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "X");
-
-		P_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "Y");
-		/*cout << "PEMG" << PEMG << endl; //used for trouble shooting jeffweighter when its off there is a bug but i dont know what
-		cout << "P_RPD_Beam_Position_Value_X " << P_RPD_Beam_Position_Value_X << endl;
-		cout << "P_RPD_Beam_Position_Value_Y " << P_RPD_Beam_Position_Value_Y << endl;*/
-		N_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "Y");
-		/*cout << "NEMG" << NEMG << endl; //used for trouble shooting jeffweighter when its off there is a bug but i dont know what
-		cout << "N_RPD_Beam_Position_Value_X " << N_RPD_Beam_Position_Value_X << endl;
-		cout << "N_RPD_Beam_Position_Value_Y " << N_RPD_Beam_Position_Value_Y << endl;*/
-
-			/// remeber to change the ru nwerighted rpd beam headerr back asxd i chanegd the output vgalues!!!!!!!!!!!!!!!!
-
-		if (PEMG != -10 && NEMG != -10){
-			EMPvEMN->Fill(PEMG, NEMG);
-		}
-
-		if (P_RPD_Beam_Position_Value_Y != -10 && N_RPD_Beam_Position_Value_Y != -10){
-
-			RPDYP_v_RPDYN->Fill(P_RPD_Beam_Position_Value_Y, N_RPD_Beam_Position_Value_X);
-		}
-
-		if (P_RPD_Beam_Position_Value_X != -10 && N_RPD_Beam_Position_Value_X != -10){
-			RPDXP_v_RPDXN->Fill(P_RPD_Beam_Position_Value_X, N_RPD_Beam_Position_Value_X);
-		}
-
-		if (P_RPD_Beam_Position_Value_X != -10){
-			RPDX_P_BEAM->Fill(P_RPD_Beam_Position_Value_X);
-			if (P_RPD_Beam_Position_Value_Y != -10){
-				Pos_RPDvRPD->Fill(P_RPD_Beam_Position_Value_X, P_RPD_Beam_Position_Value_Y);
+			/*JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg); //uncomment this to reactivate jeff weighter theese are deactivated to look for bugs in otehr software
+			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);*/
+	
+	
+	
+			P_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
+			N_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "X");
+	
+			P_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "Y");
+			/*cout << "PEMG" << PEMG << endl; //used for trouble shooting jeffweighter when its off there is a bug but i dont know what
+			cout << "P_RPD_Beam_Position_Value_X " << P_RPD_Beam_Position_Value_X << endl;
+			cout << "P_RPD_Beam_Position_Value_Y " << P_RPD_Beam_Position_Value_Y << endl;*/
+			N_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "Y");
+			/*cout << "NEMG" << NEMG << endl; //used for trouble shooting jeffweighter when its off there is a bug but i dont know what
+			cout << "N_RPD_Beam_Position_Value_X " << N_RPD_Beam_Position_Value_X << endl;
+			cout << "N_RPD_Beam_Position_Value_Y " << N_RPD_Beam_Position_Value_Y << endl;*/
+	
+				/// remeber to change the ru nwerighted rpd beam headerr back asxd i chanegd the output vgalues!!!!!!!!!!!!!!!!
+	
+			if (PEMG != -10 && NEMG != -10){
+				EMPvEMN->Fill(PEMG, NEMG);
 			}
-		}
-		if(N_RPD_Beam_Position_Value_X != -10){
-			RPDX_N_BEAM->Fill(N_RPD_Beam_Position_Value_X);
-			if (N_RPD_Beam_Position_Value_Y != -10){
-				Neg_RPDvRPD->Fill(N_RPD_Beam_Position_Value_X, N_RPD_Beam_Position_Value_Y);
+	
+			if (P_RPD_Beam_Position_Value_Y != -10 && N_RPD_Beam_Position_Value_Y != -10){
+	
+				RPDYP_v_RPDYN->Fill(P_RPD_Beam_Position_Value_Y, N_RPD_Beam_Position_Value_X);
 			}
-		}
-
-		if ( N_RPD_Beam_Position_Value_X != -10){
-			RPDX_N_BEAM->Fill(N_RPD_Beam_Position_Value_X);
-		}
-
-		if ( PEMG != -10){
-			EM_P_BEAM->Fill( PEMG);	
+	
+			if (P_RPD_Beam_Position_Value_X != -10 && N_RPD_Beam_Position_Value_X != -10){
+				RPDXP_v_RPDXN->Fill(P_RPD_Beam_Position_Value_X, N_RPD_Beam_Position_Value_X);
+			}
+	
 			if (P_RPD_Beam_Position_Value_X != -10){
-			
-			Pos_EMX_v_RPDX->Fill(PEMG, P_RPD_Beam_Position_Value_X);
-			
+				RPDX_P_BEAM->Fill(P_RPD_Beam_Position_Value_X);
+				if (P_RPD_Beam_Position_Value_Y != -10){
+					Pos_RPDvRPD->Fill(P_RPD_Beam_Position_Value_X, P_RPD_Beam_Position_Value_Y);
+				}
 			}
-		}
-		if (NEMG != -10){ 
-			EM_N_BEAM->Fill( NEMG);
 			if(N_RPD_Beam_Position_Value_X != -10){
-
-			Neg_EMX_v_RPDX->Fill(NEMG, N_RPD_Beam_Position_Value_X);
+				RPDX_N_BEAM->Fill(N_RPD_Beam_Position_Value_X);
+				if (N_RPD_Beam_Position_Value_Y != -10){
+					Neg_RPDvRPD->Fill(N_RPD_Beam_Position_Value_X, N_RPD_Beam_Position_Value_Y);
+				}
 			}
-		}
-
-
-
-		/*for (int i = 0; i <15; i++){
-			cout << i << ": " << OutPut_WeightedjeffsweightsPos[i] << " EM: " << PEMG << endl;
-		}
-*/
-
-
-	/*	if (chicken != -10){
-		EM_N_BEAM->Fill( chicken);
-		}*/
-
-		//cout << "X beam" << " " << chicken << endl;
-
-		// PUT IN JEFF WEIGHTER 3000
-
-		/*cout << PEMG << endl;
-
-		if (PEMG < 0){
-			cout << "negative" << endl;
-		}
-		else if (PEMG > 0){
-			cout << "Positive" << endl;
-		}
-		else {
-			cout << "ZERO" << endl;
-		}*/
-		
-		/*JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
 	
-			//PUT IN THING TO KILL OFF OLD MEMORY ADRESSES
-		cout << "event " << i << endl;
-		for (int i = 0; i <16; i++){
-			cout << "OutPut_WeightedjeffsweightsPos " << i << ": " << OutPut_WeightedjeffsweightsPos[i] << endl;
+			if ( N_RPD_Beam_Position_Value_X != -10){
+				RPDX_N_BEAM->Fill(N_RPD_Beam_Position_Value_X);
+			}
+	
+			if ( PEMG != -10){
+				EM_P_BEAM->Fill( PEMG);	
+				if (P_RPD_Beam_Position_Value_X != -10){
+				
+				Pos_EMX_v_RPDX->Fill(PEMG, P_RPD_Beam_Position_Value_X);
+				
+				}
+			}
+			if (NEMG != -10){ 
+				EM_N_BEAM->Fill( NEMG);
+				if(N_RPD_Beam_Position_Value_X != -10){
+	
+				Neg_EMX_v_RPDX->Fill(NEMG, N_RPD_Beam_Position_Value_X);
+				}
+			}
+	
+	
+	
+			/*for (int i = 0; i <15; i++){
+				cout << i << ": " << OutPut_WeightedjeffsweightsPos[i] << " EM: " << PEMG << endl;
+			}
+*/	
+	
+	
+		/*	if (chicken != -10){
+			EM_N_BEAM->Fill( chicken);
+			}*/
+	
+			//cout << "X beam" << " " << chicken << endl;
+	
+			// PUT IN JEFF WEIGHTER 3000
+	
+			/*cout << PEMG << endl;
+	
+			if (PEMG < 0){
+				cout << "negative" << endl;
+			}
+			else if (PEMG > 0){
+				cout << "Positive" << endl;
+			}
+			else {
+				cout << "ZERO" << endl;
+			}*/
+			
+			/*JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+		
+				//PUT IN THING TO KILL OFF OLD MEMORY ADRESSES
+			cout << "event " << i << endl;
+			for (int i = 0; i <16; i++){
+				cout << "OutPut_WeightedjeffsweightsPos " << i << ": " << OutPut_WeightedjeffsweightsPos[i] << endl;
+			}*/
+			
+			
+			if (i % 100000 == 0) cout << i << " events are processed." << endl;
+		}
+
+/*		//THIS IS FOR PART 2 THE PURPOSE IS AFTER WEVE GOTTEN THE INFORATION TO RECENTER FROM THE RXN PLANE CALCULATER FUNCTION WE NEED TO USE THAT INFORMATION TO RECENTER
+
+		for (int i = 0; i < ZDCDigiTree->GetEntries(); i++) {
+			ZDCDigiTree->GetEntry(i);
+	
+			for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
+				int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
+				int type = (int)(sectionLeaf->GetValue(n)) - 1;
+				int channel = (int)(channelLeaf->GetValue(n)) - 1;
+	
+				/// Begin filling timeslices with fC (discrimination is by channel number iteration)
+	
+				//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
+				//this is used below to keep values at 0 or greater
+				//40 fC nosie cuttoff 
+	
+				double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
+				double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));
+				double TS_Two   = (fCleaf[2]->GetValue(n) <= 0) ? 0 : (fCleaf[2]->GetValue(n));
+				double TS_Three = (fCleaf[3]->GetValue(n) <= 0) ? 0 : (fCleaf[3]->GetValue(n));
+				double TS_Four  = (fCleaf[4]->GetValue(n) <= 0) ? 0 : (fCleaf[4]->GetValue(n));
+				double TS_Five  = (fCleaf[5]->GetValue(n) <= 0) ? 0 : (fCleaf[5]->GetValue(n));
+				double TS_Six   = (fCleaf[6]->GetValue(n) <= 0) ? 0 : (fCleaf[6]->GetValue(n));
+				double TS_Seven = (fCleaf[7]->GetValue(n) <= 0) ? 0 : (fCleaf[7]->GetValue(n));
+				double TS_Eight = (fCleaf[8]->GetValue(n) <= 0) ? 0 : (fCleaf[8]->GetValue(n));
+				double TS_Nine  = (fCleaf[9]->GetValue(n) <= 0) ? 0 : (fCleaf[9]->GetValue(n));
+	
+				//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
+	
+				double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
+	
+				// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
+	
+				if (type == EM){
+					for (int TS = 0; TS < NTS; TS++){
+						RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
+					}
+				}
+				else if (type == HAD){ //figure out what cutoff for HAD
+					for (int TS = 0; TS < NTS; TS++){
+						RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
+					}
+				}
+				else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
+					for (int TS = 0; TS < NTS; TS++){
+						if (side == 0){
+							RawDataRPD[side][INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[channel]][TS] = TS_ARRAY[TS];
+						}
+						else{
+							RawDataRPD[side][channel][TS] = TS_ARRAY[TS];
+						}	  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+						//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
+					}
+				}
+			}
+	
+			//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
+			//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
+		
+			PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
+			NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
+			// bug test this to see if its running when neg for pos and pos for neg
+			
+			JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
+			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+	
+	
+	
+			P_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
+			N_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "X");
+	
+			P_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "Y");
+			
+			N_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "Y");
+
+			//part 2 can grab stuff saved to a root tree instead of redoing calculation may make it faster??? eg rxn plane of em position
+			
+			if (i % 100000 == 0) cout << i << " events are processed." << endl;
 		}*/
 		
 		
-		if (i % 100000 == 0) cout << i << " events are processed." << endl;
-	}
+	//} //THIS BRAKET IS FOR THE FOR LOOP FOR PART 2 <<<<<-------
 
 
 	/// END filling variables with DATA/fC LOOP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -383,7 +472,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
 	
 	EMPvEMN->Draw("colz");
-	c2->SaveAs(Form("ZDC_figures/EMtoRXNPlanePrototype_PlayGround_%d/EMPvsEMN%d.png", runnumber, stit2[1], runnumber));
+	c2->SaveAs(Form("ZDC_figures/EMtoRXNPlanePrototype_PlayGround_%d/EMPvsEMN%d.png", runnumber, runnumber));
 
 	Pos_EMX_v_RPDX->Draw("colz");
 	c2->SaveAs(Form("ZDC_figures/EMtoRXNPlanePrototype_PlayGround_%d/%s_XRPD_Beam_Position_v_EM_%d.png", runnumber, stit2[1], runnumber));
