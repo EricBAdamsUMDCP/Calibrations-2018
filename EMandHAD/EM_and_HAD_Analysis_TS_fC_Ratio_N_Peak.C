@@ -31,13 +31,16 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
  
   TH1::SetDefaultSumw2();
 
-  //LOG THIS CODE IS HAITUS UNTIL WE HAVE A LARGER WORKING DATA SET AS FINDING THE NEUTRON PEAKS IS HARDER WHEN INCLUDING THE EM SECTION AND THE PEAKS ARE ALREADY HARD TO FIND, A CRAB JOB IS NECESSARY
-
-cout << "running software EM_TS_DIST.C 5/13/2019 4:16:14 PM" << endl;
+  
+  cout << "running software EM_TS_DIST.C 6/7/2019 2:58:58 PM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
-  TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+  
+  TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
+
+  //TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+  
   //TTree *ZDCRecTree = (TTree*)f->Get("ZDCRecTree"); // reading ZDC rec tree
   TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
   const int NSIDE=2; const char* stit[NSIDE] = {"#minus","#plus"};  const char* stit2[NSIDE] = {"neg","pos"};
@@ -46,8 +49,9 @@ cout << "running software EM_TS_DIST.C 5/13/2019 4:16:14 PM" << endl;
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
-  int multiplicativevalue = 0;
+  double multiplicativevalue = 0.05; //closer to zero is better results
   
+  int cutoff = 70;
 
   TH1F* em[2][5];
   TH1F* emfC[2][5];
@@ -73,8 +77,8 @@ cout << "running software EM_TS_DIST.C 5/13/2019 4:16:14 PM" << endl;
     }
   }*/
 
-  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %d*P_SumEMfC", runnumber, multiplicativevalue),200,0,1000);
-  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %d*N_SumEMfC", runnumber, multiplicativevalue),200,0,1000);
+  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC", runnumber, multiplicativevalue),200,0,1000);
+  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC", runnumber, multiplicativevalue),200,0,1000);
 
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 4; ich++){
@@ -95,8 +99,8 @@ cout << "running software EM_TS_DIST.C 5/13/2019 4:16:14 PM" << endl;
   RATIOPN_FourtoThree = new TH2F(("RATIOPN_FourtoThree"),("RATIOPN_FourtoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);
   RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
 
-  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE; Sum HAD + %d * EM (fC); EM (fC)", multiplicativevalue), 70, 0, 1000, 70, 0, 10000);
-  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE; Sum HAD + %d * EM (fC); EM (fC)", multiplicativevalue), 70, 0, 1000, 70, 0, 10000);
+  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 70, 0, 1000, 70, 0, 10000);
+  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 70, 0, 1000, 70, 0, 10000);
 
 
   const int NTS=10;            // number of timeslices
@@ -112,7 +116,7 @@ cout << "running software EM_TS_DIST.C 5/13/2019 4:16:14 PM" << endl;
   TLeaf* adcLeaf[NTS];
   TLeaf* fCleaf[NTS];
 
-  int cutoff = 85;
+  
 
 
   double w[2][2][5] = {

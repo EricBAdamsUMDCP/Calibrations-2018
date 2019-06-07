@@ -37,7 +37,7 @@ int runnumber = 326776;
 void EMtoRXNPlanePrototype_PlayGround(){
 	initRootStyle();
 	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/6/2019 2:20:19 PM" << endl;
+	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/7/2019 3:31:48 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
@@ -242,19 +242,19 @@ void EMtoRXNPlanePrototype_PlayGround(){
 			
 			
 
-			/*JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg); //uncomment this to reactivate jeff weighter theese are deactivated to look for bugs in otehr software
-			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);*/
+			/*JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);*/ //uncomment this to reactivate jeff weighter theese are deactivated to look for bugs in otehr software
+			/*JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);*/
 	
 	
 	
 			P_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
-			N_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "X");
+			N_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsNeg, NEMG, "Neg", "X");
 	
 			P_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "Y");
 			/*cout << "PEMG" << PEMG << endl; //used for trouble shooting jeffweighter when its off there is a bug but i dont know what
 			cout << "P_RPD_Beam_Position_Value_X " << P_RPD_Beam_Position_Value_X << endl;
 			cout << "P_RPD_Beam_Position_Value_Y " << P_RPD_Beam_Position_Value_Y << endl;*/
-			N_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, NEMG, "Neg", "Y");
+			N_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsNeg, NEMG, "Neg", "Y");
 			/*cout << "NEMG" << NEMG << endl; //used for trouble shooting jeffweighter when its off there is a bug but i dont know what
 			cout << "N_RPD_Beam_Position_Value_X " << N_RPD_Beam_Position_Value_X << endl;
 			cout << "N_RPD_Beam_Position_Value_Y " << N_RPD_Beam_Position_Value_Y << endl;*/
