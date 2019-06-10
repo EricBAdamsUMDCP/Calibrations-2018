@@ -8,6 +8,8 @@ it needs the fC of all 16 blocks in a RPD the weights by which to calibrate the 
 
 Eric Adams
 
+this software IS SIMILAR TO CalculatesandReturnsReactionPlane.h but is >>>>NOT<<<< identical. This softrware is used to calcualte the recentering values to be used by CalculatesandReturnsReactionPlane.h to recenter the beam EVENT BY EVENT.
+This software must run over the entire data set then pass its output to CalculatesandReturnsReactionPlane.h for a succesful reaction plane to be caluclated.
 
 TO THE FUTURE PERSON WHO READS THIS,
 IF YOU FIND THE CODE HARD OR THIS CONFUSNG...
@@ -25,23 +27,22 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 #include <stdexcept>
 #include <math.h> //for atan2 as it is a math fu c could also use tmath but i want to avoid any root outside of plotting
 
-#ifndef CalculatesandReturnsReactionPlane
-#define CalculatesandReturnsReactionPlane
+#ifndef CalculatesandReturnsQObsforRecentering
+#define CalculatesandReturnsQObsforRecentering
 
-double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut_Weightedjeffsweights[16], const std::string& PosorNeg, double INPUT_V1_MEANandSIGMA_FOR_Recentering[4], double INPUT_OutPut_V2_MEANandSIGMA_FOR_Recentering[4], double (&OutPut_RPDfC_X_Y_coord)[16]){
+void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], double OutPut_Weightedjeffsweights[16], const std::string& PosorNeg, double &Q_Observed_V1_X, double &Q_Observed_V1_Y, double &Q_Observed_V2_X, double &Q_Observed_V2_Y){
 	//errors
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
 		throw std::runtime_error("ERROR: PosorNeg must be set to Pos or Neg, input variable 4 , RPD_Beam_Position_Finder.h");
 	}
 
 	//if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {}	
-	if (EM_BEAM_POSITION != -10 && OutPut_Weightedjeffsweights[15] != -10 && OutPut_Weightedjeffsweights[0] != -10){ // -10 is the value returned by functions if a bad event was measured and the functions are designed to ignore bad evets
+	if (OutPut_Weightedjeffsweights[15] != -10 && OutPut_Weightedjeffsweights[0] != -10){ // -10 is the value returned by functions if a bad event was measured and the functions are designed to ignore bad evets
 	//decleration of constants and arrays
 		const int NSIDE = 2;
 		const int NRPD = 16;
 		const int NXY = 2;
-		double EPv1Angle[NSIDE] = {-10, -10};
-		double EPv2Angle[NSIDE] = {-10, -10};
+		const char* xytit[NXY] = {"x","y"};
 		float  RPDSignalSummed[NSIDE] = {0};
 		float  cosv1RPDsum[NSIDE] = {0};
 		float  sinv1RPDsum[NSIDE] = {0};
@@ -54,9 +55,36 @@ double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut
 		double Y_position_cm[2][16] = {{-1, 1, 3, -3, -1, 1, 3, -3, 1, -1, -3, 3, 1, -1, -3, 3},  //neg
 									   {-1, 1, 3, -3, -1, 3, 1, -3, 1, -1, -3, 3, 1, -1, -3, 3}}; //pos 
 	
-		// for recentering calibration, from Qobs distributions
+		// for recentering calibration, from Qobs distributions.
+ 		
+		//HINT: Q is the flow >vector< look it up, the RPD measures a flow vector.
+
+ 		float Qobs1_mean[NXY] = {0};
+ 		float Qobs2_mean[NXY] = {0};
+ 		float Qobs1_sigma[NXY] = {1};
+ 		float Qobs2_sigma[NXY] = {1};
+
+
+ 		float Q1xRecentered = -10;
+		float Q1yRecentered = -10;
+		float Q2xRecentered = -10;
+		float Q2yRecentered = -10;
+ 		
+
+
+		//BEGIN PLOTS: the plots are used so root can store then later take a mean and sigma
+ 		/*TH1F* Qobs1[NXY];
+		TH1F* Qobs2[NXY];
+
+		for(int ixy=0;ixy<2;ixy++)
+    		{
+    		  Qobs1[ixy] = new TH1F(Form("Qobs1dist_%s_%s", PosorNeg, xytit[ixy]),Form("Q^{obs}_{1,%s}%s distribution;Q^{obs}_{1,%s};[a.u.]",xytit[ixy],PosorNeg,xytit[ixy]),100,-6,6);
+    		  Qobs2[ixy] = new TH1F(Form("Qobs2dist_%s_%s", PosorNeg, xytit[ixy]),Form("Q^{obs}_{2,%s}%s distribution;Q^{obs}_{2,%s};[a.u.]",xytit[ixy],PosorNeg,xytit[ixy]),100,-6,6);
+    		}
+    	//END PLOTS*/
 	
-	
+		///THIS SEEMS LIKE A POTENTIAL MEMORY LEAK, THESE PLOTS THAT APPEAR THEN ARE NOT DEALLOCATED BC ROOT IS DUMB, BASED ON HOW THE FUNCTION WORKS
+
 		// Declare variables for sums of TS fCs (456 is main signal of RPD and 45 is main signal of EM and HAD)
 		double fC_of_TS45_Summed = 0;
 		double fC_of_TS456_Summed = 0;
@@ -88,19 +116,23 @@ double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut
 
 					//ask alice how recentering works
 
-					Q1xRecentered = (cosv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[0])/Qobs1_sigma[0];
-					Q1yRecentered = (sinv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[1])/Qobs1_sigma[1];
-					Q2xRecentered = (cosv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[0])/Qobs2_sigma[0];
-					Q2yRecentered = (sinv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[1])/Qobs2_sigma[1];
-					
-
-
-
 
 				}
 			}
+
+			Q_Observed_V1_X = (cosv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[0])/Qobs1_sigma[0]; //note these are not actually recontered bc we dont have the mean or sigma yet
+			Q_Observed_V1_Y = (sinv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[1])/Qobs1_sigma[1];
+			Q_Observed_V2_X = (cosv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[0])/Qobs2_sigma[0];
+			Q_Observed_V2_Y = (sinv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[1])/Qobs2_sigma[1];
+
+			/*Qobs1[0]->Fill(Q1xRecentered);
+			Qobs1[1]->Fill(Q1yRecentered);
+			Qobs2[0]->Fill(Q2xRecentered);
+			Qobs2[1]->Fill(Q2yRecentered);*/
+
+			//THIS IS GETTING WEIRD IF THIS FUNCTION IS IN A LOOPIT WILL JYST CONTINUALLY MNAKE HISTOGRAMS I THINK THE MEAN HAS TO BE TAKEN OUTSIDE OF THIS FUNCTION
 		}
-		else {
+		else if (PosorNeg == "Neg"){
 			/*for(int RPD=0; RPD < NRPD; RPD++){
 		    	//generates blocks as polar coordinates
 		    	RPDBlocksInPhi[1][RPD] = atan2(Y_position_cm[1][RPD],X_position_cm[1][RPD]);
@@ -119,39 +151,19 @@ double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut
 					cosv2RPDsum[0] += cos(2*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
 					sinv2RPDsum[0] += sin(2*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
 					
-
-					//ask alice how recentering works
-
-					 // for recentering calibration, from Qobs distributions
- 					/*
- 					float Qobs1_mean[NSIDE][NXY] = {{0}};
- 					float Qobs2_mean[NSIDE][NXY] = {{0}};
- 					float Qobs1_sigm[NSIDE][NXY] = {{1}};
- 					float Qobs2_sigm[NSIDE][NXY] = {{1}};
- 					*/
-
 				}
 			}
+
+			Q_Observed_V1_X = (cosv1RPDsum[0]/RPDSignalSummed[0]-Qobs1_mean[0])/Qobs1_sigma[0];
+			Q_Observed_V1_Y = (sinv1RPDsum[0]/RPDSignalSummed[0]-Qobs1_mean[1])/Qobs1_sigma[1];
+			Q_Observed_V2_X = (cosv2RPDsum[0]/RPDSignalSummed[0]-Qobs2_mean[0])/Qobs2_sigma[0];
+			Q_Observed_V2_Y = (sinv2RPDsum[0]/RPDSignalSummed[0]-Qobs2_mean[1])/Qobs2_sigma[1];
+			
 		}
-				//convert quartz blocks into polar coordinates.. I think this should be something I calculate once and store as a permanent array I can make this with what olivers code does
-
-				// do i need to calculate q mean and q sigma?? yes to caulculate the q coreelation vectors
-
-				//calcualte Q psi 
-
-				// NEED to sit down the week of the 29th abd break down liver/mates event plane code and figure out what is good and what I need after discussing with alice
-				//to properly calculate the event plane
-
-
-				/// I NEED TO THINK ABOUT HOW TO WRITE THIS CODE FOR EASE OF CALIBRATIO NBY WHICH I MEAN EVENT PLANE FLATTENING...
-				
-				/// I NEED TOSEPERATE OUT THE RECENTERING FROM THIS HEADER SO RECENTERING AND RESOLUTION CAN BE RUN LATER AND THEREFORE NOT REQUIRE MANUAL INTERVENTION
-				/// create seperate reaction plane resolution funtion
-				/// I CAN HAVE THE OUTPT OF THIS GO INTO MAKING Q OBS PLOTS WHICH CAN THEN HAVE THE MEAN AND SIGMA AUTOMATICALLY CALLED BY ROOT THEN PASSED ONTO THE RECENTERING AND RESOLUTION FUNCTION
 		
 	}
 	else{
-		return -10;
+		Q_Observed_V1_X = -10; Q_Observed_V1_Y = -10; Q_Observed_V2_X = -10; Q_Observed_V2_Y = -10; //-10 is the bad data or processing warning number informing functions they should skip the event and move onto the next one
 	}
 
 }

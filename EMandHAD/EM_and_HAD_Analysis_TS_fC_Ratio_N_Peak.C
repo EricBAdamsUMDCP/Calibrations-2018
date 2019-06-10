@@ -32,7 +32,7 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH1::SetDefaultSumw2();
 
   
-  cout << "running software EM_TS_DIST.C 6/7/2019 2:58:58 PM" << endl;
+  cout << "running software EM_TS_DIST.C 6/10/2019 6:11:51 PM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
@@ -49,9 +49,9 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
-  double multiplicativevalue = 0.05; //closer to zero is better results
+  double multiplicativevalue = 0.15; //closer to zero is better results
   
-  int cutoff = 70;
+  int cutoff = 0; //cutoff of 70 appears to be good
 
   TH1F* em[2][5];
   TH1F* emfC[2][5];
@@ -76,14 +76,15 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
       emfC[iside][ich] = new TH1F(Form("emfC %s %d",stit2[iside],ich+1),Form("EMfC%s channel %d fC",stit[iside],ich+1),500,0,2000);
     }
   }*/
+  
 
-  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC", runnumber, multiplicativevalue),200,0,1000);
-  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC", runnumber, multiplicativevalue),200,0,1000);
+  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC", runnumber, multiplicativevalue),300,0,100000);
+  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC", runnumber, multiplicativevalue),300,0,100000);
 
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 4; ich++){
       HAD[iside][ich]   = new TH1F(Form("HAD %s %d",stit2[iside],ich+1),Form("HAD%s channel %d",stit[iside],ich+1),10,0,9);
-      HADfC[iside][ich] = new TH1F(Form("HADfC %s %d",stit2[iside],ich+1),Form("HADfC%s channel %d fC",stit[iside],ich+1),200,0,400000);
+      HADfC[iside][ich] = new TH1F(Form("HADfC %s %d",stit2[iside],ich+1),Form("HADfC%s channel %d fC",stit[iside],ich+1),300,0,400000);
     }
   }
 
@@ -99,8 +100,9 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   RATIOPN_FourtoThree = new TH2F(("RATIOPN_FourtoThree"),("RATIOPN_FourtoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);
   RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
 
-  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 70, 0, 1000, 70, 0, 10000);
-  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 70, 0, 1000, 70, 0, 10000);
+//cghanged nbins from 70 to 150
+  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 700, 0, 100000, 700, 0, 100000);
+  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 700, 0, 100000, 700, 0, 100000);
 
 
   const int NTS=10;            // number of timeslices
