@@ -18,7 +18,7 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 
 4/12/19 */
 
-// last edited (if I remebered to change this... 5/7/2019 11:49:39 AM)
+// last edited (if I remebered to change this... 6/11/2019 11:48:11 AM)
 
 
 #include <string>
@@ -28,27 +28,34 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 #ifndef CalculatesandReturnsReactionPlane
 #define CalculatesandReturnsReactionPlane
 
-double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut_Weightedjeffsweights[16], const std::string& PosorNeg, double INPUT_V1_MEANandSIGMA_FOR_Recentering[4], double INPUT_OutPut_V2_MEANandSIGMA_FOR_Recentering[4], double (&OutPut_RPDfC_X_Y_coord)[16]){
-	//errors
+void CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double Input_Weightedjeffsweights[16], const std::string& PosorNeg, const std::string& V1orV2, double INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2], double INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2], double (&OutPut_RPDfC_X_Y_coord)[16], double (&OutPut_RPD_Event_Plane_Psi)){
+	//errors ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////array is as follows [X, Y]
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
-		throw std::runtime_error("ERROR: PosorNeg must be set to Pos or Neg, input variable 4 , RPD_Beam_Position_Finder.h");
+		throw std::runtime_error("ERROR: PosorNeg must be set to Pos or Neg, input variable 3, CalculatesandReturnsReactionPlane.h");
+	}
+
+	if (V1orV2 != "V1" && V1orV2 != "V2") {
+		throw std::runtime_error("ERROR: V1orV2 must be set to V1 or V2, input variable 4 , CalculatesandReturnsReactionPlane.h");
 	}
 
 	//if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {}	
-	if (EM_BEAM_POSITION != -10 && OutPut_Weightedjeffsweights[15] != -10 && OutPut_Weightedjeffsweights[0] != -10){ // -10 is the value returned by functions if a bad event was measured and the functions are designed to ignore bad evets
+	if ( Input_Weightedjeffsweights[15] != -10 && Input_Weightedjeffsweights[0] != -10){ // -10 is the value returned by functions if a bad event was measured and the functions are designed to ignore bad evets
 	//decleration of constants and arrays
 		const int NSIDE = 2;
 		const int NRPD = 16;
-		const int NXY = 2;
-		double EPv1Angle[NSIDE] = {-10, -10};
-		double EPv2Angle[NSIDE] = {-10, -10};
 		float  RPDSignalSummed[NSIDE] = {0};
+		
 		float  cosv1RPDsum[NSIDE] = {0};
 		float  sinv1RPDsum[NSIDE] = {0};
+		float Recentered_Q_Observed_V1_X = 0;
+		float Recentered_Q_Observed_V1_Y = 0;
+
 		float  cosv2RPDsum[NSIDE] = {0};
 		float  sinv2RPDsum[NSIDE] = {0};
+		float Recentered_Q_Observed_V2_X = 0;
+		float Recentered_Q_Observed_V2_Y = 0;
 		//look up tables for RPD positions created by EBA 5/15/19 
-		double X_position_cm[2][16] = {{1, 1, 1, 1, 3, 3, 3,   3, -3, -3, -3, -3, -1, -1, -1, -1},  //neg
+		double X_position_cm[2][16] = {{1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1},  //neg
 								   	   {1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1}}; //pos
 	
 		double Y_position_cm[2][16] = {{-1, 1, 3, -3, -1, 1, 3, -3, 1, -1, -3, 3, 1, -1, -3, 3},  //neg
@@ -69,10 +76,6 @@ double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut
   	
   		if (PosorNeg == "Pos"){
 
-		    /*for(int RPD=0; RPD < NRPD; RPD++){
-		    	//generates blocks as polar coordinates
-		    	RPDBlocksInPhi[1][RPD] = atan2(Y_position_cm[1][RPD],X_position_cm[1][RPD]);
-		    }*/
   			for (int channel = 0; channel < NRPD; channel++){
 		    	fC_of_TS45_Summed  = RawDataRPD[1][channel][4] + RawDataRPD[1][channel][5];
 				fC_of_TS456_Summed = RawDataRPD[1][channel][4] + RawDataRPD[1][channel][5] + RawDataRPD[1][channel][6];
@@ -80,31 +83,35 @@ double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut
 				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[1][channel][7] <= RawDataRPD[1][channel][5]) && (RawDataRPD[1][channel][1] / RawDataRPD[1][channel][0] < 1000) && (RawDataRPD[1][channel][0] != 0)) {
 					RPDSignalSummed[1] += fC_of_TS456_Summed;
 					
-					cosv1RPDsum[1] += cos(1*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
- 					sinv1RPDsum[1] += sin(1*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
- 					cosv2RPDsum[1] += cos(2*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
- 					sinv2RPDsum[1] += sin(2*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
-					
+					if (V1orV2 == "V1"){
+						cosv1RPDsum[1] += cos(1*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
+ 						sinv1RPDsum[1] += sin(1*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
+ 					}
+ 					else{
+ 						cosv2RPDsum[1] += cos(2*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
+ 						sinv2RPDsum[1] += sin(2*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
+					}
 
 					//ask alice how recentering works
-
-					Q1xRecentered = (cosv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[0])/Qobs1_sigma[0];
-					Q1yRecentered = (sinv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[1])/Qobs1_sigma[1];
-					Q2xRecentered = (cosv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[0])/Qobs2_sigma[0];
-					Q2yRecentered = (sinv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[1])/Qobs2_sigma[1];
-					
-
-
 
 
 				}
 			}
+
+			if (V1orV2 == "V1"){
+				Recentered_Q_Observed_V1_X = (cosv1RPDsum[1]/RPDSignalSummed[1]-INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[0])/INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[0]; 
+				Recentered_Q_Observed_V1_Y = (sinv1RPDsum[1]/RPDSignalSummed[1]-INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[1])/INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[1];
+			
+				OutPut_RPD_Event_Plane_Psi = atan2(Recentered_Q_Observed_V1_Y, Recentered_Q_Observed_V1_X); // FOR V1
+			}
+			else{
+				Recentered_Q_Observed_V2_X = (cosv2RPDsum[1]/RPDSignalSummed[1]-INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[0])/INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[0];
+				Recentered_Q_Observed_V2_Y = (sinv2RPDsum[1]/RPDSignalSummed[1]-INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[1])/INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[1];
+				
+				OutPut_RPD_Event_Plane_Psi = atan2(Recentered_Q_Observed_V2_Y, Recentered_Q_Observed_V2_X)/2; // FOR V2
+			}
 		}
-		else {
-			/*for(int RPD=0; RPD < NRPD; RPD++){
-		    	//generates blocks as polar coordinates
-		    	RPDBlocksInPhi[1][RPD] = atan2(Y_position_cm[1][RPD],X_position_cm[1][RPD]);
-		    }*/
+		else{
 
 		    for (int channel = 0; channel < NRPD; channel++){
 				//remeber TS start at 0 DONT SUBTRACT
@@ -114,34 +121,31 @@ double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut
 				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {
 					RPDSignalSummed[0] += fC_of_TS456_Summed;
 					//here im creating the components of the flow vector
-					cosv1RPDsum[0] += cos(1*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
-					sinv1RPDsum[0] += sin(1*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
-					cosv2RPDsum[0] += cos(2*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
-					sinv2RPDsum[0] += sin(2*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
 					
-
-					//ask alice how recentering works
-
-					 // for recentering calibration, from Qobs distributions
- 					/*
- 					float Qobs1_mean[NSIDE][NXY] = {{0}};
- 					float Qobs2_mean[NSIDE][NXY] = {{0}};
- 					float Qobs1_sigm[NSIDE][NXY] = {{1}};
- 					float Qobs2_sigm[NSIDE][NXY] = {{1}};
- 					*/
-
+					if (V1orV2 == "V1"){
+						cosv1RPDsum[0] += cos(1*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
+						sinv1RPDsum[0] += sin(1*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
+					}
+					else{
+						cosv2RPDsum[0] += cos(2*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
+						sinv2RPDsum[0] += sin(2*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
+					}
 				}
 			}
+
+			if (V1orV2 == "V1"){
+				Recentered_Q_Observed_V1_X = (cosv1RPDsum[0]/RPDSignalSummed[0]-INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[0])/INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[0]; 
+				Recentered_Q_Observed_V1_Y = (sinv1RPDsum[0]/RPDSignalSummed[0]-INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[1])/INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[1];
+				
+				OutPut_RPD_Event_Plane_Psi = atan2(Recentered_Q_Observed_V1_Y, Recentered_Q_Observed_V1_X); // FOR V1
+			}
+			else{
+				Recentered_Q_Observed_V2_X = (cosv2RPDsum[0]/RPDSignalSummed[0]-INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[0])/INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[0];
+				Recentered_Q_Observed_V2_Y = (sinv2RPDsum[0]/RPDSignalSummed[0]-INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[1])/INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[1];
+				
+				OutPut_RPD_Event_Plane_Psi = atan2(Recentered_Q_Observed_V2_Y, Recentered_Q_Observed_V2_X)/2; // FOR V2
+			}
 		}
-				//convert quartz blocks into polar coordinates.. I think this should be something I calculate once and store as a permanent array I can make this with what olivers code does
-
-				// do i need to calculate q mean and q sigma?? yes to caulculate the q coreelation vectors
-
-				//calcualte Q psi 
-
-				// NEED to sit down the week of the 29th abd break down liver/mates event plane code and figure out what is good and what I need after discussing with alice
-				//to properly calculate the event plane
-
 
 				/// I NEED TO THINK ABOUT HOW TO WRITE THIS CODE FOR EASE OF CALIBRATIO NBY WHICH I MEAN EVENT PLANE FLATTENING...
 				
@@ -151,7 +155,7 @@ double CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double OutPut
 		
 	}
 	else{
-		return -10;
+		OutPut_RPD_Event_Plane_Psi = -10;
 	}
 
 }

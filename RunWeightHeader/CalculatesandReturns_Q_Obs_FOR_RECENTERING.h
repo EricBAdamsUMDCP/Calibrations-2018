@@ -20,7 +20,7 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 
 4/12/19 */
 
-// last edited (if I remebered to change this... 5/7/2019 11:49:39 AM)
+// last edited (if I remebered to change this... 6/11/2019 11:48:17 AM)
 
 
 #include <string>
@@ -30,14 +30,14 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 #ifndef CalculatesandReturnsQObsforRecentering
 #define CalculatesandReturnsQObsforRecentering
 
-void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], double OutPut_Weightedjeffsweights[16], const std::string& PosorNeg, double &Q_Observed_V1_X, double &Q_Observed_V1_Y, double &Q_Observed_V2_X, double &Q_Observed_V2_Y){
+void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], double Input_Weightedjeffsweights[16], const std::string& PosorNeg, double &Output_Q_Observed_V1_X, double &Output_Q_Observed_V1_Y, double &Output_Q_Observed_V2_X, double &Output_Q_Observed_V2_Y){
 	//errors
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
 		throw std::runtime_error("ERROR: PosorNeg must be set to Pos or Neg, input variable 4 , RPD_Beam_Position_Finder.h");
 	}
 
 	//if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {}	
-	if (OutPut_Weightedjeffsweights[15] != -10 && OutPut_Weightedjeffsweights[0] != -10){ // -10 is the value returned by functions if a bad event was measured and the functions are designed to ignore bad evets
+	if (Input_Weightedjeffsweights[15] != -10 || Input_Weightedjeffsweights[0] != -10){ // -10 is the value returned by functions if a bad event was measured and the functions are designed to ignore bad evets
 	//decleration of constants and arrays
 		const int NSIDE = 2;
 		const int NRPD = 16;
@@ -49,7 +49,7 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 		float  cosv2RPDsum[NSIDE] = {0};
 		float  sinv2RPDsum[NSIDE] = {0};
 		//look up tables for RPD positions created by EBA 5/15/19 
-		double X_position_cm[2][16] = {{1, 1, 1, 1, 3, 3, 3,   3, -3, -3, -3, -3, -1, -1, -1, -1},  //neg
+		double X_position_cm[2][16] = {{1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1},  //neg
 								   	   {1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1}}; //pos
 	
 		double Y_position_cm[2][16] = {{-1, 1, 3, -3, -1, 1, 3, -3, 1, -1, -3, 3, 1, -1, -3, 3},  //neg
@@ -63,14 +63,7 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
  		float Qobs2_mean[NXY] = {0};
  		float Qobs1_sigma[NXY] = {1};
  		float Qobs2_sigma[NXY] = {1};
-
-
- 		float Q1xRecentered = -10;
-		float Q1yRecentered = -10;
-		float Q2xRecentered = -10;
-		float Q2yRecentered = -10;
  		
-
 
 		//BEGIN PLOTS: the plots are used so root can store then later take a mean and sigma
  		/*TH1F* Qobs1[NXY];
@@ -120,10 +113,10 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 				}
 			}
 
-			Q_Observed_V1_X = (cosv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[0])/Qobs1_sigma[0]; //note these are not actually recontered bc we dont have the mean or sigma yet
-			Q_Observed_V1_Y = (sinv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[1])/Qobs1_sigma[1];
-			Q_Observed_V2_X = (cosv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[0])/Qobs2_sigma[0];
-			Q_Observed_V2_Y = (sinv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[1])/Qobs2_sigma[1];
+			Output_Q_Observed_V1_X = (cosv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[0])/Qobs1_sigma[0]; //note these are not actually recontered bc we dont have the mean or sigma yet
+			Output_Q_Observed_V1_Y = (sinv1RPDsum[1]/RPDSignalSummed[1]-Qobs1_mean[1])/Qobs1_sigma[1];
+			Output_Q_Observed_V2_X = (cosv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[0])/Qobs2_sigma[0];
+			Output_Q_Observed_V2_Y = (sinv2RPDsum[1]/RPDSignalSummed[1]-Qobs2_mean[1])/Qobs2_sigma[1];
 
 			/*Qobs1[0]->Fill(Q1xRecentered);
 			Qobs1[1]->Fill(Q1yRecentered);
@@ -154,16 +147,17 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 				}
 			}
 
-			Q_Observed_V1_X = (cosv1RPDsum[0]/RPDSignalSummed[0]-Qobs1_mean[0])/Qobs1_sigma[0];
-			Q_Observed_V1_Y = (sinv1RPDsum[0]/RPDSignalSummed[0]-Qobs1_mean[1])/Qobs1_sigma[1];
-			Q_Observed_V2_X = (cosv2RPDsum[0]/RPDSignalSummed[0]-Qobs2_mean[0])/Qobs2_sigma[0];
-			Q_Observed_V2_Y = (sinv2RPDsum[0]/RPDSignalSummed[0]-Qobs2_mean[1])/Qobs2_sigma[1];
+			Output_Q_Observed_V1_X = (cosv1RPDsum[0]/RPDSignalSummed[0]-Qobs1_mean[0])/Qobs1_sigma[0];
+			Output_Q_Observed_V1_Y = (sinv1RPDsum[0]/RPDSignalSummed[0]-Qobs1_mean[1])/Qobs1_sigma[1];
+			Output_Q_Observed_V2_X = (cosv2RPDsum[0]/RPDSignalSummed[0]-Qobs2_mean[0])/Qobs2_sigma[0];
+			Output_Q_Observed_V2_Y = (sinv2RPDsum[0]/RPDSignalSummed[0]-Qobs2_mean[1])/Qobs2_sigma[1];
 			
 		}
 		
 	}
 	else{
-		Q_Observed_V1_X = -10; Q_Observed_V1_Y = -10; Q_Observed_V2_X = -10; Q_Observed_V2_Y = -10; //-10 is the bad data or processing warning number informing functions they should skip the event and move onto the next one
+		Output_Q_Observed_V1_X = -10; Output_Q_Observed_V1_Y = -10; Output_Q_Observed_V2_X = -10; Output_Q_Observed_V2_Y = -10; //-10 is the bad data or processing warning number informing functions they should skip the event and move onto the next one
+	//make sure to code the histogram to skip filling if any of them return -10
 	}
 
 }

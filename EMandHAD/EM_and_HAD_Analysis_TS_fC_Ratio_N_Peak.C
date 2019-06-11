@@ -29,10 +29,12 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   int iPeriod = 0;
 
  
+//THE BLOB SEEN WHEN TS 5 IS INCLUDED IS LI8KELY FROM AN OUT OF TIME SIGNAL.
+
   TH1::SetDefaultSumw2();
 
   
-  cout << "running software EM_TS_DIST.C 6/10/2019 6:11:51 PM" << endl;
+  cout << "running software EM_TS_DIST.C 6/11/2019 10:38:26 AM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
@@ -49,7 +51,7 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
-  double multiplicativevalue = 0.15; //closer to zero is better results
+  double multiplicativevalue = 0.18; //closer to zero is better results
   
   int cutoff = 0; //cutoff of 70 appears to be good
 
@@ -100,9 +102,9 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   RATIOPN_FourtoThree = new TH2F(("RATIOPN_FourtoThree"),("RATIOPN_FourtoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);
   RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
 
-//cghanged nbins from 70 to 150
-  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 700, 0, 100000, 700, 0, 100000);
-  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 700, 0, 100000, 700, 0, 100000);
+
+  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 700, 0, 100000, 700, 0, 100000);
+  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 700, 0, 100000, 700, 0, 100000);
 
 
   const int NTS=10;            // number of timeslices
@@ -146,9 +148,13 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
         (fCleaf[5]->GetValue(n) < cutoff) ? 0 : (fCleaf[5]->GetValue(n)), (fCleaf[6]->GetValue(n) < cutoff) ? 0 : (fCleaf[6]->GetValue(n)), (fCleaf[7]->GetValue(n) < cutoff) ? 0 : (fCleaf[7]->GetValue(n)), 
         (fCleaf[8]->GetValue(n) < cutoff) ? 0 : (fCleaf[8]->GetValue(n)), (fCleaf[9]->GetValue(n) < cutoff) ? 0 : (fCleaf[9]->GetValue(n))};
          
+
+         ///////////////////////////////////////
+      //  REMOVING TS 5 FROM THE CODE AS REQUESTEDD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //////////////////////////////////////////////////////////
   
       if (type == 0){
-        EM_TS_45[side][channel] = TS_fC[4] + TS_fC[5];
+        EM_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
 
 /*        if (side == 0){
           for(int iTS = 0; iTS < 10; iTS++){
@@ -164,7 +170,7 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
         }*/
       }
       if (type == 1){ //HAD
-        HAD_TS_45[side][channel] = TS_fC[4] + TS_fC[5];
+        HAD_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
 
           if (side == 0){
           for(int iTS = 0; iTS < 10; iTS++){
