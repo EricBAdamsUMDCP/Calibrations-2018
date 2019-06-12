@@ -109,7 +109,7 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
       int type = (int)(sectionLeaf->GetValue(n))-1;
       int channel = (int)(channelLeaf->GetValue(n))-1;
      
-      if (type == 0){
+      if (type == 0){ //Type == 1 is HAD and Type == 3 is RPD
 
         double TS_fC[NTS] = {(fCleaf[0]->GetValue(n) < 10) ? 0 : (fCleaf[0]->GetValue(n)), (fCleaf[1]->GetValue(n) < 10) ? 0 : (fCleaf[1]->GetValue(n)),
         (fCleaf[2]->GetValue(n) < 10) ? 0 : (fCleaf[2]->GetValue(n)), (fCleaf[3]->GetValue(n) < 10) ? 0 : (fCleaf[3]->GetValue(n)), (fCleaf[4]->GetValue(n) < 10) ? 0 : (fCleaf[4]->GetValue(n)), 

@@ -25,7 +25,7 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 
 #include <string>
 #include <stdexcept>
-#include <math.h> //for atan2 as it is a math fu c could also use tmath but i want to avoid any root outside of plotting
+#include <cmath> //for atan2 as it is a math fu c could also use tmath but i want to avoid any root outside of plotting
 
 #ifndef CalculatesandReturnsQObsforRecentering
 #define CalculatesandReturnsQObsforRecentering
@@ -37,7 +37,7 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 	}
 
 	//if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {}	
-	if (Input_Weightedjeffsweights[15] != -10 || Input_Weightedjeffsweights[0] != -10){ // -10 is the value returned by functions if a bad event was measured and the functions are designed to ignore bad evets
+	if (Input_Weightedjeffsweights[15] != -10 && Input_Weightedjeffsweights[0] != -10){ // -10 is the value returned by functions if a bad event was measured and the functions are designed to ignore bad evets
 	//decleration of constants and arrays
 		const int NSIDE = 2;
 		const int NRPD = 16;

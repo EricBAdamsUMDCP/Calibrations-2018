@@ -23,7 +23,7 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 
 #include <string>
 #include <stdexcept>
-#include <math.h> //for atan2 as it is a math fu c could also use tmath but i want to avoid any root outside of plotting
+#include <cmath> //for atan2 as it is a math fu c could also use tmath but i want to avoid any root outside of plotting
 
 #ifndef CalculatesandReturnsReactionPlane
 #define CalculatesandReturnsReactionPlane

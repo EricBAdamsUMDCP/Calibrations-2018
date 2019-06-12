@@ -29,12 +29,12 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   int iPeriod = 0;
 
  
-//THE BLOB SEEN WHEN TS 5 IS INCLUDED IS LI8KELY FROM AN OUT OF TIME SIGNAL.
+//THE BLOB SEEN WHEN TS 5 IS INCLUDED IS LIKELY FROM AN OUT OF TIME SIGNAL.
 
   TH1::SetDefaultSumw2();
 
   
-  cout << "running software EM_TS_DIST.C 6/11/2019 10:38:26 AM" << endl;
+  cout << "running software EM_TS_DIST.C 6/11/2019 7:56:20 PM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
@@ -51,8 +51,8 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
-  double multiplicativevalue = 0.18; //closer to zero is better results
-  
+  double multiplicativevalue = 0.18; 
+  double ratiovalue = .9; //was 0.6
   int cutoff = 0; //cutoff of 70 appears to be good
 
   TH1F* em[2][5];
@@ -72,13 +72,12 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH2F* PEMvTotalE;
   TH2F* NEMvTotalE;
 
- /* for(int iside = 0; iside < 2; iside++){
+  for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 5; ich++){
       em[iside][ich]   = new TH1F(Form("em %s %d",stit2[iside],ich+1),Form("EM%s channel %d",stit[iside],ich+1),10,0,9);
-      emfC[iside][ich] = new TH1F(Form("emfC %s %d",stit2[iside],ich+1),Form("EMfC%s channel %d fC",stit[iside],ich+1),500,0,2000);
+      //emfC[iside][ich] = new TH1F(Form("emfC %s %d",stit2[iside],ich+1),Form("EMfC%s channel %d fC",stit[iside],ich+1),500,0,2000);
     }
-  }*/
-  
+  }
 
   P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC", runnumber, multiplicativevalue),300,0,100000);
   N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC", runnumber, multiplicativevalue),300,0,100000);
@@ -152,36 +151,46 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
          ///////////////////////////////////////
       //  REMOVING TS 5 FROM THE CODE AS REQUESTEDD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //////////////////////////////////////////////////////////
-  
+      
       if (type == 0){
-        EM_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
-
-/*        if (side == 0){
-          for(int iTS = 0; iTS < 10; iTS++){
-             em[side][channel]->Fill(iTS, TS_fC[iTS]); 
-             emfC[side][channel]->Fill(TS_fC[iTS]);
+        if (TS_fC[4]/TS_fC[5] > ratiovalue){
+          EM_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
+        }
+        if (side == 0){
+          if (TS_fC[4]/TS_fC[5] > ratiovalue){
+            for(int iTS = 0; iTS < 10; iTS++){
+               em[side][channel]->Fill(iTS, TS_fC[iTS]); 
+               //emfC[side][channel]->Fill(TS_fC[iTS]);
+            }
           }
         }
         else if (side == 1){
-          for(int iTS = 0; iTS < 10; iTS++){
-             em[side][channel]->Fill(iTS, TS_fC[iTS]); 
-             emfC[side][channel]->Fill(TS_fC[iTS]);
+          if (TS_fC[4]/TS_fC[5] > ratiovalue){
+            for(int iTS = 0; iTS < 10; iTS++){
+               em[side][channel]->Fill(iTS, TS_fC[iTS]); 
+               //emfC[side][channel]->Fill(TS_fC[iTS]);
+            }
           }
-        }*/
+        }
       }
       if (type == 1){ //HAD
-        HAD_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
-
-          if (side == 0){
+        if (TS_fC[4]/TS_fC[5] > ratiovalue){
+          HAD_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
+        }
+        if (side == 0){
           for(int iTS = 0; iTS < 10; iTS++){
-             HAD[side][channel]->Fill(iTS, TS_fC[iTS]);
-             HADfC[side][channel]->Fill(TS_fC[iTS]);
+            if (TS_fC[4]/TS_fC[5] > ratiovalue){
+              HAD[side][channel]->Fill(iTS, TS_fC[iTS]);
+            }
+             //HADfC[side][channel]->Fill(TS_fC[iTS]);
           }
         }
         else if (side == 1){
-          for(int iTS = 0; iTS < 10; iTS++){
-             HAD[side][channel]->Fill(iTS, TS_fC[iTS]); 
-             HADfC[side][channel]->Fill(TS_fC[iTS]);
+          if (TS_fC[4]/TS_fC[5] > ratiovalue){
+            for(int iTS = 0; iTS < 10; iTS++){
+               HAD[side][channel]->Fill(iTS, TS_fC[iTS]); 
+               //HADfC[side][channel]->Fill(TS_fC[iTS]);
+            }
           }
         }
       }
@@ -270,15 +279,16 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   c2->SaveAs(Form("ZDC_figures/EM_HAD/NEMvTotalE_%d.png",runnumber));
 
   c2->SetLogy();
+ 
 
- /* for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
+  for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
     for(int ich = 0; ich < 5; ich++){
-      c3->SetLogy();
+     
       em[iside][ich]->SetLineColor(4);
       em[iside][ich]->Draw("hist e");
-      c3->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
-      f2.Write();
-    }*/
+      c2->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
+      //f2.Write();
+    }
 /*  for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
     for(int ich = 0; ich < 5; ich++){
       c2->SetLogy();
@@ -289,49 +299,49 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
     }
 */
 
-  /*RATIOemfC_OnetoThree[1]->Draw("hist e"); //uncomment to get graphs
-  c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels1by3_%d.png", "Pos",runnumber));
-  RATIOemfC_TwotoThree[1]->Draw("hist e");
-  c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels2by3_%d.png", "Pos",runnumber));
-  RATIOemfC_FourtoThree[1]->Draw("hist e");
-  c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels4by3_%d.png", "Pos",runnumber));
-  RATIOemfC_FivetoThree[1]->Draw("hist e");
-  c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels5by3_%d.png", "Pos",runnumber));
+                                       /*RATIOemfC_OnetoThree[1]->Draw("hist e"); //uncomment to get graphs
+                                       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels1by3_%d.png", "Pos",runnumber));
+                                       RATIOemfC_TwotoThree[1]->Draw("hist e");
+                                       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels2by3_%d.png", "Pos",runnumber));
+                                       RATIOemfC_FourtoThree[1]->Draw("hist e");
+                                       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels4by3_%d.png", "Pos",runnumber));
+                                       RATIOemfC_FivetoThree[1]->Draw("hist e");
+                                       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels5by3_%d.png", "Pos",runnumber));
 
 
-  RATIOemfC_OnetoThree[0]->Draw("hist e");
-  c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels1by3_%d.png", "Neg",runnumber));
-  RATIOemfC_TwotoThree[0]->Draw("hist e");
-  c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels2by3_%d.png", "Neg",runnumber));
-  RATIOemfC_FourtoThree[0]->Draw("hist e");
-  c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels4by3_%d.png", "Neg",runnumber));
-  RATIOemfC_FivetoThree[0]->Draw("hist e");
-  c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels5by3_%d.png", "Neg",runnumber));
+                                       RATIOemfC_OnetoThree[0]->Draw("hist e");
+                                       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels1by3_%d.png", "Neg",runnumber));
+                                       RATIOemfC_TwotoThree[0]->Draw("hist e");
+                                       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels2by3_%d.png", "Neg",runnumber));
+                                       RATIOemfC_FourtoThree[0]->Draw("hist e");
+                                       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels4by3_%d.png", "Neg",runnumber));
+                                       RATIOemfC_FivetoThree[0]->Draw("hist e");
+                                       c2->SaveAs(Form("ZDC_figures/em/emfC_%s_channels5by3_%d.png", "Neg",runnumber));
 
-  RATIOPN_OnetoThree->Draw("colz");
-  c2->SaveAs(Form("ZDC_figures/em/RATIOPN_OnetoThree_%d.png",runnumber));
-  RATIOPN_TwotoThree->Draw("colz");
-  c2->SaveAs(Form("ZDC_figures/em/RATIOPN_TwotoThree_%d.png",runnumber));
-  RATIOPN_FourtoThree->Draw("colz");
-  c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FourtoThree_%d.png",runnumber));
-  RATIOPN_FivetoThree->Draw("colz");
-  c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FivetoThree_%d.png",runnumber));
-*/
+                                       RATIOPN_OnetoThree->Draw("colz");
+                                       c2->SaveAs(Form("ZDC_figures/em/RATIOPN_OnetoThree_%d.png",runnumber));
+                                       RATIOPN_TwotoThree->Draw("colz");
+                                       c2->SaveAs(Form("ZDC_figures/em/RATIOPN_TwotoThree_%d.png",runnumber));
+                                       RATIOPN_FourtoThree->Draw("colz");
+                                       c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FourtoThree_%d.png",runnumber));
+                                       RATIOPN_FivetoThree->Draw("colz");
+                                       c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FivetoThree_%d.png",runnumber));
+                                      */
 
-  P_HADSUM->Draw("hist e");
+ /* P_HADSUM->Draw("hist e");
    c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
   N_HADSUM->Draw("hist e");
-   c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
+   c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));*/
 
 
- /* for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
+  for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
     for(int ich = 0; ich < 4; ich++){
       HAD[iside][ich]->Draw("hist e");
       c2->SaveAs(Form("ZDC_figures/had/HAD_%s_TS_%d_%d.png", stit2[iside], ich+1,runnumber));
       HADfC[iside][ich]->Draw("hist e");
       c2->SaveAs(Form("ZDC_figures/had/HAD_%s_fC_%d_%d.png", stit2[iside], ich+1,runnumber));
     }
-  }*/
+  }
 
  
 
