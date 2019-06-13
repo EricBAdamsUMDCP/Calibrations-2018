@@ -34,7 +34,7 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH1::SetDefaultSumw2();
 
   
-  cout << "running software EM_TS_DIST.C 6/11/2019 7:56:20 PM" << endl;
+  cout << "running software EM_TS_DIST.C 6/13/2019 11:04:20 AM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
@@ -51,9 +51,12 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
-  double multiplicativevalue = 0.18; 
-  double ratiovalue = .9; //was 0.6
+  double multiplicativevalue = 0.19; 
+  double P_ratiovalue = 6.0; //.7 keeps the blob small (yes it can be optimized more but itsp good) based on alices ratio of 4 to 5 analysis we will set our cut off at a ratio of 6
+  double N_ratiovalue = 3.0;
+  //ratio value for pos is 6 and for neg is 3
   int cutoff = 0; //cutoff of 70 appears to be good
+  int graphMin = 3500;
 
   TH1F* em[2][5];
   TH1F* emfC[2][5];
@@ -61,16 +64,18 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH1F* HADfC[2][4];
   TH1F* P_HADSUM;
   TH1F* N_HADSUM;
-  TH1F* RATIOemfC_OnetoThree[2];
+  /*TH1F* RATIOemfC_OnetoThree[2];
   TH1F* RATIOemfC_TwotoThree[2];
   TH1F* RATIOemfC_FourtoThree[2];
   TH1F* RATIOemfC_FivetoThree[2];
   TH2F* RATIOPN_OnetoThree;
   TH2F* RATIOPN_TwotoThree;
   TH2F* RATIOPN_FourtoThree;
-  TH2F* RATIOPN_FivetoThree;
+  TH2F* RATIOPN_FivetoThree;*/
   TH2F* PEMvTotalE;
   TH2F* NEMvTotalE;
+  TH2F* P_45vTotalE;
+  TH2F* N_45vTotalE;
 
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 5; ich++){
@@ -102,9 +107,12 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
 
 
-  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 700, 0, 100000, 700, 0, 100000);
-  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 700, 0, 100000, 700, 0, 100000);
+  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 60, 3000, 60000, 60, 3000, 60000);
+  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 60, 3000, 60000, 60, 3000, 60000);
 
+
+  P_45vTotalE = new TH2F(Form("P_45vTotalE"),Form("ts4/5 em and had vTotalE ts 4; Sum HAD + %f * EM (fC); ts4/5 em and had vTotalE ts 4 (fC)", multiplicativevalue), 70, 3000, 10000, 70, 0, 100);
+  N_45vTotalE = new TH2F(Form("N_45vTotalE"),Form("ts4/5 em and had vTotalE TS 4; Sum HAD + %f * EM (fC); ts4/5 em and had vTotalE ts 4 (fC)", multiplicativevalue), 70, 3000, 10000, 70, 0, 100);
 
   const int NTS=10;            // number of timeslices
   TLeaf* bxidLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("bxid");
@@ -118,8 +126,6 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   
   TLeaf* adcLeaf[NTS];
   TLeaf* fCleaf[NTS];
-
-  
 
 
   double w[2][2][5] = {
@@ -135,6 +141,9 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 
     double EM_TS_45[NSIDE][5] = {0};
     double HAD_TS_45[NSIDE][4] = {0};
+
+    double EM4v5array[2][5] = {0};
+    double HAD4v5array[2][4] = {0};
 
     for(int n = 0; n < 50; n++){
       int side = (int)((zsideLeaf->GetValue(n)+1)/2.0);
@@ -153,11 +162,13 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
         //////////////////////////////////////////////////////////
       
       if (type == 0){
-        if (TS_fC[4]/TS_fC[5] > ratiovalue){
-          EM_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
-        }
+        
         if (side == 0){
-          if (TS_fC[4]/TS_fC[5] > ratiovalue){
+          if (TS_fC[4]/TS_fC[5] > N_ratiovalue ){
+          EM_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
+          }
+          EM4v5array[side][channel] = TS_fC[4]/TS_fC[5];
+          if (TS_fC[4]/TS_fC[5] > N_ratiovalue){
             for(int iTS = 0; iTS < 10; iTS++){
                em[side][channel]->Fill(iTS, TS_fC[iTS]); 
                //emfC[side][channel]->Fill(TS_fC[iTS]);
@@ -165,7 +176,11 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
           }
         }
         else if (side == 1){
-          if (TS_fC[4]/TS_fC[5] > ratiovalue){
+          if (TS_fC[4]/TS_fC[5] > P_ratiovalue ){
+          EM_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
+          }
+          EM4v5array[side][channel] = TS_fC[4]/TS_fC[5];
+          if (TS_fC[4]/TS_fC[5] > P_ratiovalue){
             for(int iTS = 0; iTS < 10; iTS++){
                em[side][channel]->Fill(iTS, TS_fC[iTS]); 
                //emfC[side][channel]->Fill(TS_fC[iTS]);
@@ -174,19 +189,24 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
         }
       }
       if (type == 1){ //HAD
-        if (TS_fC[4]/TS_fC[5] > ratiovalue){
-          HAD_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
-        }
         if (side == 0){
+          if (TS_fC[4]/TS_fC[5] > N_ratiovalue){
+          HAD_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
+          }
+          HAD4v5array[side][channel] = TS_fC[4]/TS_fC[5];
           for(int iTS = 0; iTS < 10; iTS++){
-            if (TS_fC[4]/TS_fC[5] > ratiovalue){
+            if (TS_fC[4]/TS_fC[5] > N_ratiovalue){
               HAD[side][channel]->Fill(iTS, TS_fC[iTS]);
             }
              //HADfC[side][channel]->Fill(TS_fC[iTS]);
           }
         }
         else if (side == 1){
-          if (TS_fC[4]/TS_fC[5] > ratiovalue){
+          if (TS_fC[4]/TS_fC[5] > P_ratiovalue){
+          HAD_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
+          }
+          HAD4v5array[side][channel] = TS_fC[4]/TS_fC[5];
+          if (TS_fC[4]/TS_fC[5] > P_ratiovalue){
             for(int iTS = 0; iTS < 10; iTS++){
                HAD[side][channel]->Fill(iTS, TS_fC[iTS]); 
                //HADfC[side][channel]->Fill(TS_fC[iTS]);
@@ -200,8 +220,9 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 ////////////////Begin EM/////////////////////////////////////////////////////////////////////////////////////////
   double P_SumEMfC = EM_TS_45[1][0] + EM_TS_45[1][1] + EM_TS_45[1][2] + EM_TS_45[1][3] + EM_TS_45[1][4];
   double N_SumEMfC = EM_TS_45[0][0] + EM_TS_45[0][1] + EM_TS_45[0][2] + EM_TS_45[0][3] + EM_TS_45[0][4];
-
-  double P_OnetoThree  = (EM_TS_45[1][0]/EM_TS_45[1][2]);
+  double P_sumEM4v5 = EM4v5array[1][0] + EM4v5array[1][1] + EM4v5array[1][2] + EM4v5array[1][3] + EM4v5array[1][4];
+  double N_sumEM4v5 = EM4v5array[0][0] + EM4v5array[0][1] + EM4v5array[0][2] + EM4v5array[0][3] + EM4v5array[0][4];
+/*  double P_OnetoThree  = (EM_TS_45[1][0]/EM_TS_45[1][2]);
   double P_TwotoThree  = (EM_TS_45[1][1]/EM_TS_45[1][2]);
   double P_FourtoThree = (EM_TS_45[1][3]/EM_TS_45[1][2]);
   double P_FivetoThree = (EM_TS_45[1][4]/EM_TS_45[1][2]);
@@ -225,26 +246,33 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   if (P_OnetoThree != 1 && N_OnetoThree != 1)  {RATIOPN_OnetoThree->Fill(P_OnetoThree, N_OnetoThree);}
   if (P_TwotoThree != 1 && N_TwotoThree != 1)  {RATIOPN_TwotoThree->Fill(P_TwotoThree, N_TwotoThree);}
   if (P_FourtoThree != 1 && N_FourtoThree != 1){RATIOPN_FourtoThree->Fill(P_FourtoThree,N_FourtoThree);}
-  if (P_FivetoThree != 1 && N_FivetoThree != 1){RATIOPN_FivetoThree->Fill(P_FivetoThree,N_FivetoThree);}
+  if (P_FivetoThree != 1 && N_FivetoThree != 1){RATIOPN_FivetoThree->Fill(P_FivetoThree,N_FivetoThree);}*/
   ////////////End EM////////////////////////////////////////////////////////////////////////////////////////////
 
   ////////////Begin HAD/////////////////////////////////////////////////////////////////////////////////////////
 
   double P_SumHADfC = HAD_TS_45[1][0] + HAD_TS_45[1][1] + HAD_TS_45[1][2] + HAD_TS_45[1][3];
   double N_SumHADfC = HAD_TS_45[0][0] + HAD_TS_45[0][1] + HAD_TS_45[0][2] + HAD_TS_45[0][3];
+  double P_sumHAD4v5 = HAD4v5array[1][0] + HAD4v5array[1][1] + HAD4v5array[1][2] + HAD4v5array[1][3];
+  double N_sumHAD4v5 = HAD4v5array[0][0] + HAD4v5array[0][1] + HAD4v5array[0][2] + HAD4v5array[0][3];
 
   ////////////End HAD//////////////////////////////////////////////////////////////////////////////////////////
 
   ////////////Begin HAD and EM (only if both are used)/////////////////////////////////////////////////////////
+  
+  double N_SUM = N_SumHADfC + multiplicativevalue*N_SumEMfC;
+  double P_SUM = P_SumHADfC + multiplicativevalue*P_SumEMfC;
 
-
-  if (P_SumEMfC > cutoff && P_SumHADfC > cutoff){
-    PEMvTotalE->Fill((P_SumHADfC + multiplicativevalue*P_SumEMfC), P_SumEMfC); //0.005
-    P_HADSUM->Fill((P_SumHADfC + multiplicativevalue*P_SumEMfC));
+  if (P_SUM > graphMin ){
+    PEMvTotalE->Fill((P_SUM), P_SumEMfC); //0.005
+    P_HADSUM->Fill((P_SUM));
+    P_45vTotalE->Fill((P_SUM), (P_sumEM4v5 + P_sumHAD4v5));
   }
-  if (N_SumEMfC > cutoff && N_SumHADfC > cutoff){
-    NEMvTotalE->Fill((N_SumHADfC + multiplicativevalue*N_SumEMfC), N_SumEMfC); //0.005
-    N_HADSUM->Fill((N_SumHADfC + multiplicativevalue*N_SumEMfC));
+  
+  if (N_SUM > graphMin){
+    NEMvTotalE->Fill((N_SUM), N_SumEMfC); //0.005
+    N_HADSUM->Fill((N_SUM));
+    N_45vTotalE->Fill((N_SUM), (N_sumEM4v5 + N_sumHAD4v5));
   }
 /*
   if (P_SumHADfC > 100){
@@ -271,19 +299,24 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 
   //TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
   TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
+  
 
   c2->SetLogz();
   PEMvTotalE->Draw("Colz");
   c2->SaveAs(Form("ZDC_figures/EM_HAD/PEMvTotalE_%d.png",runnumber));
   NEMvTotalE->Draw("Colz");
   c2->SaveAs(Form("ZDC_figures/EM_HAD/NEMvTotalE_%d.png",runnumber));
-
+  P_45vTotalE->Draw("Colz");
+  c2->SaveAs(Form("ZDC_figures/EM_HAD/P_45vTotalE_%d.png",runnumber));
+  N_45vTotalE->Draw("Colz");
+  c2->SaveAs(Form("ZDC_figures/EM_HAD/N_45vTotalE_%d.png",runnumber));
+  
   c2->SetLogy();
- 
+
 
   for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
     for(int ich = 0; ich < 5; ich++){
-     
+      
       em[iside][ich]->SetLineColor(4);
       em[iside][ich]->Draw("hist e");
       c2->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
@@ -328,10 +361,10 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                        c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FivetoThree_%d.png",runnumber));
                                       */
 
- /* P_HADSUM->Draw("hist e");
+  P_HADSUM->Draw("hist e");
    c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
   N_HADSUM->Draw("hist e");
-   c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));*/
+   c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
 
 
   for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
