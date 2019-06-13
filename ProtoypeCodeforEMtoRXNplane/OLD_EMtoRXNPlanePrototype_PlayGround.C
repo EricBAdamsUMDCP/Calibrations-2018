@@ -21,7 +21,6 @@
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h" // custom header writte by Eric A
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/JeffWeighter3000.h" //custom header written by Eric A to measure RPD beam postion in X and Y
-#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/CalculatesandReturns_Q_Obs_FOR_RECENTERING.h"
 using namespace std;
 
 // I am a chemist not an englishist I cant spell
@@ -63,7 +62,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	const int NHAD = 4;
 	const int NRPDColnRow = 4;
 	const int NSIDE = 2; const char* stit[NSIDE] = { "#minus","#plus" };  const char* stit2[NSIDE] = { "neg","pos" };
-	const int NXY = 2;
+
 	double RPDXmin = -3;
 	double RPDXmax = 3;
 	double RPDYMin = -3;
@@ -101,10 +100,6 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	TH1F* EM_N_BEAM;
 	TH1F* RPDX_P_BEAM;
 	TH1F* RPDX_N_BEAM;
-	TH1F* EP1dist[NSIDE];
-	TH1F* EP2dist[NSIDE];
-	TH1F* Qobs1[NSIDE][NXY];
-	TH1F* Qobs2[NSIDE][NXY];
 
 	TH2F* EMPvEMN;
 	TH2F* Pos_EMX_v_RPDX;
@@ -116,19 +111,6 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 	//TH2F* RPD_v_EM_P_BEAM;
 	//TH2F* RPD_v_EM_N_BEAM;
-
-	
-	const char* xytit[NXY] = {"x","y"};
-	for(int iside=0;iside<NSIDE;iside++)
-	{
-	  EP1dist[iside] = new TH1F(Form("EP1dist_%s",stit2[iside]),"EP_{1} distribution;#Psi_{1};[a.u.]",100,-M_PI,M_PI);
-	  EP2dist[iside] = new TH1F(Form("EP2dist_%s",stit2[iside]),"EP_{2} distribution;#Psi_{2};[a.u.]",100,-M_PI/2,M_PI/2);
-	  for(int ixy=0;ixy<2;ixy++)
-	  {
-	    Qobs1[iside][ixy] = new TH1F(Form("Qobs1dist_%s_%s",stit2[iside],xytit[ixy]),Form("Q^{obs}_{1,%s}%s distribution;Q^{obs}_{1,%s};[a.u.]",xytit[ixy],stit[iside],xytit[ixy]),100,6,0);
-	    Qobs2[iside][ixy] = new TH1F(Form("Qobs2dist_%s_%s",stit2[iside],xytit[ixy]),Form("Q^{obs}_{2,%s}%s distribution;Q^{obs}_{2,%s};[a.u.]",xytit[ixy],stit[iside],xytit[ixy]),100,6,0);
-	  }
-	}
 
 	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
@@ -175,26 +157,15 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double PEMG = 0;
 	double NEMG = 0;
 	
-	double OutPut_WeightedjeffsweightsPos[NRPD] = {0}; //{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-	double OutPut_WeightedjeffsweightsNeg[NRPD] = {0}; //{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};// change back to zero they are set to one for testing purposes
+	double OutPut_WeightedjeffsweightsPos[NRPD] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};//{0};
+	double OutPut_WeightedjeffsweightsNeg[NRPD] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};//{0}; // change back to zero they are set to one for testing purposes
 
-	double Pos_Output_Q_Observed_V1_X = 0;
-	double Pos_Output_Q_Observed_V1_Y = 0;
-	double Pos_Output_Q_Observed_V2_X = 0;
-	double Pos_Output_Q_Observed_V2_Y = 0;
-
-	double Neg_Output_Q_Observed_V1_X = 0;
-	double Neg_Output_Q_Observed_V1_Y = 0;
-	double Neg_Output_Q_Observed_V2_X = 0;
-	double Neg_Output_Q_Observed_V2_Y = 0;
-
-
-/*	double P_RPD_Beam_Position_Value_X = 0;
+	double P_RPD_Beam_Position_Value_X = 0;
 	double N_RPD_Beam_Position_Value_X = 0;
 
 	double P_RPD_Beam_Position_Value_Y = 0;
 	double N_RPD_Beam_Position_Value_Y = 0;
-*/
+
 
 	for (int iTS = 0; iTS < NTS; iTS++) {
 		fCleaf[iTS] = (TLeaf*)ZDCDigiTree->GetLeaf(Form("nfC%d", iTS));
@@ -273,34 +244,21 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 			JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg); //uncomment this to reactivate jeff weighter theese are deactivated to look for bugs in otehr software
 			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
-			
-			CalculatesandReturns_Q_ObsforRecentering(RawDataRPD, OutPut_WeightedjeffsweightsPos, "Pos", Pos_Output_Q_Observed_V1_X, Pos_Output_Q_Observed_V1_Y, Pos_Output_Q_Observed_V2_X, Pos_Output_Q_Observed_V2_Y);
-			CalculatesandReturns_Q_ObsforRecentering(RawDataRPD, OutPut_WeightedjeffsweightsNeg, "Neg", Neg_Output_Q_Observed_V1_X, Neg_Output_Q_Observed_V1_Y, Neg_Output_Q_Observed_V2_X, Neg_Output_Q_Observed_V2_Y);
-		
-			if (Pos_Output_Q_Observed_V1_X != -10 && Pos_Output_Q_Observed_V1_Y != -10 && Neg_Output_Q_Observed_V1_X != -10 && Neg_Output_Q_Observed_V1_Y != -10){
-				cout << "Pos_Output_Q_Observed_V1_X:  " <<  Pos_Output_Q_Observed_V1_X << endl; 
-				cout << "Pos_Output_Q_Observed_V1_Y:  " <<  Pos_Output_Q_Observed_V1_Y << endl; 
-				cout << "Pos_Output_Q_Observed_V2_X:  " <<  Pos_Output_Q_Observed_V2_X << endl; 
-				cout << "Pos_Output_Q_Observed_V2_Y:  " <<  Pos_Output_Q_Observed_V2_Y << endl; 
-				cout << "Neg_Output_Q_Observed_V1_X:  " <<  Neg_Output_Q_Observed_V1_X << endl; 
-				cout << "Neg_Output_Q_Observed_V1_Y:  " <<  Neg_Output_Q_Observed_V1_Y << endl; 
-				cout << "Neg_Output_Q_Observed_V2_X:  " <<  Neg_Output_Q_Observed_V2_X << endl; 
-				cout << "Neg_Output_Q_Observed_V2_Y:  " <<  Neg_Output_Q_Observed_V2_Y << endl; 
-
-			
-				Qobs1[0][0]->Fill(Pos_Output_Q_Observed_V1_X);
-				Qobs1[0][1]->Fill(Pos_Output_Q_Observed_V1_Y);
-				Qobs1[1][0]->Fill(Neg_Output_Q_Observed_V1_X);
-				Qobs1[1][1]->Fill(Neg_Output_Q_Observed_V1_Y);
-			}
-
 	
-/*			P_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
+	
+	
+			P_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "X");
 			N_RPD_Beam_Position_Value_X = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsNeg, NEMG, "Neg", "X");
 	
 			P_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsPos, PEMG, "Pos", "Y");
+			/*cout << "PEMG" << PEMG << endl; //used for trouble shooting jeffweighter when its off there is a bug but i dont know what
+			cout << "P_RPD_Beam_Position_Value_X " << P_RPD_Beam_Position_Value_X << endl;
+			cout << "P_RPD_Beam_Position_Value_Y " << P_RPD_Beam_Position_Value_Y << endl;*/
 			N_RPD_Beam_Position_Value_Y = RPD_Beam_Position_Value_X_or_Y(RawDataRPD, OutPut_WeightedjeffsweightsNeg, NEMG, "Neg", "Y");
-			
+			/*cout << "NEMG" << NEMG << endl; //used for trouble shooting jeffweighter when its off there is a bug but i dont know what
+			cout << "N_RPD_Beam_Position_Value_X " << N_RPD_Beam_Position_Value_X << endl;
+			cout << "N_RPD_Beam_Position_Value_Y " << N_RPD_Beam_Position_Value_Y << endl;*/
+	
 				/// remeber to change the ru nwerighted rpd beam headerr back asxd i chanegd the output vgalues!!!!!!!!!!!!!!!!
 	
 			if (PEMG != -10 && NEMG != -10){
@@ -347,8 +305,8 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	
 				Neg_EMX_v_RPDX->Fill(NEMG, N_RPD_Beam_Position_Value_X);
 				}
-			}*/
-	///////////////////////////////////////////////
+			}
+	
 	
 	
 			/*for (int i = 0; i <15; i++){
@@ -493,18 +451,21 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	//CREATING HISTOGRAMS FOR 4x4 and 5x5 for RPD pos and neg and ZDC pos and neg for fC versus TS//
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	TCanvas* c1 = new TCanvas(Form("c1"), Form("RUN_%d", runnumber), 2000, 2000);
-
-	Qobs1[0][0]->Draw("hist e");
-	Qobs1[0][1]->Draw("hist e");
-	Qobs1[1][0]->Draw("hist e");
-	Qobs1[1][1]->Draw("hist e");
-
-/*	EM_P_BEAM->Draw("hist e");
-
+	//TPad* newpad = new TPad("newpad", "a transparent pad", 0, 0, 1, 1);
+	//newpad->SetFillStyle(4000);
+	//newpad->Draw();
+	EM_P_BEAM->Draw("hist e");
+	//TPaveLabel* title = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[1], runnumber));
+	//title->SetFillColor(16);
+	//title->SetTextSize(2);
+	//title->Draw();
 	c1->SaveAs(Form("ZDC_figures/EMtoRXNPlanePrototype_PlayGround_%d/%s_Beam_Position_EM_%d_10fC.png", runnumber, stit2[1], runnumber));
 
 	EM_N_BEAM->Draw("hist e");
-
+	/* TPaveLabel* title2 = new TPaveLabel(0.1, 0.94, 0.9, 0.98, Form("%s_RPD_%d", stit2[0], runnumber));
+	title2->SetFillColor(16);
+	title2->SetTextSize(2);
+	title2->Draw(); */
 	c1->SaveAs(Form("ZDC_figures/EMtoRXNPlanePrototype_PlayGround_%d/%s_Beam_Position_EM_%d_10fC.png", runnumber, stit2[0], runnumber));
 	
 	
@@ -542,7 +503,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	RPDXP_v_RPDXN->Draw("colz");
 
 	c2->SaveAs(Form("ZDC_figures/EMtoRXNPlanePrototype_PlayGround_%d/RPDXP_v_RPDXN_%d.png", runnumber, runnumber));
-	*/
+	
 	f2.Write();
 }
 

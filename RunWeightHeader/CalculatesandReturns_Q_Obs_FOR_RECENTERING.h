@@ -30,6 +30,8 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 #ifndef CalculatesandReturnsQObsforRecentering
 #define CalculatesandReturnsQObsforRecentering
 
+using namespace std;
+
 void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], double Input_Weightedjeffsweights[16], const std::string& PosorNeg, double &Output_Q_Observed_V1_X, double &Output_Q_Observed_V1_Y, double &Output_Q_Observed_V2_X, double &Output_Q_Observed_V2_Y){
 	//errors
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
@@ -61,8 +63,8 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 
  		float Qobs1_mean[NXY] = {0};
  		float Qobs2_mean[NXY] = {0};
- 		float Qobs1_sigma[NXY] = {1};
- 		float Qobs2_sigma[NXY] = {1};
+ 		float Qobs1_sigma[NXY] = {1, 1};
+ 		float Qobs2_sigma[NXY] = {1, 1};
  		
 
 		//BEGIN PLOTS: the plots are used so root can store then later take a mean and sigma
@@ -81,8 +83,26 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 		// Declare variables for sums of TS fCs (456 is main signal of RPD and 45 is main signal of EM and HAD)
 		double fC_of_TS45_Summed = 0;
 		double fC_of_TS456_Summed = 0;
-	
-	
+		
+
+		///Begin MEMSET setting all variables to 0 incase variables are being kept////////
+		/*for ( int i =0; i < 2; i++){
+			std::memset(cosv1RPDsum, 0, sizeof(cosv1RPDsum[i]));
+			std::memset(sinv1RPDsum, 0, sizeof(sinv1RPDsum[i]));
+			std::memset(cosv2RPDsum, 0, sizeof(cosv2RPDsum[i]));
+			std::memset(sinv2RPDsum, 0, sizeof(sinv2RPDsum[i]));
+		}
+
+		std::memset(Output_Q_Observed_V1_X, 0, sizeof(Output_Q_Observed_V1_X));
+		std::memset(Output_Q_Observed_V1_Y, 0, sizeof(Output_Q_Observed_V1_Y));
+		std::memset(Output_Q_Observed_V2_X, 0, sizeof(Output_Q_Observed_V2_X));
+		std::memset(Output_Q_Observed_V2_Y, 0, sizeof(Output_Q_Observed_V2_Y));
+
+		std::memset(fC_of_TS45_Summed, 0, sizeof(fC_of_TS45_Summed));
+		std::memset(fC_of_TS456_Summed, 0, sizeof(fC_of_TS456_Summed));*/
+
+		///END MEMSET setting all variables to 0 incase variables are being kept////////
+
 			//DOUBLE CHECK THESE NUMBERS AND MAKE SURE THEY MATCH THEIR RESPECTIVE QB POSITION THEY WERE CALCULATED SORT OF SLOPPLY ean 6/3/19 4 PM						   
 		float RPDBlocksInPhi[NSIDE][NRPD] = {{-0.785398, 0.785398, 1.24905, -1.24905, -0.321751, 0.321751, 0.785398, -0.785398, 2.81984, -2.81984, -2.35619, 2.35619, 2.35619, -2.35619, -1.89255, 1.89255}, //NEG
 		 									 {-0.785398, 0.785398, 1.24905, -1.24905, -0.321751, 0.785398, 0.321751, -0.785398, 2.81984, -2.81984, -2.35619, 2.35619, 2.35619, -2.35619, -1.89255, 1.89255}};
