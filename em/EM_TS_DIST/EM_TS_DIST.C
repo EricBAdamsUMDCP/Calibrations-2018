@@ -101,6 +101,9 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
   
   for(int i = 0; i < ZDCDigiTree->GetEntries(); i++){
     ZDCDigiTree->GetEntry(i);
+    int BXID = bxidLeaf->GetValue();
+
+    cout << "BXID" << BXID << endl;
 
     double EM_TS_45[NSIDE][5] = {0};
 
@@ -108,6 +111,8 @@ cout << "running software EM_TS_DIST.C 5/9/2019 3:09:45 PM" << endl;
       int side = (int)((zsideLeaf->GetValue(n)+1)/2.0);
       int type = (int)(sectionLeaf->GetValue(n))-1;
       int channel = (int)(channelLeaf->GetValue(n))-1;
+
+
      
       if (type == 0){ //Type == 1 is HAD and Type == 3 is RPD
 

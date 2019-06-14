@@ -28,7 +28,7 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 #ifndef CalculatesandReturnsReactionPlane
 #define CalculatesandReturnsReactionPlane
 
-void CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double Input_Weightedjeffsweights[16], const std::string& PosorNeg, const std::string& V1orV2, double INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2], double INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2], /*double (&OutPut_RPDfC_X_Y_coord)[16], */double (&OutPut_RPD_Event_Plane_Psi)){
+void CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double Input_Weightedjeffsweights[16], const std::string& PosorNeg, const std::string& V1orV2, double INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2], double INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2], double (&OutPut_Weighted_RPDfC)[16], double (&OutPut_RPD_Event_Plane_Psi)){
 	//errors ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////array is as follows [X, Y]
 	if (PosorNeg != "Pos" && PosorNeg != "Neg") {
 		throw std::runtime_error("ERROR: PosorNeg must be set to Pos or Neg, input variable 3, CalculatesandReturnsReactionPlane.h");
@@ -84,6 +84,8 @@ void CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double Input_We
 					
 					double Weighted_fC_of_TS456_Summed = fC_of_TS456_Summed * Input_Weightedjeffsweights[channel];
 					
+					OutPut_Weighted_RPDfC[channel] = Weighted_fC_of_TS456_Summed;
+
 					RPDSignalSummed[1] += Weighted_fC_of_TS456_Summed;
 					
 					if (V1orV2 == "V1"){
@@ -124,6 +126,8 @@ void CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double Input_We
 				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {
 					
 					double Weighted_fC_of_TS456_Summed = fC_of_TS456_Summed * Input_Weightedjeffsweights[channel];
+
+					OutPut_Weighted_RPDfC[channel] = Weighted_fC_of_TS456_Summed;
 
 					RPDSignalSummed[0] += Weighted_fC_of_TS456_Summed;
 					//here im creating the components of the flow vector

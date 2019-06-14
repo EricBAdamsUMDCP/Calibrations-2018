@@ -23,6 +23,7 @@
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/JeffWeighter3000.h" //custom header written by Eric A to measure RPD beam postion in X and Y
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/CalculatesandReturns_Q_Obs_FOR_RECENTERING.h"
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/CalculatesandReturnsReactionPlane.h"
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/CalculatesandReturns_RESOLUTION_ReactionPlane.h"
 using namespace std;
 
 #ifndef M_PI
@@ -44,13 +45,16 @@ int runnumber = 326776;
 
 void EMtoRXNPlanePrototype_PlayGround(){
 	initRootStyle();
-	string Dataset = "AOD_zdc_digi_tree_326776_many_3";
-	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/14/2019 9:56:44 AM" << endl;
+	
+
+	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); string Dataset = "PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root";// opening root fie (only have 1 uncommented)
+	
+	TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); string Dataset = "AOD_zdc_digi_tree_326776_many_3"; // opening the root file
+
+	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/14/2019 2:38:24 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
-	TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
 	
-	//TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
 	
 	TTree* ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 
@@ -112,6 +116,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	TH1F* EP2dist[NSIDE];
 	TH1F* Qobs1[NSIDE][NXY];
 	TH1F* Qobs2[NSIDE][NXY];
+	TH1F* RXN_Plane_Resolution_Histo;
 
 	TH2F* EMPvEMN;
 	TH2F* Pos_EMX_v_RPDX;
@@ -136,6 +141,8 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	    Qobs2[iside][ixy] = new TH1F(Form("Qobs2dist_%s_%s",stit2[iside],xytit[ixy]),Form("Q^{obs}_{2,%s}%s distribution;Q^{obs}_{2,%s};[a.u.]",xytit[ixy],stit[iside],xytit[ixy]),100,6,0);
 	  }
 	}
+
+	RXN_Plane_Resolution_Histo = new TH1F(Form("RXNPRes"),"RXN Plane Resolution;Resolution;[a.u.]",100,-M_PI,M_PI);
 
 	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
@@ -214,7 +221,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	// https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
 
 
-	//for (int h = 0; h < 2; h) { //THIS FOR LOOKS NEEDS TO BE ACTIVATED WHEN PART 2 IS ACTIVATED
+	
 		for (int i = 0; i < ZDCDigiTree->GetEntries(); i++) {
 			ZDCDigiTree->GetEntry(i);
 	
@@ -421,7 +428,10 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		//THIS IS FOR PART 2 THE PURPOSE IS AFTER WEVE GOTTEN THE INFORATION TO RECENTER FROM THE RXN PLANE CALCULATER FUNCTION WE NEED TO USE THAT INFORMATION TO RECENTER
 
 		double POS_OutPut_RPD_Event_Plane_Psi = 0;
-		/*double OutPut_RPDfC_X_Y_coord[16] = {0};*/
+		double NEG_OutPut_RPD_Event_Plane_Psi = 0;
+		double POS_OutPut_RPDfC_X_Y_coord[16] = {0};
+		double NEG_OutPut_RPDfC_X_Y_coord[16] = {0};
+		double Output_ReactionPlaneResolution_All_mustbeMeaned = 0;
 
 		for (int i = 0; i < ZDCDigiTree->GetEntries(); i++) {
 			ZDCDigiTree->GetEntry(i);
@@ -486,17 +496,37 @@ void EMtoRXNPlanePrototype_PlayGround(){
 			
 			JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
 			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
-	
-			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsPos, "Pos", "V1", INPUT_V1orV2_MEAN_X_Y_FOR_Recentering, INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, /*OutPut_RPDfC_X_Y_coord,*/ POS_OutPut_RPD_Event_Plane_Psi);
-	
-			EP1dist[1]->Fill(POS_OutPut_RPD_Event_Plane_Psi);
+		
+			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsPos, "Pos", "V1", INPUT_V1orV2_MEAN_X_Y_FOR_Recentering, INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, /*POS_OutPut_RPDfC_X_Y_coord,*/ POS_OutPut_RPD_Event_Plane_Psi);
+			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsNeg, "Neg", "V1", INPUT_V1orV2_MEAN_X_Y_FOR_Recentering, INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, /*NEG_OutPut_RPDfC_X_Y_coord,*/ NEG_OutPut_RPD_Event_Plane_Psi);
+
+			Outputs_Resolution_ReactionPlane_to_Mean( POS_OutPut_RPD_Event_Plane_Psi, NEG_OutPut_RPD_Event_Plane_Psi, Output_ReactionPlaneResolution_All_mustbeMeaned);
+
+			if ( POS_OutPut_RPD_Event_Plane_Psi != -10){
+				EP1dist[1]->Fill(POS_OutPut_RPD_Event_Plane_Psi);
+			}
+			cout << "POS_OutPut_RPD_Event_Plane_Psi" << POS_OutPut_RPD_Event_Plane_Psi << endl;
+
+			if ( NEG_OutPut_RPD_Event_Plane_Psi != -10){
+				EP1dist[0]->Fill(NEG_OutPut_RPD_Event_Plane_Psi);
+			}
+			cout << "NEG_OutPut_RPD_Event_Plane_Psi" << NEG_OutPut_RPD_Event_Plane_Psi << endl;
+
+
+			if ( POS_OutPut_RPD_Event_Plane_Psi != -10 && NEG_OutPut_RPD_Event_Plane_Psi != -10){
+				RXN_Plane_Resolution_Histo->Fill(Output_ReactionPlaneResolution_All_mustbeMeaned);
+			}
+
+
 			//part 2 can grab stuff saved to a root tree instead of redoing calculation may make it faster??? eg rxn plane of em position??
 			
 			if (i % 100000 == 0) cout << i << " (PART 2) events are processed." << endl;
 		}
 		
 		
-	//} //THIS BRAKET IS FOR THE FOR LOOP FOR PART 2 <<<<<-------
+		double RXN_Plane_Resolution = RXN_Plane_Resolution_Histo->GetMean();
+
+		cout << "RXN_Plane_Resolution" << RXN_Plane_Resolution << endl;
 
 
 	/// END filling variables with DATA/fC LOOP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -533,6 +563,9 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 	EP1dist[1]->Draw("hist e");
 	c2->Print(Form("%s/EP1dist_V1_Pos.png",figdir));
+
+	EP1dist[0]->Draw("hist e");
+	c2->Print(Form("%s/EP1dist_V1_Neg.png",figdir));
 
 /*	EM_P_BEAM->Draw("hist e");
 
