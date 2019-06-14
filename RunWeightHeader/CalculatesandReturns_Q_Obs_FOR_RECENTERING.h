@@ -23,8 +23,9 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 // last edited (if I remebered to change this... 6/11/2019 11:48:17 AM)
 
 
-#include <string>
+#include <string.h>
 #include <stdexcept>
+#include <cstring>
 #include <cmath> //for atan2 as it is a math fu c could also use tmath but i want to avoid any root outside of plotting
 
 #ifndef CalculatesandReturnsQObsforRecentering
@@ -119,12 +120,15 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 				fC_of_TS456_Summed = RawDataRPD[1][channel][4] + RawDataRPD[1][channel][5] + RawDataRPD[1][channel][6];
 
 				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[1][channel][7] <= RawDataRPD[1][channel][5]) && (RawDataRPD[1][channel][1] / RawDataRPD[1][channel][0] < 1000) && (RawDataRPD[1][channel][0] != 0)) {
-					RPDSignalSummed[1] += fC_of_TS456_Summed;
 					
-					cosv1RPDsum[1] += cos(1*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
- 					sinv1RPDsum[1] += sin(1*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
- 					cosv2RPDsum[1] += cos(2*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
- 					sinv2RPDsum[1] += sin(2*RPDBlocksInPhi[1][channel])*fC_of_TS456_Summed;
+					double Weighted_fC_of_TS456_Summed = fC_of_TS456_Summed * Input_Weightedjeffsweights[channel];
+
+					RPDSignalSummed[1] += Weighted_fC_of_TS456_Summed;
+					
+					cosv1RPDsum[1] += cos(1*RPDBlocksInPhi[1][channel]) * Weighted_fC_of_TS456_Summed;
+ 					sinv1RPDsum[1] += sin(1*RPDBlocksInPhi[1][channel]) * Weighted_fC_of_TS456_Summed;
+ 					cosv2RPDsum[1] += cos(2*RPDBlocksInPhi[1][channel]) * Weighted_fC_of_TS456_Summed;
+ 					sinv2RPDsum[1] += sin(2*RPDBlocksInPhi[1][channel]) * Weighted_fC_of_TS456_Summed;
 					
 
 					//ask alice how recentering works
@@ -157,12 +161,15 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 				fC_of_TS456_Summed = RawDataRPD[0][channel][4] + RawDataRPD[0][channel][5] + RawDataRPD[0][channel][6];
 
 				if ((fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed / fC_of_TS456_Summed > .8) && (RawDataRPD[0][channel][7] <= RawDataRPD[0][channel][5]) && (RawDataRPD[0][channel][1] / RawDataRPD[0][channel][0] < 1000) && (RawDataRPD[0][channel][0] != 0)) {
-					RPDSignalSummed[0] += fC_of_TS456_Summed;
+					
+					double Weighted_fC_of_TS456_Summed = fC_of_TS456_Summed * Input_Weightedjeffsweights[channel];
+
+					RPDSignalSummed[0] += Weighted_fC_of_TS456_Summed;
 					//here im creating the components of the flow vector
-					cosv1RPDsum[0] += cos(1*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
-					sinv1RPDsum[0] += sin(1*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
-					cosv2RPDsum[0] += cos(2*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
-					sinv2RPDsum[0] += sin(2*RPDBlocksInPhi[0][channel])*fC_of_TS456_Summed;
+					cosv1RPDsum[0] += cos(1*RPDBlocksInPhi[0][channel]) * Weighted_fC_of_TS456_Summed;
+					sinv1RPDsum[0] += sin(1*RPDBlocksInPhi[0][channel]) * Weighted_fC_of_TS456_Summed;
+					cosv2RPDsum[0] += cos(2*RPDBlocksInPhi[0][channel]) * Weighted_fC_of_TS456_Summed;
+					sinv2RPDsum[0] += sin(2*RPDBlocksInPhi[0][channel]) * Weighted_fC_of_TS456_Summed;
 					
 				}
 			}
