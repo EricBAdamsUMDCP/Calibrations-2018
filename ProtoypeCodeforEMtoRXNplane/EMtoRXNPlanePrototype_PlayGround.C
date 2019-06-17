@@ -47,11 +47,11 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	initRootStyle();
 	
 
-	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); string Dataset = "PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root";// opening root fie (only have 1 uncommented)
+	TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); string Dataset = "PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root";// opening root fie (only have 1 uncommented)
 	
-	TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); string Dataset = "AOD_zdc_digi_tree_326776_many_3"; // opening the root file
+	//TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); string Dataset = "AOD_zdc_digi_tree_326776_many_3"; // opening the root file
 
-	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/14/2019 2:38:24 PM" << endl;
+	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/17/2019 3:20:27 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 	
@@ -82,6 +82,9 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double EM_CUT_Xmin = -4;
 	double EM_CUT_Xmax = 4;
 
+	double HolderForRXNPlanePos; ///4x4
+	double HolderForRXNPlaneNeg; ///4x4
+
 	double EM = 0;
 	double HAD = 1;
 	double RPD = 3;
@@ -99,6 +102,12 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double RawDataRPD[NSIDE][NRPD][NTS] = { {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}},    //neg  // these are used to store the raw data 
 										    {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}} }; //pos
 	
+
+	double X_position_cm[2][16] = {{1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1},  //neg
+							   	   {1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1}}; //pos
+	
+	double Y_position_cm[2][16] = {{-1, 1, 3, -3, -1, 1, 3, -3, 1, -1, -3, 3, 1, -1, -3, 3},  //neg
+								   {-1, 1, 3, -3, -1, 3, 1, -3, 1, -1, -3, 3, 1, -1, -3, 3}}; //pos 
 
 	/// END Variable and constant declaration ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -119,12 +128,14 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	TH1F* RXN_Plane_Resolution_Histo;
 
 	TH2F* EMPvEMN;
-	TH2F* Pos_EMX_v_RPDX;
+	TH2F* RPD_Pos_w_RXN_Plane; //4x4 plot
+	TH2F* RPD_Neg_w_RXN_Plane; //4x4 plot
+/*	TH2F* Pos_EMX_v_RPDX;
 	TH2F* Neg_EMX_v_RPDX;
 	TH2F* Pos_RPDvRPD;
 	TH2F* Neg_RPDvRPD;
 	TH2F* RPDXP_v_RPDXN;
-	TH2F* RPDYP_v_RPDYN;
+	TH2F* RPDYP_v_RPDYN;*/
 
 	//TH2F* RPD_v_EM_P_BEAM;
 	//TH2F* RPD_v_EM_N_BEAM;
@@ -144,15 +155,30 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 	RXN_Plane_Resolution_Histo = new TH1F(Form("RXNPRes"),"RXN Plane Resolution;Resolution;[a.u.]",100,-M_PI,M_PI);
 
+	///4x4plot
+	RPD_Pos_w_RXN_Plane = new TH2F(Form("RPD_Pos %d", runnumber), Form("RPD_Pos_w_RXN_Plane%d", runnumber), 4, -2, 2, 4, -2, 2);
+
+	RPD_Pos_w_RXN_Plane->GetXaxis()->SetNdivisions(4);
+	RPD_Pos_w_RXN_Plane->GetYaxis()->SetNdivisions(4);
+	
+	RPD_Neg_w_RXN_Plane = new TH2F(Form("RPD_Neg %d", runnumber), Form("RPD_Neg_w_RXN_Plane%d", runnumber), 4, -2, 2, 4, -2, 2);
+	
+	RPD_Neg_w_RXN_Plane->GetXaxis()->SetNdivisions(4);
+	RPD_Neg_w_RXN_Plane->GetYaxis()->SetNdivisions(4);
+	/// 4x4plot
+
+
+
+
 	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 
-	RPDX_P_BEAM = new TH1F(Form("RPDX_P_BEAM %d", runnumber), Form("P_RPDX_%d_NBins_%d_MB_2; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	/*RPDX_P_BEAM = new TH1F(Form("RPDX_P_BEAM %d", runnumber), Form("P_RPDX_%d_NBins_%d_MB_2; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
 	RPDX_N_BEAM = new TH1F(Form("RPDX_N_BEAM %d", runnumber), Form("N_RPDX_%d_NBins_%d_MB_2; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
-
+*/
 	EMPvEMN = new TH2F(Form("EMPvEMN %d", runnumber), Form("EMPvEMN_%d_NBins_%d_MB_2; EMP cm; EMN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
 
-	Pos_EMX_v_RPDX = new TH2F(Form("XRPD_EM_P_BEAM %d", runnumber), Form("P_RPDX_EM_%d_NBins_%d_MB_2; EM cm; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
+	/*Pos_EMX_v_RPDX = new TH2F(Form("XRPD_EM_P_BEAM %d", runnumber), Form("P_RPDX_EM_%d_NBins_%d_MB_2; EM cm; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
 	Neg_EMX_v_RPDX = new TH2F(Form("XRPD_EM_N_BEAM %d", runnumber), Form("N_RPDX_EM_%d_NBins_%d_MB_2; EM cm; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
 
 	Pos_RPDvRPD = new TH2F(Form("Pos_RPDvRPD %d", runnumber), Form("Pos_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
@@ -160,7 +186,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 	RPDXP_v_RPDXN = new TH2F(Form("RPDXP_v_RPDXN %d", runnumber), Form("RPDXP_v_RPDXN_%d_NBins_%d_MB_2; RPDXP cm; RPDXN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
 	RPDYP_v_RPDYN = new TH2F(Form("RPDYP_v_RPDYN %d", runnumber), Form("RPDYP_v_RPDYN_%d_NBins_%d_MB_2; RPDYP cm; RPDYN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
-
+*/
 
 	//RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
 	//RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
@@ -412,18 +438,26 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		double Mean_Y_Pos = Qobs1[1][1]->GetMean(); //y
 		double  RMS_Y_Pos = Qobs1[1][1]->GetRMS(); 
 
-		double INPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Pos, Mean_Y_Pos};
-		double INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Pos, RMS_Y_Pos};
+		double PosINPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Pos, Mean_Y_Pos};
+		double PosINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Pos, RMS_Y_Pos};
 
-		cout << "Mean_X_Pos:  " << Mean_X_Pos << endl;
+		/*cout << "Mean_X_Pos:  " << Mean_X_Pos << endl;
 		cout << "RMS_X_Pos:  " << RMS_X_Pos << endl;
-		cout << "Mean_Y_Pos:  " << RMS_Y_Pos << endl;
-		cout << "RMS_Y_Pos:  " << RMS_Y_Pos << endl;
+		cout << "Mean_Y_Pos:  " << Mean_Y_Pos << endl;
+		cout << "RMS_Y_Pos:  " << RMS_Y_Pos << endl;*/
 
-	/*  double Mean_X_Neg = Qobs1[0][ixy]->GetMean() //neg
-		double  RMS_X_Neg = Qobs1[0][ixy]->GetRMS() 
-		double Mean_Y_Neg = Qobs1[0][ixy]->GetMean() 
-		double  RMS_Y_Neg = Qobs1[0][ixy]->GetRMS() */
+	 	double Mean_X_Neg = Qobs1[0][0]->GetMean(); //neg
+		double  RMS_X_Neg = Qobs1[0][0]->GetRMS();
+		double Mean_Y_Neg = Qobs1[0][1]->GetMean();
+		double  RMS_Y_Neg = Qobs1[0][1]->GetRMS();
+
+		double NegINPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Neg, Mean_Y_Neg};
+		double NegINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Neg,  RMS_Y_Neg};
+
+		/*cout << "Mean_X_Neg:  " << Mean_X_Neg << endl;
+		cout <<  "RMS_X_Neg:  " <<  RMS_X_Neg << endl;
+		cout << "Mean_Y_Neg:  " << Mean_Y_Neg << endl;
+		cout <<  "RMS_Y_Neg:  " <<  RMS_Y_Neg << endl;*/
 
 		//THIS IS FOR PART 2 THE PURPOSE IS AFTER WEVE GOTTEN THE INFORATION TO RECENTER FROM THE RXN PLANE CALCULATER FUNCTION WE NEED TO USE THAT INFORMATION TO RECENTER
 
@@ -497,8 +531,31 @@ void EMtoRXNPlanePrototype_PlayGround(){
 			JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
 			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
 		
-			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsPos, "Pos", "V1", INPUT_V1orV2_MEAN_X_Y_FOR_Recentering, INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, /*POS_OutPut_RPDfC_X_Y_coord,*/ POS_OutPut_RPD_Event_Plane_Psi);
-			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsNeg, "Neg", "V1", INPUT_V1orV2_MEAN_X_Y_FOR_Recentering, INPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, /*NEG_OutPut_RPDfC_X_Y_coord,*/ NEG_OutPut_RPD_Event_Plane_Psi);
+			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsPos, "Pos", "V1", PosINPUT_V1orV2_MEAN_X_Y_FOR_Recentering, PosINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, POS_OutPut_RPDfC_X_Y_coord, POS_OutPut_RPD_Event_Plane_Psi);
+			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsNeg, "Neg", "V1", NegINPUT_V1orV2_MEAN_X_Y_FOR_Recentering, NegINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, NEG_OutPut_RPDfC_X_Y_coord, NEG_OutPut_RPD_Event_Plane_Psi);
+
+			if (i % 1000000 == 0){
+				for (int h = 0; h <2; h++){
+					for (int i = 0; i < 15; i++){
+					
+						if (h == 0){
+							int bin = RPD_Neg_w_RXN_Plane->GetBin(X_position_cm[h][i], Y_position_cm[h][i]/*,binz*/);
+							//double ContentOfBin = RPD_Neg_w_RXN_Plane->GetBinContent(bin);
+							RPD_Neg_w_RXN_Plane->SetBinContent(bin, (NEG_OutPut_RPDfC_X_Y_coord[i] /*+ ContentOfBin*/));
+							//double label = RPD_Neg_w_RXN_Plane->GetBinContent(bin);
+							RPD_Neg_w_RXN_Plane->SetBinLabel(bin, NEG_OutPut_RPDfC_X_Y_coord[i]/*label*/);
+				
+						}
+						else{
+							int bin = RPD_Pos_w_RXN_Plane->GetBin(X_position_cm[h][i], Y_position_cm[h][i]/*,binz*/);
+							//double ContentOfBin = RPD_Pos_w_RXN_Plane->GetBinContent(bin);
+							RPD_Pos_w_RXN_Plane->SetBinContent(bin, (POS_OutPut_RPDfC_X_Y_coord[i] /* + ContentOfBin*/)); //it might be the other way around idk
+							//double label = RPD_Pos_w_RXN_Plane->GetBinContent(bin);
+							RPD_Pos_w_RXN_Plane->SetBinLabel(bin, POS_OutPut_RPDfC_X_Y_coord[i]/*label*/);
+						}	
+					}
+				}
+			}
 
 			Outputs_Resolution_ReactionPlane_to_Mean( POS_OutPut_RPD_Event_Plane_Psi, NEG_OutPut_RPD_Event_Plane_Psi, Output_ReactionPlaneResolution_All_mustbeMeaned);
 
@@ -566,6 +623,12 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 	EP1dist[0]->Draw("hist e");
 	c2->Print(Form("%s/EP1dist_V1_Neg.png",figdir));
+
+	RPD_Pos_w_RXN_Plane->Draw("colz");
+	TLine *linePos = new TLine(0,0,(cos(HolderForRXNPlanePos)),(sin(HolderForRXNPlanePos)) ); 
+	
+	RPD_Neg_w_RXN_Plane->Draw("colz");
+	TLine *linePos = new TLine(0,0,(cos(HolderForRXNPlaneNeg)),(sin(HolderForRXNPlaneNeg)) ); 
 
 /*	EM_P_BEAM->Draw("hist e");
 

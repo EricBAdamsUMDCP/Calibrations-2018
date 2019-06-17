@@ -105,6 +105,7 @@ void CalculatesandReturns_Q_ObsforRecentering(double RawDataRPD[2][16][10], doub
 		///END MEMSET setting all variables to 0 incase variables are being kept////////
 
 			//DOUBLE CHECK THESE NUMBERS AND MAKE SURE THEY MATCH THEIR RESPECTIVE QB POSITION THEY WERE CALCULATED SORT OF SLOPPLY ean 6/3/19 4 PM						   
+		
 		float RPDBlocksInPhi[NSIDE][NRPD] = {{-0.785398, 0.785398, 1.24905, -1.24905, -0.321751, 0.321751, 0.785398, -0.785398, 2.81984, -2.81984, -2.35619, 2.35619, 2.35619, -2.35619, -1.89255, 1.89255}, //NEG
 		 									 {-0.785398, 0.785398, 1.24905, -1.24905, -0.321751, 0.785398, 0.321751, -0.785398, 2.81984, -2.81984, -2.35619, 2.35619, 2.35619, -2.35619, -1.89255, 1.89255}};
 	

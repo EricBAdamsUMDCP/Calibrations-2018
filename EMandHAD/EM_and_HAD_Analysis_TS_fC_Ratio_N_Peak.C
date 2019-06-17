@@ -34,7 +34,7 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH1::SetDefaultSumw2();
 
   
-  cout << "running software EM_TS_DIST.C 6/13/2019 11:37:26 AM" << endl;
+  cout << "running software EM_TS_DIST.C 6/17/2019 4:34:37 PM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
@@ -55,8 +55,11 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   double P_ratiovalue = 7.0; //used to be 6
   double N_ratiovalue = 4.0; //used to be 3
   //ratio value for pos is 6 and for neg is 3
-  int cutoff = 0; //cutoff of 70 appears to be good
-  int graphMin = 15000; //was 5000 this is for coloration test
+  int cutoff = 00; //cutoff of 70 appears to be good
+  int graphMaxPos = 45000; //was 5000 this is for coloration test
+  int graphMaxNeg = 50000;
+  int graphMinPos = 3000;
+  int graphMinNeg = 4000;
 
   TH1F* em[2][5];
   TH1F* emfC[2][5];
@@ -263,13 +266,13 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   double N_SUM = N_SumHADfC + multiplicativevalue*N_SumEMfC;
   double P_SUM = P_SumHADfC + multiplicativevalue*P_SumEMfC;
 
-  if (P_SUM > graphMin ){
+  if (graphMaxPos > P_SUM && P_SUM > graphMinPos){
     PEMvTotalE->Fill((P_SUM), P_SumEMfC); //0.005
     P_HADSUM->Fill((P_SUM));
     P_45vTotalE->Fill((P_SUM), (P_sumEM4v5 + P_sumHAD4v5));
   }
   
-  if (N_SUM > graphMin){
+  if ( graphMaxNeg > N_SUM && N_SUM > graphMinNeg){
     NEMvTotalE->Fill((N_SUM), N_SumEMfC); //0.005
     N_HADSUM->Fill((N_SUM));
     N_45vTotalE->Fill((N_SUM), (N_sumEM4v5 + N_sumHAD4v5));
@@ -362,11 +365,12 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                       */
 
   TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
- 
-  P_HADSUM->Draw("hist e");
+  //c3->SetLogy();
+  P_HADSUM->Draw("c");
    c3->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
   TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
-  N_HADSUM->Draw("hist e");
+ // c4->SetLogy();
+  N_HADSUM->Draw("c");
    c4->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
 
 
