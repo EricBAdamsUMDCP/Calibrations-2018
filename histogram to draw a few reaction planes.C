@@ -60,16 +60,16 @@ for (int h = 0; h <2; h++){
 			int bin = RPD_Neg_w_RXN_Plane->GetBin(X_position_cm[h][i], Y_position_cm[h][i]/*,binz*/);
 			//double ContentOfBin = RPD_Neg_w_RXN_Plane->GetBinContent(bin);
 			RPD_Neg_w_RXN_Plane->SetBinContent(bin, (NEG_OutPut_RPDfC_X_Y_coord[i] /*+ ContentOfBin*/));
-			double label = RPD_Neg_w_RXN_Plane->GetBinContent(bin);
-			RPD_Neg_w_RXN_Plane->SetBinLabel(bin, label);
+			//double label = RPD_Neg_w_RXN_Plane->GetBinContent(bin);
+			RPD_Neg_w_RXN_Plane->SetBinLabel(bin, NEG_OutPut_RPDfC_X_Y_coord[i]/*label*/);
 
 		}
 		else{
 			int bin = RPD_Pos_w_RXN_Plane->GetBin(X_position_cm[h][i], Y_position_cm[h][i]/*,binz*/);
 			//double ContentOfBin = RPD_Pos_w_RXN_Plane->GetBinContent(bin);
 			RPD_Pos_w_RXN_Plane->SetBinContent(bin, (POS_OutPut_RPDfC_X_Y_coord[i] /* + ContentOfBin*/)); //it might be the other way around idk
-			double label = RPD_Pos_w_RXN_Plane->GetBinContent(bin);
-			RPD_Pos_w_RXN_Plane->SetBinLabel(bin, label);
+			//double label = RPD_Pos_w_RXN_Plane->GetBinContent(bin);
+			RPD_Pos_w_RXN_Plane->SetBinLabel(bin, POS_OutPut_RPDfC_X_Y_coord[i]/*label*/);
 		}	
 	}
 }

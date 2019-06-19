@@ -55,11 +55,11 @@ void CalculatesandReturnsRXN_Plane(double RawDataRPD[2][16][10], double Input_We
 		float Recentered_Q_Observed_V2_X = 0;
 		float Recentered_Q_Observed_V2_Y = 0;
 		//look up tables for RPD positions created by EBA 5/15/19 
-		double X_position_cm[2][16] = {{1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1},  //neg
+		/*double X_position_cm[2][16] = {{1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1},  //neg
 								   	   {1, 1, 1, 1, 3, 3, 3, 3, -3, -3, -3, -3, -1, -1, -1, -1}}; //pos
 	
 		double Y_position_cm[2][16] = {{-1, 1, 3, -3, -1, 1, 3, -3, 1, -1, -3, 3, 1, -1, -3, 3},  //neg
-									   {-1, 1, 3, -3, -1, 3, 1, -3, 1, -1, -3, 3, 1, -1, -3, 3}}; //pos 
+									   {-1, 1, 3, -3, -1, 3, 1, -3, 1, -1, -3, 3, 1, -1, -3, 3}}; //pos */
 	
 		// for recentering calibration, from Qobs distributions
 	
