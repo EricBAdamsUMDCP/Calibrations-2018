@@ -23,7 +23,7 @@ Double_t sumOfGauss(Double_t*, Double_t*);
 TH1F* spectrum_noise;
 
 
-void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
+void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   initRootStyle();
 
   int iPeriod = 0;
@@ -34,7 +34,7 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH1::SetDefaultSumw2();
 
   
-  cout << "running software EM_TS_DIST.C 6/17/2019 4:34:37 PM" << endl;
+  cout << "running software EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C 6/19/2019 3:41:15 PM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
@@ -51,7 +51,8 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
-  double multiplicativevalue = 0.19; 
+  double EMmultiplicativevalue = 0.19; 
+  double RPDmultiplicativevalue = 0.08;
   double P_ratiovalue = 7.0; //used to be 6
   double N_ratiovalue = 4.0; //used to be 3
   //ratio value for pos is 6 and for neg is 3
@@ -87,8 +88,8 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
     }
   }
 
-  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC", runnumber, multiplicativevalue),300,0,100000);
-  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC", runnumber, multiplicativevalue),300,0,100000);
+  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC", runnumber, EMmultiplicativevalue),300,0,100000);
+  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC", runnumber, EMmultiplicativevalue),300,0,100000);
 
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 4; ich++){
@@ -110,12 +111,12 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
 
 
-  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 100, 5000, 60000, 100, 5000, 80000); //used to be 50
-  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC); EM (fC)", multiplicativevalue), 100, 5000, 60000, 100, 5000, 80000); //nin used to be 700
+  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC); EM (fC)", EMmultiplicativevalue), 100, 5000, 60000, 100, 5000, 80000); //used to be 50
+  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC); EM (fC)", EMmultiplicativevalue), 100, 5000, 60000, 100, 5000, 80000); //nin used to be 700
 
 
-  P_45vTotalE = new TH2F(Form("P_45vTotalE"),Form("ts4/5 em and had vTotalE ts 4; Sum HAD + %f * EM (fC); ts4/5 em and had vTotalE ts 4 (fC)", multiplicativevalue), 60, 3000, 20000, 60, 0, 200);
-  N_45vTotalE = new TH2F(Form("N_45vTotalE"),Form("ts4/5 em and had vTotalE TS 4; Sum HAD + %f * EM (fC); ts4/5 em and had vTotalE ts 4 (fC)", multiplicativevalue), 60, 3000, 20000, 60, 0, 200);
+  P_45vTotalE = new TH2F(Form("P_45vTotalE"),Form("ts4/5 em and had vTotalE ts 4; Sum HAD + %f * EM (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue), 60, 3000, 20000, 60, 0, 200);
+  N_45vTotalE = new TH2F(Form("N_45vTotalE"),Form("ts4/5 em and had vTotalE TS 4; Sum HAD + %f * EM (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue), 60, 3000, 20000, 60, 0, 200);
 
   const int NTS=10;            // number of timeslices
   TLeaf* bxidLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("bxid");
@@ -144,7 +145,7 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 
     double EM_TS_45[NSIDE][5] = {0}; //actually just 4
     double HAD_TS_45[NSIDE][4] = {0}; // actually just 4
-    double RPD_TS_45[NSIDE][16] = {16}
+    double RPD_TS_45[NSIDE][16] = {16}; //4 & 5
 
     double EM4v5array[2][5] = {0};
     double HAD4v5array[2][4] = {0};
@@ -268,12 +269,12 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   ////////////Begin RPD ////////////////////////////////////////////////////////////////////////////////////////
   double P_SumRPDfC = 0;
   for (int i = 0; i <16; i++) {
-  P_SumRPDfC += RPD_TS_45[1][i] 
+  P_SumRPDfC += RPD_TS_45[1][i]; 
   }
   
   double N_SumRPDfC = 0;
   for (int i = 0; i <16; i++) {
-  N_SumRPDfC += RPD_TS_45[0][i] 
+  N_SumRPDfC += RPD_TS_45[0][i];
   }
 
   ////////////End RPD //////////////////////////////////////////////////////////////////////////////////////////
@@ -289,8 +290,8 @@ void EM_and_HAD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 
   ////////////Begin HAD and EM (only if both are used)/////////////////////////////////////////////////////////
   
-  double N_SUM = N_SumHADfC + multiplicativevalue*N_SumEMfC;
-  double P_SUM = P_SumHADfC + multiplicativevalue*P_SumEMfC;
+  double N_SUM = N_SumHADfC + EMmultiplicativevalue*N_SumEMfC + N_SumRPDfC*RPDmultiplicativevalue;
+  double P_SUM = P_SumHADfC + EMmultiplicativevalue*P_SumEMfC + P_SumRPDfC*RPDmultiplicativevalue;
 
   if (graphMaxPos > P_SUM && P_SUM > graphMinPos){
     PEMvTotalE->Fill((P_SUM), P_SumEMfC); //0.005

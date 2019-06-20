@@ -52,7 +52,7 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	
 	TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); string Dataset = "AOD_zdc_digi_tree_326776_many_3"; // opening the root file
 
-	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/18/2019 8:03:31 PM" << endl;
+	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/20/2019 1:10:01 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 	
@@ -76,22 +76,25 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	const int NRPDColnRow = 4;
 	const int NSIDE = 2; const char* stit[NSIDE] = { "#minus","#plus" };  const char* stit2[NSIDE] = { "neg","pos" };
 	const int NXY = 2;
+		  int NumberofZDCTreeEntries = 0;
+
 	double RPDXmin = -3;
 	double RPDXmax = 3;
 	double RPDYMin = -3;
 	double RPDYMax = 3;
 	double EM_CUT_Xmin = -4;
 	double EM_CUT_Xmax = 4;
+	
 
-	double HolderForRXNPlanePos; ///4x4
-	double HolderForRXNPlaneNeg; ///4x4
+	double Not_neg10_NEG = 0; //for figuring out quantity of bad events
+	double Not_neg10_POS = 0;
 
 	double EM = 0;
 	double HAD = 1;
 	double RPD = 3;
 
-	int INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[NRPD] = {14, 13, 16, 15, 10, 12, 9, 11, 6, 5, 8, 7, 2, 1, 4, 3}; //tenative needs to be checked
-			
+	int INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[NRPD] = {13, 12, 15, 14, 9, 11, 8, 10, 5, 4, 7, 6, 1, 0, 3, 2}; //tenative needs to be checked
+													  //{14, 13, 16, 15, 10, 12, 9, 11, 6, 5, 8, 7, 2, 1, 4, 3} // old bfopr noticed out of bounmds array issue and subtracted 1 kept for reference
 
 /////////////these arrays serve the purpoose of storing data so it can be stored later and used event by event//////////////////////////////////////////////////////////////////////			
     double   RawDataEM[NSIDE][NEM][NTS] = {{{0}, {0}, {0}, {0}, {0}},   //neg
@@ -209,7 +212,8 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	TLeaf* nHFneg = (TLeaf*)ZDCDigiTree->GetLeaf("nHFneg");
 	TLeaf* nHFpos = (TLeaf*)ZDCDigiTree->GetLeaf("nHFpos");
 
-	
+	NumberofZDCTreeEntries = ZDCDigiTree->GetEntries(); // main purpose of this is to create the array size for storing the rxn plane values for correction/flattening of the event planes
+
 	double PXG = 0;
 	double NXG = 0;
 	
@@ -247,286 +251,286 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	/// Begin filling variables with DATA/fC LOOP 
 	// https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
 
-
 	
-		for (int i = 0; i < ZDCDigiTree->GetEntries(); i++) {
-			ZDCDigiTree->GetEntry(i);
+	for (int i = 0; i < NumberofZDCTreeEntries /*ZDCDigiTree->GetEntries()*/; i++) {
+		ZDCDigiTree->GetEntry(i);
 	
-			for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
-				int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
-				int type = (int)(sectionLeaf->GetValue(n)) - 1;
-				int channel = (int)(channelLeaf->GetValue(n)) - 1;
+		for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
+			int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
+			int type = (int)(sectionLeaf->GetValue(n)) - 1;
+			int channel = (int)(channelLeaf->GetValue(n)) - 1;
 	
-				/// Begin filling timeslices with fC (discrimination is by channel number iteration)
+			/// Begin filling timeslices with fC (discrimination is by channel number iteration)
 	
-				//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
-				//this is used below to keep values at 0 or greater
-				//40 fC nosie cuttoff 
+			//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
+			//this is used below to keep values at 0 or greater
+			//40 fC nosie cuttoff 
 	
-				double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
-				double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));
-				double TS_Two   = (fCleaf[2]->GetValue(n) <= 0) ? 0 : (fCleaf[2]->GetValue(n));
-				double TS_Three = (fCleaf[3]->GetValue(n) <= 0) ? 0 : (fCleaf[3]->GetValue(n));
-				double TS_Four  = (fCleaf[4]->GetValue(n) <= 0) ? 0 : (fCleaf[4]->GetValue(n));
-				double TS_Five  = (fCleaf[5]->GetValue(n) <= 0) ? 0 : (fCleaf[5]->GetValue(n));
-				double TS_Six   = (fCleaf[6]->GetValue(n) <= 0) ? 0 : (fCleaf[6]->GetValue(n));
-				double TS_Seven = (fCleaf[7]->GetValue(n) <= 0) ? 0 : (fCleaf[7]->GetValue(n));
-				double TS_Eight = (fCleaf[8]->GetValue(n) <= 0) ? 0 : (fCleaf[8]->GetValue(n));
-				double TS_Nine  = (fCleaf[9]->GetValue(n) <= 0) ? 0 : (fCleaf[9]->GetValue(n));
+			double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
+			double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));
+			double TS_Two   = (fCleaf[2]->GetValue(n) <= 0) ? 0 : (fCleaf[2]->GetValue(n));
+			double TS_Three = (fCleaf[3]->GetValue(n) <= 0) ? 0 : (fCleaf[3]->GetValue(n));
+			double TS_Four  = (fCleaf[4]->GetValue(n) <= 0) ? 0 : (fCleaf[4]->GetValue(n));
+			double TS_Five  = (fCleaf[5]->GetValue(n) <= 0) ? 0 : (fCleaf[5]->GetValue(n));
+			double TS_Six   = (fCleaf[6]->GetValue(n) <= 0) ? 0 : (fCleaf[6]->GetValue(n));
+			double TS_Seven = (fCleaf[7]->GetValue(n) <= 0) ? 0 : (fCleaf[7]->GetValue(n));
+			double TS_Eight = (fCleaf[8]->GetValue(n) <= 0) ? 0 : (fCleaf[8]->GetValue(n));
+			double TS_Nine  = (fCleaf[9]->GetValue(n) <= 0) ? 0 : (fCleaf[9]->GetValue(n));
 	
-				//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
+			//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
 	
-				double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
+			double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
 	
-				// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
+			// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
 	
-				if (type == EM){
-					for (int TS = 0; TS < NTS; TS++){
-						RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
-					}
-				}
-				/*else if (type == HAD){ //figure out what cutoff for HAD
-					for (int TS = 0; TS < NTS; TS++){
-						RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
-					}
-				}*/
-				else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
-					for (int TS = 0; TS < NTS; TS++){
-						if (side == 0){
-							RawDataRPD[side][INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[channel]][TS] = TS_ARRAY[TS];
-						}
-						else{
-							RawDataRPD[side][channel][TS] = TS_ARRAY[TS];
-						}	  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
-						//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
-					}
+			if (type == EM){
+				for (int TS = 0; TS < NTS; TS++){
+					RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
 				}
 			}
-	
-			//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
-			//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
-		
-			PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
-			NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
-			// bug test this to see if its running when neg for pos and pos for neg
-			
-			
-
-			JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg); //uncomment this to reactivate jeff weighter theese are deactivated to look for bugs in otehr software
-			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
-			
-			CalculatesandReturns_Q_ObsforRecentering(RawDataRPD, OutPut_WeightedjeffsweightsPos, "Pos", Pos_Output_Q_Observed_V1_X, Pos_Output_Q_Observed_V1_Y, Pos_Output_Q_Observed_V2_X, Pos_Output_Q_Observed_V2_Y);
-			CalculatesandReturns_Q_ObsforRecentering(RawDataRPD, OutPut_WeightedjeffsweightsNeg, "Neg", Neg_Output_Q_Observed_V1_X, Neg_Output_Q_Observed_V1_Y, Neg_Output_Q_Observed_V2_X, Neg_Output_Q_Observed_V2_Y);
-		
-			if (Pos_Output_Q_Observed_V1_X != -10 && Pos_Output_Q_Observed_V1_Y != -10 && Neg_Output_Q_Observed_V1_X != -10 && Neg_Output_Q_Observed_V1_Y != -10){
-				/* //for debugging purposes				
-				cout << "Pos_Output_Q_Observed_V1_X:  " <<  Pos_Output_Q_Observed_V1_X << endl; 
-				cout << "Pos_Output_Q_Observed_V1_Y:  " <<  Pos_Output_Q_Observed_V1_Y << endl; 
-				cout << "Pos_Output_Q_Observed_V2_X:  " <<  Pos_Output_Q_Observed_V2_X << endl; 
-				cout << "Pos_Output_Q_Observed_V2_Y:  " <<  Pos_Output_Q_Observed_V2_Y << endl; 
-				cout << "Neg_Output_Q_Observed_V1_X:  " <<  Neg_Output_Q_Observed_V1_X << endl; 
-				cout << "Neg_Output_Q_Observed_V1_Y:  " <<  Neg_Output_Q_Observed_V1_Y << endl; 
-				cout << "Neg_Output_Q_Observed_V2_X:  " <<  Neg_Output_Q_Observed_V2_X << endl; 
-				cout << "Neg_Output_Q_Observed_V2_Y:  " <<  Neg_Output_Q_Observed_V2_Y << endl; */
-
-				//these are filled to be used later for getting values for recentering
-				Qobs1[0][0]->Fill(Pos_Output_Q_Observed_V1_X);
-				Qobs1[0][1]->Fill(Pos_Output_Q_Observed_V1_Y);
-				Qobs1[1][0]->Fill(Neg_Output_Q_Observed_V1_X);
-				Qobs1[1][1]->Fill(Neg_Output_Q_Observed_V1_Y);
+			/*else if (type == HAD){ //figure out what cutoff for HAD
+				for (int TS = 0; TS < NTS; TS++){
+					RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
+				}
+			}*/
+			else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
+				for (int TS = 0; TS < NTS; TS++){
+					if (side == 0){
+						RawDataRPD[side][INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[channel]][TS] = TS_ARRAY[TS];
+					}
+					else{
+						RawDataRPD[side][channel][TS] = TS_ARRAY[TS];
+					}	  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
+				}
 			}
-			
-			
-			if (i % 100000 == 0) cout << i << " (PART 1) events are processed." << endl;
+		}
+	
+		//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
+		//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
+	
+		PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
+		NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
+		// bug test this to see if its running when neg for pos and pos for neg
+		
+		
+
+		JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg); //uncomment this to reactivate jeff weighter theese are deactivated to look for bugs in otehr software
+		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+		
+		CalculatesandReturns_Q_ObsforRecentering(RawDataRPD, OutPut_WeightedjeffsweightsPos, "Pos", Pos_Output_Q_Observed_V1_X, Pos_Output_Q_Observed_V1_Y, Pos_Output_Q_Observed_V2_X, Pos_Output_Q_Observed_V2_Y);
+		CalculatesandReturns_Q_ObsforRecentering(RawDataRPD, OutPut_WeightedjeffsweightsNeg, "Neg", Neg_Output_Q_Observed_V1_X, Neg_Output_Q_Observed_V1_Y, Neg_Output_Q_Observed_V2_X, Neg_Output_Q_Observed_V2_Y);
+	
+		if (Pos_Output_Q_Observed_V1_X != -10 && Pos_Output_Q_Observed_V1_Y != -10 && Neg_Output_Q_Observed_V1_X != -10 && Neg_Output_Q_Observed_V1_Y != -10){
+			/* //for debugging purposes				
+			cout << "Pos_Output_Q_Observed_V1_X:  " <<  Pos_Output_Q_Observed_V1_X << endl; 
+			cout << "Pos_Output_Q_Observed_V1_Y:  " <<  Pos_Output_Q_Observed_V1_Y << endl; 
+			cout << "Pos_Output_Q_Observed_V2_X:  " <<  Pos_Output_Q_Observed_V2_X << endl; 
+			cout << "Pos_Output_Q_Observed_V2_Y:  " <<  Pos_Output_Q_Observed_V2_Y << endl; 
+			cout << "Neg_Output_Q_Observed_V1_X:  " <<  Neg_Output_Q_Observed_V1_X << endl; 
+			cout << "Neg_Output_Q_Observed_V1_Y:  " <<  Neg_Output_Q_Observed_V1_Y << endl; 
+			cout << "Neg_Output_Q_Observed_V2_X:  " <<  Neg_Output_Q_Observed_V2_X << endl; 
+			cout << "Neg_Output_Q_Observed_V2_Y:  " <<  Neg_Output_Q_Observed_V2_Y << endl; */
+
+			//these are filled to be used later for getting values for recentering
+			Qobs1[0][0]->Fill(Pos_Output_Q_Observed_V1_X);
+			Qobs1[0][1]->Fill(Pos_Output_Q_Observed_V1_Y);
+			Qobs1[1][0]->Fill(Neg_Output_Q_Observed_V1_X);
+			Qobs1[1][1]->Fill(Neg_Output_Q_Observed_V1_Y);
+		}
+		
+		
+		if (i % 100000 == 0) cout << i << " (PART 1) events are processed." << endl;
+	}
+
+	//>>>THIS IS PART 2 THE PURPOSE IS AFTER WEVE GOTTEN THE INFORATION TO RECENTER FROM THE RXN PLANE CALCULATER FUNCTION WE NEED TO USE THAT INFORMATION TO RECENTER
+	
+	/////////////Begin computations for recentering////////////////////
+
+	//pos
+	double Mean_X_Pos = Qobs1[1][0]->GetMean(); //x
+	double  RMS_X_Pos = Qobs1[1][0]->GetRMS(); 
+	double Mean_Y_Pos = Qobs1[1][1]->GetMean(); //y
+	double  RMS_Y_Pos = Qobs1[1][1]->GetRMS(); 
+
+	double PosINPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Pos, Mean_Y_Pos};
+	double PosINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Pos, RMS_Y_Pos};
+
+	/*cout << "Mean_X_Pos:  " << Mean_X_Pos << endl;
+	cout << "RMS_X_Pos:  " << RMS_X_Pos << endl;
+	cout << "Mean_Y_Pos:  " << Mean_Y_Pos << endl;
+	cout << "RMS_Y_Pos:  " << RMS_Y_Pos << endl;*/
+
+	 double Mean_X_Neg = Qobs1[0][0]->GetMean(); //neg
+	double  RMS_X_Neg = Qobs1[0][0]->GetRMS();
+	double Mean_Y_Neg = Qobs1[0][1]->GetMean();
+	double  RMS_Y_Neg = Qobs1[0][1]->GetRMS();
+
+	double NegINPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Neg, Mean_Y_Neg};
+	double NegINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Neg,  RMS_Y_Neg};
+
+	/*cout << "Mean_X_Neg:  " << Mean_X_Neg << endl;
+	cout <<  "RMS_X_Neg:  " <<  RMS_X_Neg << endl;
+	cout << "Mean_Y_Neg:  " << Mean_Y_Neg << endl;
+	cout <<  "RMS_Y_Neg:  " <<  RMS_Y_Neg << endl;*/
+
+	/// END math for recentering///////////////////////////////////////////////////////
+
+	double POS_OutPut_RPD_Event_Plane_Psi = 0;
+	double NEG_OutPut_RPD_Event_Plane_Psi = 0;
+	double POS_OutPut_RPDfC_X_Y_coord[16] = {0};
+	double NEG_OutPut_RPDfC_X_Y_coord[16] = {0};
+	double Output_ReactionPlaneResolution_All_mustbeMeaned = 0;
+
+																	//double INPUT_Event_Plane[NumberofZDCTreeEntries] = {0}; //for the rxn plane correction function so it doesnt have to calculate the rxn plane a 2nd time
+
+
+
+	for (int i = 0; i < NumberofZDCTreeEntries /*ZDCDigiTree->GetEntries()*/; i++) {
+		ZDCDigiTree->GetEntry(i);
+	
+		for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
+			int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
+			int type = (int)(sectionLeaf->GetValue(n)) - 1;
+			int channel = (int)(channelLeaf->GetValue(n)) - 1;
+	
+			/// Begin filling timeslices with fC (discrimination is by channel number iteration)
+	
+			//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
+			//this is used below to keep values at 0 or greater
+	
+			double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
+			double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));
+			double TS_Two   = (fCleaf[2]->GetValue(n) <= 0) ? 0 : (fCleaf[2]->GetValue(n));
+			double TS_Three = (fCleaf[3]->GetValue(n) <= 0) ? 0 : (fCleaf[3]->GetValue(n));
+			double TS_Four  = (fCleaf[4]->GetValue(n) <= 0) ? 0 : (fCleaf[4]->GetValue(n));
+			double TS_Five  = (fCleaf[5]->GetValue(n) <= 0) ? 0 : (fCleaf[5]->GetValue(n));
+			double TS_Six   = (fCleaf[6]->GetValue(n) <= 0) ? 0 : (fCleaf[6]->GetValue(n));
+			double TS_Seven = (fCleaf[7]->GetValue(n) <= 0) ? 0 : (fCleaf[7]->GetValue(n));
+			double TS_Eight = (fCleaf[8]->GetValue(n) <= 0) ? 0 : (fCleaf[8]->GetValue(n));
+			double TS_Nine  = (fCleaf[9]->GetValue(n) <= 0) ? 0 : (fCleaf[9]->GetValue(n));
+	
+			//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
+	
+			double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
+	
+			// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
+	
+			if (type == EM){
+				for (int TS = 0; TS < NTS; TS++){
+					RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
+				}
+			}
+			/*else if (type == HAD){ //figure out what cutoff for HAD
+				for (int TS = 0; TS < NTS; TS++){
+					RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
+				}
+			}*/
+			else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
+				for (int TS = 0; TS < NTS; TS++){
+					if (side == 0){
+						RawDataRPD[side][INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[channel]][TS] = TS_ARRAY[TS];
+					}
+					else{
+						RawDataRPD[side][channel][TS] = TS_ARRAY[TS];
+					}	  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
+				}
+			}
 		}
 
-		//>>>THIS IS PART 2 THE PURPOSE IS AFTER WEVE GOTTEN THE INFORATION TO RECENTER FROM THE RXN PLANE CALCULATER FUNCTION WE NEED TO USE THAT INFORMATION TO RECENTER
+		PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
+		NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
+		// bug test this to see if its running when neg for pos and pos for neg
 		
-		/////////////Begin computations for recentering////////////////////
-
-		//pos
-		double Mean_X_Pos = Qobs1[1][0]->GetMean(); //x
-		double  RMS_X_Pos = Qobs1[1][0]->GetRMS(); 
-		double Mean_Y_Pos = Qobs1[1][1]->GetMean(); //y
-		double  RMS_Y_Pos = Qobs1[1][1]->GetRMS(); 
-
-		double PosINPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Pos, Mean_Y_Pos};
-		double PosINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Pos, RMS_Y_Pos};
-
-		/*cout << "Mean_X_Pos:  " << Mean_X_Pos << endl;
-		cout << "RMS_X_Pos:  " << RMS_X_Pos << endl;
-		cout << "Mean_Y_Pos:  " << Mean_Y_Pos << endl;
-		cout << "RMS_Y_Pos:  " << RMS_Y_Pos << endl;*/
-
-	 	double Mean_X_Neg = Qobs1[0][0]->GetMean(); //neg
-		double  RMS_X_Neg = Qobs1[0][0]->GetRMS();
-		double Mean_Y_Neg = Qobs1[0][1]->GetMean();
-		double  RMS_Y_Neg = Qobs1[0][1]->GetRMS();
-
-		double NegINPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Neg, Mean_Y_Neg};
-		double NegINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Neg,  RMS_Y_Neg};
-
-		/*cout << "Mean_X_Neg:  " << Mean_X_Neg << endl;
-		cout <<  "RMS_X_Neg:  " <<  RMS_X_Neg << endl;
-		cout << "Mean_Y_Neg:  " << Mean_Y_Neg << endl;
-		cout <<  "RMS_Y_Neg:  " <<  RMS_Y_Neg << endl;*/
-
-		/// END math for recentering///////////////////////////////////////////////////////
-
-		double POS_OutPut_RPD_Event_Plane_Psi = 0;
-		double NEG_OutPut_RPD_Event_Plane_Psi = 0;
-		double POS_OutPut_RPDfC_X_Y_coord[16] = {0};
-		double NEG_OutPut_RPDfC_X_Y_coord[16] = {0};
-		double Output_ReactionPlaneResolution_All_mustbeMeaned = 0;
-
-		for (int i = 0; i < ZDCDigiTree->GetEntries(); i++) {
-			ZDCDigiTree->GetEntry(i);
+		JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
+		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
 	
-			for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
-				int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
-				int type = (int)(sectionLeaf->GetValue(n)) - 1;
-				int channel = (int)(channelLeaf->GetValue(n)) - 1;
-	
-				/// Begin filling timeslices with fC (discrimination is by channel number iteration)
-	
-				//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
-				//this is used below to keep values at 0 or greater
-	
-				double TS_Zero  = (fCleaf[0]->GetValue(n) <= 0) ? 0 : (fCleaf[0]->GetValue(n));
-				double TS_One   = (fCleaf[1]->GetValue(n) <= 0) ? 0 : (fCleaf[1]->GetValue(n));
-				double TS_Two   = (fCleaf[2]->GetValue(n) <= 0) ? 0 : (fCleaf[2]->GetValue(n));
-				double TS_Three = (fCleaf[3]->GetValue(n) <= 0) ? 0 : (fCleaf[3]->GetValue(n));
-				double TS_Four  = (fCleaf[4]->GetValue(n) <= 0) ? 0 : (fCleaf[4]->GetValue(n));
-				double TS_Five  = (fCleaf[5]->GetValue(n) <= 0) ? 0 : (fCleaf[5]->GetValue(n));
-				double TS_Six   = (fCleaf[6]->GetValue(n) <= 0) ? 0 : (fCleaf[6]->GetValue(n));
-				double TS_Seven = (fCleaf[7]->GetValue(n) <= 0) ? 0 : (fCleaf[7]->GetValue(n));
-				double TS_Eight = (fCleaf[8]->GetValue(n) <= 0) ? 0 : (fCleaf[8]->GetValue(n));
-				double TS_Nine  = (fCleaf[9]->GetValue(n) <= 0) ? 0 : (fCleaf[9]->GetValue(n));
-	
-				//// RESEARCH CONTINUE STATEMENT SO I CAN SKIP ENTIRE EVENTS THAT HAVE A ts OF 0????
-	
-				double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
-	
-				// filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
-	
-				if (type == EM){
-					for (int TS = 0; TS < NTS; TS++){
-						RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
-					}
-				}
-				/*else if (type == HAD){ //figure out what cutoff for HAD
-					for (int TS = 0; TS < NTS; TS++){
-						RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
-					}
-				}*/
-				else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
-					for (int TS = 0; TS < NTS; TS++){
-						if (side == 0){
-							RawDataRPD[side][INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[channel]][TS] = TS_ARRAY[TS];
-						}
-						else{
-							RawDataRPD[side][channel][TS] = TS_ARRAY[TS];
-						}	  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
-						//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
-					}
-				}
-			}
-	
-			//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
-			//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
-		
-			PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
-			NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
-			// bug test this to see if its running when neg for pos and pos for neg
+		CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsPos, "Pos", "V1", PosINPUT_V1orV2_MEAN_X_Y_FOR_Recentering, PosINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, POS_OutPut_RPDfC_X_Y_coord, POS_OutPut_RPD_Event_Plane_Psi);
+		CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsNeg, "Neg", "V1", NegINPUT_V1orV2_MEAN_X_Y_FOR_Recentering, NegINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, NEG_OutPut_RPDfC_X_Y_coord, NEG_OutPut_RPD_Event_Plane_Psi);
+
+		int plot_frequency = 9000000; //change this back to 2000
+
+		if (i % plot_frequency /*1000000*/ == 0 && i != 0){ //for every one millition event do the thing
 			
-			JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
-			JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
-		
-			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsPos, "Pos", "V1", PosINPUT_V1orV2_MEAN_X_Y_FOR_Recentering, PosINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, POS_OutPut_RPDfC_X_Y_coord, POS_OutPut_RPD_Event_Plane_Psi);
-			CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsNeg, "Neg", "V1", NegINPUT_V1orV2_MEAN_X_Y_FOR_Recentering, NegINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, NEG_OutPut_RPDfC_X_Y_coord, NEG_OutPut_RPD_Event_Plane_Psi);
-
-			if (i % 2000/*1000000*/ == 0 && i != 0){ //for every one millition event do the thing
+			/*for (int r = 0; r < 16; r++){
+				cout << "Pos " << r << "  " << POS_OutPut_RPDfC_X_Y_coord[r] << endl;
 				
-				for (int r = 0; r < 16; r++){
-					cout << "Pos " << r << "  " << POS_OutPut_RPDfC_X_Y_coord[r] << endl;
-					
+			}
+
+			for (int r = 0; r < 16; r++){
+				cout << "Neg " << r << "  " << NEG_OutPut_RPDfC_X_Y_coord[r] << endl;
+				
+			}
+*/
+			
+			int Bin_Order_Neg[16] = {15, 21, 27, 9, 16, 28, 22, 10, 19, 13, 7, 25, 20, 14, 8, 26}; //Neg order of BINS
+	 		int Bin_Order_Pos[16] = {15, 21, 27, 9, 16, 22, 28, 10, 19, 13, 7, 25, 20, 14, 8, 26}; //Pos order of BINS
+
+	 		// the bin order is seemingly non sensical but this is because root is non sensical.
+	 		// the binning starts at 7 and increases by 4 then skips 2 bins and starts again at 13
+	 		//the binning ordering is designed to accomodate the order in which the channels are read out.
+				
+	 		int number = i/plot_frequency /*1000000*/; //controls frequency quartz block energy histo is drawn
+
+			// this fills a 2d histo with each quartz block so the user can se th actual energy deposition distribution
+			if ( NEG_OutPut_RPD_Event_Plane_Psi != -10){
+				for (int i = 0; i < 16; i++){
+					int bin = Bin_Order_Neg[i];
+					RPD_Neg_w_RXN_Plane->SetBinContent(bin, (NEG_OutPut_RPDfC_X_Y_coord[i])); 
 				}
 
-				for (int r = 0; r < 16; r++){
-					cout << "Neg " << r << "  " << NEG_OutPut_RPDfC_X_Y_coord[r] << endl;
-					
-				}
-
-				
-				int Bin_Order_Neg[16] = {15, 21, 27, 9, 16, 28, 22, 10, 19, 13, 7, 25, 20, 14, 8, 26}; //Neg order of BINS
-	 			int Bin_Order_Pos[16] = {15, 21, 27, 9, 16, 22, 28, 10, 19, 13, 7, 25, 20, 14, 8, 26}; //Pos order of BINS
-
-	 			// the bin order is seemingly non sensical but this is because root is non sensical.
-	 			// the binning starts at 7 and increases by 4 then skips 2 bins and starts again at 13
-	 			//the binning ordering is designed to accomodate the order in which the channels are read out.
-
-				for (int h = 0; h <2; h++){
-					for (int i = 0; i < 16; i++){
-					
-						if (h == 0){
-							//int bin = RPD_Neg_w_RXN_Plane->GetBin(X_position_cm[h][i], Y_position_cm[h][i]/*,binz*/);
-							// each set of 4 has 2 empty spacing bins bc root//bottom left is bin 7 bottom right is bin 10, 2nd from bottom left is 13, 2nd from bottom right is 16, 2nd from top left side is 19, 2nd from top right is 22, top left is 25, top right is 28
-							//cout << "X  " << X_position_cm[h][i] << "  Y  " << Y_position_cm[h][i] << endl;
-							//cout << "bin " << bin << endl;
-								// can check if im filling the rtpd bins in right orientation by setting fake bin values and looking at color differential
-							int bin = Bin_Order_Neg[i];
-							//double ContentOfBin = RPD_Neg_w_RXN_Plane->GetBinContent(bin);
-							RPD_Neg_w_RXN_Plane->SetBinContent(bin, (NEG_OutPut_RPDfC_X_Y_coord[i] /*+ ContentOfBin*/));
-							//double label = RPD_Neg_w_RXN_Plane->GetBinContent(bin);
-								//RPD_Neg_w_RXN_Plane->SetBinLabel(bin, NEG_OutPut_RPDfC_X_Y_coord[i]/*label*/);
-				
-						}
-						else{ 
-							//int bin = RPD_Pos_w_RXN_Plane->GetBin(X_position_cm[h][i], Y_position_cm[h][i]/*,binz*/);
-							//double ContentOfBin = RPD_Pos_w_RXN_Plane->GetBinContent(bin);
-							int bin = Bin_Order_Pos[i];
-							RPD_Pos_w_RXN_Plane->SetBinContent(bin, (POS_OutPut_RPDfC_X_Y_coord[i] /* + ContentOfBin*/)); //it might be the other way around idk
-							//double label = RPD_Pos_w_RXN_Plane->GetBinContent(bin);
-								//RPD_Pos_w_RXN_Plane->SetBinLabel(bin, POS_OutPut_RPDfC_X_Y_coord[i]/*label*/);
-						}	
-					}
-				}
-				int number = i/2000/*1000000*/;
-				RPD_Pos_w_RXN_Plane->Draw("colz");
-				TLine *linePos = new TLine(0,0,(cos(HolderForRXNPlanePos)),(sin(HolderForRXNPlanePos)) ); 
-				c3->Print(Form("%s/RPDwRXNP_POS_%d.png",figdir, number));
-				//  https://root.cern.ch/root/roottalk/roottalk01/0493.html
-				
 				RPD_Neg_w_RXN_Plane->Draw("colz");
-				TLine *lineNeg = new TLine(0,0,(cos(HolderForRXNPlaneNeg)),(sin(HolderForRXNPlaneNeg)) ); 
+				TLine *lineNeg = new TLine(0,0,(cos(NEG_OutPut_RPD_Event_Plane_Psi)*2),(sin(NEG_OutPut_RPD_Event_Plane_Psi)*2) ); 
+				lineNeg->SetLineWidth(6);
+				lineNeg->Draw(); 	//the lines are drawings of the rxn plane on the quartz block histo
 				c3->Print(Form("%s/RPDwRXNP_NEG_%d.png",figdir, number));
 			}
+			else if ( POS_OutPut_RPD_Event_Plane_Psi != -10){
+				for (int i = 0; i < 16; i++){
+					int bin = Bin_Order_Pos[i];
+					RPD_Pos_w_RXN_Plane->SetBinContent(bin, (POS_OutPut_RPDfC_X_Y_coord[i])); //it might be the other way around idk
+				}
 
-			Outputs_Resolution_ReactionPlane_to_Mean( POS_OutPut_RPD_Event_Plane_Psi, NEG_OutPut_RPD_Event_Plane_Psi, Output_ReactionPlaneResolution_All_mustbeMeaned);
-
-			if ( POS_OutPut_RPD_Event_Plane_Psi != -10){
-				EP1dist[1]->Fill(POS_OutPut_RPD_Event_Plane_Psi);
+				RPD_Pos_w_RXN_Plane->Draw("colz");
+				TLine *linePos = new TLine(0,0,(cos(POS_OutPut_RPD_Event_Plane_Psi)*2),(sin(POS_OutPut_RPD_Event_Plane_Psi)*2)); 
+				linePos->SetLineWidth(6);
+				linePos->Draw();	//the lines are drawings of the rxn plane on the quartz block histo
+				c3->Print(Form("%s/RPDwRXNP_POS_%d.png",figdir, number));
+				//  https://root.cern.ch/root/roottalk/roottalk01/0493.html	
 			}
-			//cout << "POS_OutPut_RPD_Event_Plane_Psi" << POS_OutPut_RPD_Event_Plane_Psi << endl;
-
-			if ( NEG_OutPut_RPD_Event_Plane_Psi != -10){
-				EP1dist[0]->Fill(NEG_OutPut_RPD_Event_Plane_Psi);
-			}
-			//cout << "NEG_OutPut_RPD_Event_Plane_Psi" << NEG_OutPut_RPD_Event_Plane_Psi << endl;
-
-
-			if ( POS_OutPut_RPD_Event_Plane_Psi != -10 && NEG_OutPut_RPD_Event_Plane_Psi != -10){
-				RXN_Plane_Resolution_Histo->Fill(Output_ReactionPlaneResolution_All_mustbeMeaned);
-			}
-
-
-			//part 2 can grab stuff saved to a root tree instead of redoing calculation may make it faster??? eg rxn plane of em position??
-			
-			if (i % 100000 == 0) cout << i << " (PART 2) events are processed." << endl;
 		}
+				
+		Outputs_Resolution_ReactionPlane_to_Mean( POS_OutPut_RPD_Event_Plane_Psi, NEG_OutPut_RPD_Event_Plane_Psi, Output_ReactionPlaneResolution_All_mustbeMeaned);
+
+		if ( POS_OutPut_RPD_Event_Plane_Psi != -10){
+			Not_neg10_POS += 1;
+			EP1dist[1]->Fill(POS_OutPut_RPD_Event_Plane_Psi);
+		}
+		//cout << "POS_OutPut_RPD_Event_Plane_Psi" << POS_OutPut_RPD_Event_Plane_Psi << endl;
+
+		if ( NEG_OutPut_RPD_Event_Plane_Psi != -10){
+			Not_neg10_NEG += 1;
+			EP1dist[0]->Fill(NEG_OutPut_RPD_Event_Plane_Psi);
+		}
+		//cout << "NEG_OutPut_RPD_Event_Plane_Psi" << NEG_OutPut_RPD_Event_Plane_Psi << endl;
+
+
+		if ( POS_OutPut_RPD_Event_Plane_Psi != -10 && NEG_OutPut_RPD_Event_Plane_Psi != -10){
+			RXN_Plane_Resolution_Histo->Fill(Output_ReactionPlaneResolution_All_mustbeMeaned);
+		}
+
+
+		//part 2 can grab stuff saved to a root tree instead of redoing calculation may make it faster??? eg rxn plane of em position??
 		
-		
-		double RXN_Plane_Resolution = RXN_Plane_Resolution_Histo->GetMean();
+		if (i % 100000 == 0) cout << i << " (PART 2) events are processed." << endl;
+	}
+	
+	cout << "Not_neg10_NEG  " << Not_neg10_NEG << endl;
+	cout << "Not_neg10_POS  " << Not_neg10_POS << endl;
+	cout << "NumberofZDCTreeEntries" << NumberofZDCTreeEntries << endl;
+	
+	double RXN_Plane_Resolution = RXN_Plane_Resolution_Histo->GetMean();
 
 		//cout << "RXN_Plane_Resolution" << RXN_Plane_Resolution << endl;
 
