@@ -17,6 +17,9 @@
 #include "TLine.h" //ERIC Added
 #include <cstring> //colin added
 #include <string> // Eric Added
+#include <unordered_map> //colin added
+#include <utility> //colin added
+#include <cmath>
 
 //function headers
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h" // custom header writte by Eric A
@@ -25,11 +28,18 @@
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/CalculatesandReturns_Q_Obs_FOR_RECENTERING.h"
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/CalculatesandReturnsReactionPlane.h"
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/CalculatesandReturns_RESOLUTION_ReactionPlane.h"
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/CalculatesandReturnsCORRECTEDReactionPlane.h"
 using namespace std;
 
 #ifndef M_PI
 #define M_PI       3.14159265358979323846264338328
 #endif
+
+//struct for storing associated negative and positive RXN plane values
+struct RXNP_ValuePair {
+	double RXNP_Neg;
+	double RXNP_Pos;
+};
 
 const char* figdir = "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/ProtoypeCodeforEMtoRXNplane/ZDC_figures/REACTION PLANE 326776";
 
@@ -44,30 +54,31 @@ void initRootStyle();
 
 int runnumber = 326776;
 
-void EMtoRXNPlanePrototype_PlayGround(){
+void EMtoRXNPlanetoV1_PlayGround(){
 	initRootStyle();
 	
 
-	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); string Dataset = "PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root";// opening root fie (only have 1 uncommented)
+	TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); string Dataset = "PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root";// opening root fie (only have 1 uncommented)
 	
-	TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); string Dataset = "AOD_zdc_digi_tree_326776_many_3"; // opening the root file
+	//TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); string Dataset = "AOD_zdc_digi_tree_326776_many_3"; // opening the root file
 
-	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/20/2019 1:10:01 PM" << endl;
+	//TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/TracksMaybeAOD_zdc_digi_tree_326776_many_5.root"); string Dataset = "TracksMaybeAOD_zdc_digi_tree_326776_many_5.root"; 	
+	
+	cout << "Running SOFTWARE: EMtoRXNPlanePrototype_PlayGround.C 6/21/2019 6:42:22 PM" << endl;
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 	
 	
-	TTree* ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
-
+	TTree* ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree	
 
 	/// Begin Variable and constant decleration//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	const int MinimumBias = 2;
-	const int MinXTH2F = -4;
-	const int MaxXTH2F = 4;
-	const int MinYTH2F = -4;
-	const int MaxYTH2F = 4;
-	const int NumberOfBins = 64; //number of bins in TH1F histograms produced by this code
+	const int MinXTH2D = -4;
+	const int MaxXTH2D = 4;
+	const int MinYTH2D = -4;
+	const int MaxYTH2D = 4;
+	const int NumberOfBins = 64; //number of bins in TH1D histograms produced by this code
 	const int NChannels = 50;
 	const int NTS = 10;// number of timeslices
 	const int NRPD = 16;
@@ -86,8 +97,8 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double EM_CUT_Xmax = 4;
 	
 
-	double Not_neg10_NEG = 0; //for figuring out quantity of bad events
-	double Not_neg10_POS = 0;
+	double neg10_NEG = 0; //for figuring out quantity of bad events
+	double neg10_POS = 0;
 
 	double EM = 0;
 	double HAD = 1;
@@ -121,51 +132,59 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	//DECLARING HISTOGRAMS//
 	////////////////////////
 
-	TH1F* EM_P_BEAM;
-	TH1F* EM_N_BEAM;
-	TH1F* RPDX_P_BEAM;
-	TH1F* RPDX_N_BEAM;
-	TH1F* EP1dist[NSIDE];
-	TH1F* EP2dist[NSIDE];
-	TH1F* Qobs1[NSIDE][NXY];
-	TH1F* Qobs2[NSIDE][NXY];
-	TH1F* RXN_Plane_Resolution_Histo;
+	TH1D* EM_P_BEAM;
+	TH1D* EM_N_BEAM;
+	TH1D* RPDX_P_BEAM;
+	TH1D* RPDX_N_BEAM;
+	TH1D* EP1dist[NSIDE];
+	TH1D* EP2dist[NSIDE];
+	TH1D* Qobs1[NSIDE][NXY];
+	TH1D* Qobs2[NSIDE][NXY];
+	TH1D* RXN_Plane_Resolution_Histo;
+	TH1D* RXNP_means_sin[2];
+	TH1D* RXNP_means_cos[2];
 
-	TH2F* EMPvEMN;
-	TH2F* RPD_Pos_w_RXN_Plane; //4x4 plot
-	TH2F* RPD_Neg_w_RXN_Plane; //4x4 plot
-/*	TH2F* Pos_EMX_v_RPDX;
-	TH2F* Neg_EMX_v_RPDX;
-	TH2F* Pos_RPDvRPD;
-	TH2F* Neg_RPDvRPD;
-	TH2F* RPDXP_v_RPDXN;
-	TH2F* RPDYP_v_RPDYN;*/
+	TH2D* EMPvEMN;
+	TH2D* RPD_Pos_w_RXN_Plane; //4x4 plot
+	TH2D* RPD_Neg_w_RXN_Plane; //4x4 plot
+/*	TH2D* Pos_EMX_v_RPDX;
+	TH2D* Neg_EMX_v_RPDX;
+	TH2D* Pos_RPDvRPD;
+	TH2D* Neg_RPDvRPD;
+	TH2D* RPDXP_v_RPDXN;
+	TH2D* RPDYP_v_RPDYN;*/
 
-	//TH2F* RPD_v_EM_P_BEAM;
-	//TH2F* RPD_v_EM_N_BEAM;
+	//TH2D* RPD_v_EM_P_BEAM;
+	//TH2D* RPD_v_EM_N_BEAM;
 
 	
 	const char* xytit[NXY] = {"x","y"};
 	for(int iside=0;iside<NSIDE;iside++)
 	{
-	  EP1dist[iside] = new TH1F(Form("EP1dist_%s",stit2[iside]),"EP_{1} distribution;#Psi_{1};[a.u.]",100,-M_PI,M_PI);
-	  EP2dist[iside] = new TH1F(Form("EP2dist_%s",stit2[iside]),"EP_{2} distribution;#Psi_{2};[a.u.]",100,-M_PI/2,M_PI/2);
+	  EP1dist[iside] = new TH1D(Form("EP1dist_%s",stit2[iside]),"EP_{1} distribution;#Psi_{1};[a.u.]",100,-M_PI,M_PI);
+	  EP2dist[iside] = new TH1D(Form("EP2dist_%s",stit2[iside]),"EP_{2} distribution;#Psi_{2};[a.u.]",100,-M_PI/2,M_PI/2);
 	  for(int ixy=0;ixy<2;ixy++)
 	  {
-	    Qobs1[iside][ixy] = new TH1F(Form("Qobs1dist_%s_%s",stit2[iside],xytit[ixy]),Form("Q^{obs}_{1,%s}%s distribution;Q^{obs}_{1,%s};[a.u.]",xytit[ixy],stit[iside],xytit[ixy]),100,6,0);
-	    Qobs2[iside][ixy] = new TH1F(Form("Qobs2dist_%s_%s",stit2[iside],xytit[ixy]),Form("Q^{obs}_{2,%s}%s distribution;Q^{obs}_{2,%s};[a.u.]",xytit[ixy],stit[iside],xytit[ixy]),100,6,0);
+	    Qobs1[iside][ixy] = new TH1D(Form("Qobs1dist_%s_%s",stit2[iside],xytit[ixy]),Form("Q^{obs}_{1,%s}%s distribution;Q^{obs}_{1,%s};[a.u.]",xytit[ixy],stit[iside],xytit[ixy]),100,6,0);
+	    Qobs2[iside][ixy] = new TH1D(Form("Qobs2dist_%s_%s",stit2[iside],xytit[ixy]),Form("Q^{obs}_{2,%s}%s distribution;Q^{obs}_{2,%s};[a.u.]",xytit[ixy],stit[iside],xytit[ixy]),100,6,0);
 	  }
 	}
+	
+	//create mean histograms
+	for (int i = 0; i < 2; i++) {
+		RXNP_means_sin[i] = new TH1D(Form("MEANS_SIN_%d", i), Form("MEANS_SIN_%d", i), 1000, 1, 0);
+		RXNP_means_cos[i] = new TH1D(Form("MEANS_COS_%d", i), Form("MEANS_COS_%d", i), 1000, 1, 0);
+	}
 
-	RXN_Plane_Resolution_Histo = new TH1F(Form("RXNPRes"),"RXN Plane Resolution;Resolution;[a.u.]",100,-M_PI,M_PI);
+	RXN_Plane_Resolution_Histo = new TH1D(Form("RXNPRes"),"RXN Plane Resolution;Resolution;[a.u.]",100,-M_PI,M_PI);
 
 	///4x4plot
-	RPD_Pos_w_RXN_Plane = new TH2F(Form("RPD_Pos %d", runnumber), Form("RPD_Pos_w_RXN_Plane%d", runnumber), 4, -4, 4, 4, -4, 4);
+	RPD_Pos_w_RXN_Plane = new TH2D(Form("RPD_Pos %d", runnumber), Form("RPD_Pos_w_RXN_Plane%d", runnumber), 4, -4, 4, 4, -4, 4);
 
 	RPD_Pos_w_RXN_Plane->GetXaxis()->SetNdivisions(4);
 	RPD_Pos_w_RXN_Plane->GetYaxis()->SetNdivisions(4);
 	
-	RPD_Neg_w_RXN_Plane = new TH2F(Form("RPD_Neg %d", runnumber), Form("RPD_Neg_w_RXN_Plane%d", runnumber), 4, -4, 4, 4, -4, 4);
+	RPD_Neg_w_RXN_Plane = new TH2D(Form("RPD_Neg %d", runnumber), Form("RPD_Neg_w_RXN_Plane%d", runnumber), 4, -4, 4, 4, -4, 4);
 	
 	RPD_Neg_w_RXN_Plane->GetXaxis()->SetNdivisions(4);
 	RPD_Neg_w_RXN_Plane->GetYaxis()->SetNdivisions(4);
@@ -174,26 +193,26 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 	TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);/// for 4x4 declared early so not in a loop and must be before all histos are made
 
-	EM_P_BEAM = new TH1F(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
-	EM_N_BEAM = new TH1F(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	EM_P_BEAM = new TH1D(Form("EM_P_BEAM %d", runnumber), Form("P_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D);
+	EM_N_BEAM = new TH1D(Form("EM_N_BEAM %d", runnumber), Form("N_EM_%d_NBins_%d_MB_2_10fC; EM cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D);
 
-	/*RPDX_P_BEAM = new TH1F(Form("RPDX_P_BEAM %d", runnumber), Form("P_RPDX_%d_NBins_%d_MB_2; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
-	RPDX_N_BEAM = new TH1F(Form("RPDX_N_BEAM %d", runnumber), Form("N_RPDX_%d_NBins_%d_MB_2; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F);
+	/*RPDX_P_BEAM = new TH1D(Form("RPDX_P_BEAM %d", runnumber), Form("P_RPDX_%d_NBins_%d_MB_2; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D);
+	RPDX_N_BEAM = new TH1D(Form("RPDX_N_BEAM %d", runnumber), Form("N_RPDX_%d_NBins_%d_MB_2; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D);
 */
-	EMPvEMN = new TH2F(Form("EMPvEMN %d", runnumber), Form("EMPvEMN_%d_NBins_%d_MB_2; EMP cm; EMN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
+	EMPvEMN = new TH2D(Form("EMPvEMN %d", runnumber), Form("EMPvEMN_%d_NBins_%d_MB_2; EMP cm; EMN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinXTH2D, MaxXTH2D);
 
-	/*Pos_EMX_v_RPDX = new TH2F(Form("XRPD_EM_P_BEAM %d", runnumber), Form("P_RPDX_EM_%d_NBins_%d_MB_2; EM cm; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
-	Neg_EMX_v_RPDX = new TH2F(Form("XRPD_EM_N_BEAM %d", runnumber), Form("N_RPDX_EM_%d_NBins_%d_MB_2; EM cm; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
+	/*Pos_EMX_v_RPDX = new TH2D(Form("XRPD_EM_P_BEAM %d", runnumber), Form("P_RPDX_EM_%d_NBins_%d_MB_2; EM cm; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinXTH2D, MaxXTH2D);
+	Neg_EMX_v_RPDX = new TH2D(Form("XRPD_EM_N_BEAM %d", runnumber), Form("N_RPDX_EM_%d_NBins_%d_MB_2; EM cm; RPDX cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinXTH2D, MaxXTH2D);
 
-	Pos_RPDvRPD = new TH2F(Form("Pos_RPDvRPD %d", runnumber), Form("Pos_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
-	Neg_RPDvRPD = new TH2F(Form("Neg_RPDvRPD %d", runnumber), Form("Neg_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
+	Pos_RPDvRPD = new TH2D(Form("Pos_RPDvRPD %d", runnumber), Form("Pos_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinXTH2D, MaxXTH2D);
+	Neg_RPDvRPD = new TH2D(Form("Neg_RPDvRPD %d", runnumber), Form("Neg_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinXTH2D, MaxXTH2D);
 
-	RPDXP_v_RPDXN = new TH2F(Form("RPDXP_v_RPDXN %d", runnumber), Form("RPDXP_v_RPDXN_%d_NBins_%d_MB_2; RPDXP cm; RPDXN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
-	RPDYP_v_RPDYN = new TH2F(Form("RPDYP_v_RPDYN %d", runnumber), Form("RPDYP_v_RPDYN_%d_NBins_%d_MB_2; RPDYP cm; RPDYN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinXTH2F, MaxXTH2F);
+	RPDXP_v_RPDXN = new TH2D(Form("RPDXP_v_RPDXN %d", runnumber), Form("RPDXP_v_RPDXN_%d_NBins_%d_MB_2; RPDXP cm; RPDXN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinXTH2D, MaxXTH2D);
+	RPDYP_v_RPDYN = new TH2D(Form("RPDYP_v_RPDYN %d", runnumber), Form("RPDYP_v_RPDYN_%d_NBins_%d_MB_2; RPDYP cm; RPDYN cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinXTH2D, MaxXTH2D);
 */
 
-	//RPD_v_EM_P_BEAM = new TH2F(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
-	//RPD_v_EM_N_BEAM = new TH2F(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2F, MaxXTH2F, NumberOfBins, MinYTH2F, MaxYTH2F);
+	//RPD_v_EM_P_BEAM = new TH2D(Form("RPD_P_BEAM %d", runnumber), Form("RPD_P_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinYTH2D, MaxYTH2D);
+	//RPD_v_EM_N_BEAM = new TH2D(Form("RPD_N_BEAM %d", runnumber), Form("RPD_N_BEAM_POSITION_v_EM_%d_NBins_%d_MB_2; EM cm; RPD cm", runnumber, NumberOfBins), NumberOfBins, MinXTH2D, MaxXTH2D, NumberOfBins, MinYTH2D, MaxYTH2D);
 
 	/// END Histogram Declaration ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -204,14 +223,17 @@ void EMtoRXNPlanePrototype_PlayGround(){
 
 	// For c++ root tree interface ////////////////////////
 	TLeaf* bxidLeaf = (TLeaf*)ZDCDigiTree->GetLeaf("bxid");
+	TLeaf* eventLeaf = (TLeaf*)ZDCDigiTree->GetLeaf("event");
 	TLeaf* zsideLeaf = (TLeaf*)ZDCDigiTree->GetLeaf("zside");
 	TLeaf* sectionLeaf = (TLeaf*)ZDCDigiTree->GetLeaf("section");
 	TLeaf* channelLeaf = (TLeaf*)ZDCDigiTree->GetLeaf("channel");
 	TLeaf* random = (TLeaf*)ZDCDigiTree->GetLeaf("HLT_HIRandom_v1");
-	TLeaf* ntrk = (TLeaf*)ZDCDigiTree->GetLeaf("nTrack");
+	TLeaf* ntracks = (TLeaf*)ZDCDigiTree->GetLeaf("nTrack");
+	TLeaf* phi = (TLeaf*)ZDCDigiTree->GetLeaf("phi");
+	
 	TLeaf* nHFneg = (TLeaf*)ZDCDigiTree->GetLeaf("nHFneg");
 	TLeaf* nHFpos = (TLeaf*)ZDCDigiTree->GetLeaf("nHFpos");
-
+	
 	NumberofZDCTreeEntries = ZDCDigiTree->GetEntries(); // main purpose of this is to create the array size for storing the rxn plane values for correction/flattening of the event planes
 
 	double PXG = 0;
@@ -251,10 +273,22 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	/// Begin filling variables with DATA/fC LOOP 
 	// https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
 
+	/*double numtracks = 0;
+	double PHI = 0;*/
 	
 	for (int i = 0; i < NumberofZDCTreeEntries /*ZDCDigiTree->GetEntries()*/; i++) {
 		ZDCDigiTree->GetEntry(i);
-	
+
+/*		numtracks = ntracks->GetValue();
+		cout << "n" << numtracks << endl;
+		
+		if (numtracks >6){
+			for (int r = 1; r < numtracks; r++){
+			PHI = phi->GetValue(r);
+			cout << "PHI" << PHI << endl;
+			}
+		}*/
+
 		for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
 			int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
 			int type = (int)(sectionLeaf->GetValue(n)) - 1;
@@ -306,14 +340,9 @@ void EMtoRXNPlanePrototype_PlayGround(){
 			}
 		}
 	
-		//	PXG = RPD_Beam_Position_Finder( RawDataRPD, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Pos", "X", "Give");
-		//	NXG = RPD_Beam_Position_Finder( TS_Zero, TS_One, TS_Four, TS_Five, TS_Six, TS_Seven, n, side, type, channel, RPDXmin, RPDXmax, RPDYMin, RPDYMax, "Neg", "X", "Give", 326776);
-	
 		PEMG = EM_Beam_Position_Value( RawDataEM, "Pos");
 		NEMG = EM_Beam_Position_Value( RawDataEM, "Neg");
 		// bug test this to see if its running when neg for pos and pos for neg
-		
-		
 
 		JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg); //uncomment this to reactivate jeff weighter theese are deactivated to look for bugs in otehr software
 		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
@@ -322,15 +351,6 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		CalculatesandReturns_Q_ObsforRecentering(RawDataRPD, OutPut_WeightedjeffsweightsNeg, "Neg", Neg_Output_Q_Observed_V1_X, Neg_Output_Q_Observed_V1_Y, Neg_Output_Q_Observed_V2_X, Neg_Output_Q_Observed_V2_Y);
 	
 		if (Pos_Output_Q_Observed_V1_X != -10 && Pos_Output_Q_Observed_V1_Y != -10 && Neg_Output_Q_Observed_V1_X != -10 && Neg_Output_Q_Observed_V1_Y != -10){
-			/* //for debugging purposes				
-			cout << "Pos_Output_Q_Observed_V1_X:  " <<  Pos_Output_Q_Observed_V1_X << endl; 
-			cout << "Pos_Output_Q_Observed_V1_Y:  " <<  Pos_Output_Q_Observed_V1_Y << endl; 
-			cout << "Pos_Output_Q_Observed_V2_X:  " <<  Pos_Output_Q_Observed_V2_X << endl; 
-			cout << "Pos_Output_Q_Observed_V2_Y:  " <<  Pos_Output_Q_Observed_V2_Y << endl; 
-			cout << "Neg_Output_Q_Observed_V1_X:  " <<  Neg_Output_Q_Observed_V1_X << endl; 
-			cout << "Neg_Output_Q_Observed_V1_Y:  " <<  Neg_Output_Q_Observed_V1_Y << endl; 
-			cout << "Neg_Output_Q_Observed_V2_X:  " <<  Neg_Output_Q_Observed_V2_X << endl; 
-			cout << "Neg_Output_Q_Observed_V2_Y:  " <<  Neg_Output_Q_Observed_V2_Y << endl; */
 
 			//these are filled to be used later for getting values for recentering
 			Qobs1[0][0]->Fill(Pos_Output_Q_Observed_V1_X);
@@ -356,11 +376,6 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double PosINPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Pos, Mean_Y_Pos};
 	double PosINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Pos, RMS_Y_Pos};
 
-	/*cout << "Mean_X_Pos:  " << Mean_X_Pos << endl;
-	cout << "RMS_X_Pos:  " << RMS_X_Pos << endl;
-	cout << "Mean_Y_Pos:  " << Mean_Y_Pos << endl;
-	cout << "RMS_Y_Pos:  " << RMS_Y_Pos << endl;*/
-
 	 double Mean_X_Neg = Qobs1[0][0]->GetMean(); //neg
 	double  RMS_X_Neg = Qobs1[0][0]->GetRMS();
 	double Mean_Y_Neg = Qobs1[0][1]->GetMean();
@@ -369,13 +384,9 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double NegINPUT_V1orV2_MEAN_X_Y_FOR_Recentering[2] = { Mean_X_Neg, Mean_Y_Neg};
 	double NegINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering[2] = { RMS_X_Neg,  RMS_Y_Neg};
 
-	/*cout << "Mean_X_Neg:  " << Mean_X_Neg << endl;
-	cout <<  "RMS_X_Neg:  " <<  RMS_X_Neg << endl;
-	cout << "Mean_Y_Neg:  " << Mean_Y_Neg << endl;
-	cout <<  "RMS_Y_Neg:  " <<  RMS_Y_Neg << endl;*/
 
 	/// END math for recentering///////////////////////////////////////////////////////
-
+	double event = 0;
 	double POS_OutPut_RPD_Event_Plane_Psi = 0;
 	double NEG_OutPut_RPD_Event_Plane_Psi = 0;
 	double POS_OutPut_RPDfC_X_Y_coord[16] = {0};
@@ -383,12 +394,17 @@ void EMtoRXNPlanePrototype_PlayGround(){
 	double Output_ReactionPlaneResolution_All_mustbeMeaned = 0;
 
 																	//double INPUT_Event_Plane[NumberofZDCTreeEntries] = {0}; //for the rxn plane correction function so it doesnt have to calculate the rxn plane a 2nd time
-
-
-
+																	
+	///////////////////////////////////////////////////////////////////////////////////////////	
+	//map for storing events and their associated negative and positive RXN plane values
+	std::unordered_map<int, RXNP_ValuePair> RXNP_Event_Map;
+	///////////////////////////////////////////////////////////////////////////////////////////
+	
 	for (int i = 0; i < NumberofZDCTreeEntries /*ZDCDigiTree->GetEntries()*/; i++) {
 		ZDCDigiTree->GetEntry(i);
-	
+		
+		event = eventLeaf->GetValue();
+		
 		for (int n = 0; n < NChannels; n++) { //iterates through all channels of both ZDC + and -
 			int side = (int)((zsideLeaf->GetValue(n) + 1) / 2.0);
 			int type = (int)(sectionLeaf->GetValue(n)) - 1;
@@ -444,32 +460,32 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		// bug test this to see if its running when neg for pos and pos for neg
 		
 		JeffWeighter3000_OutputsArray( NEMG, 0, OutPut_WeightedjeffsweightsNeg);
-		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos);
+		JeffWeighter3000_OutputsArray( PEMG, 1, OutPut_WeightedjeffsweightsPos); 
 	
 		CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsPos, "Pos", "V1", PosINPUT_V1orV2_MEAN_X_Y_FOR_Recentering, PosINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, POS_OutPut_RPDfC_X_Y_coord, POS_OutPut_RPD_Event_Plane_Psi);
 		CalculatesandReturnsRXN_Plane( RawDataRPD,  OutPut_WeightedjeffsweightsNeg, "Neg", "V1", NegINPUT_V1orV2_MEAN_X_Y_FOR_Recentering, NegINPUT_V1orV2_SIGMA_X_Y_FOR_Recentering, NEG_OutPut_RPDfC_X_Y_coord, NEG_OutPut_RPD_Event_Plane_Psi);
+		
+		//insert RXN plane values into map, indexed by their event number (these values will be corrected and filtered later)
+		//if both plane values are -10 (i.e. both invalid), don't insert an entry at all. pairs for which one value is -10 will need to be filtered later
+		if (!(NEG_OutPut_RPD_Event_Plane_Psi == -10 && POS_OutPut_RPD_Event_Plane_Psi == -10)) {
+			if (RXNP_Event_Map.count(event) != 0) {
+				std::cout << "DUPLICATE EVENT DETECTED: " << event << std::endl;
+			}
+			
+			RXNP_Event_Map.insert({
+				event,
+				RXNP_ValuePair({NEG_OutPut_RPD_Event_Plane_Psi, POS_OutPut_RPD_Event_Plane_Psi})
+			});
+		}
 
 		int plot_frequency = 9000000; //change this back to 2000
 
 		if (i % plot_frequency /*1000000*/ == 0 && i != 0){ //for every one millition event do the thing
 			
-			/*for (int r = 0; r < 16; r++){
-				cout << "Pos " << r << "  " << POS_OutPut_RPDfC_X_Y_coord[r] << endl;
-				
-			}
-
-			for (int r = 0; r < 16; r++){
-				cout << "Neg " << r << "  " << NEG_OutPut_RPDfC_X_Y_coord[r] << endl;
-				
-			}
-*/
-			
 			int Bin_Order_Neg[16] = {15, 21, 27, 9, 16, 28, 22, 10, 19, 13, 7, 25, 20, 14, 8, 26}; //Neg order of BINS
 	 		int Bin_Order_Pos[16] = {15, 21, 27, 9, 16, 22, 28, 10, 19, 13, 7, 25, 20, 14, 8, 26}; //Pos order of BINS
 
-	 		// the bin order is seemingly non sensical but this is because root is non sensical.
-	 		// the binning starts at 7 and increases by 4 then skips 2 bins and starts again at 13
-	 		//the binning ordering is designed to accomodate the order in which the channels are read out.
+	 		// the bin order is seemingly non sensical but this is because root is non sensical. // the binning starts at 7 and increases by 4 then skips 2 bins and starts again at 13 //the binning ordering is designed to accomodate the order in which the channels are read out.
 				
 	 		int number = i/plot_frequency /*1000000*/; //controls frequency quartz block energy histo is drawn
 
@@ -500,17 +516,15 @@ void EMtoRXNPlanePrototype_PlayGround(){
 				//  https://root.cern.ch/root/roottalk/roottalk01/0493.html	
 			}
 		}
-				
-		Outputs_Resolution_ReactionPlane_to_Mean( POS_OutPut_RPD_Event_Plane_Psi, NEG_OutPut_RPD_Event_Plane_Psi, Output_ReactionPlaneResolution_All_mustbeMeaned);
 
-		if ( POS_OutPut_RPD_Event_Plane_Psi != -10){
-			Not_neg10_POS += 1;
+	/*	if ( POS_OutPut_RPD_Event_Plane_Psi != -10){
+			neg10_POS += 1;
 			EP1dist[1]->Fill(POS_OutPut_RPD_Event_Plane_Psi);
 		}
 		//cout << "POS_OutPut_RPD_Event_Plane_Psi" << POS_OutPut_RPD_Event_Plane_Psi << endl;
 
 		if ( NEG_OutPut_RPD_Event_Plane_Psi != -10){
-			Not_neg10_NEG += 1;
+			neg10_NEG += 1;
 			EP1dist[0]->Fill(NEG_OutPut_RPD_Event_Plane_Psi);
 		}
 		//cout << "NEG_OutPut_RPD_Event_Plane_Psi" << NEG_OutPut_RPD_Event_Plane_Psi << endl;
@@ -519,15 +533,60 @@ void EMtoRXNPlanePrototype_PlayGround(){
 		if ( POS_OutPut_RPD_Event_Plane_Psi != -10 && NEG_OutPut_RPD_Event_Plane_Psi != -10){
 			RXN_Plane_Resolution_Histo->Fill(Output_ReactionPlaneResolution_All_mustbeMeaned);
 		}
-
+	*/
 
 		//part 2 can grab stuff saved to a root tree instead of redoing calculation may make it faster??? eg rxn plane of em position??
 		
 		if (i % 100000 == 0) cout << i << " (PART 2) events are processed." << endl;
 	}
 	
-	cout << "Not_neg10_NEG  " << Not_neg10_NEG << endl;
-	cout << "Not_neg10_POS  " << Not_neg10_POS << endl;
+	// PERFORM CORRECTION ON PLANE VALUES WITHIN MAP //
+	//calculate mean values of reaction plane angle components
+	//populate histograms
+	for (auto& RXNP_Event_Pair : RXNP_Event_Map) {
+		RXNP_ValuePair& value_pair = RXNP_Event_Pair.second;
+		double& RXNP_Neg = value_pair.RXNP_Neg;
+		double& RXNP_Pos = value_pair.RXNP_Pos;
+		
+		//negatives
+		if (RXNP_Neg != -10) {
+			RXNP_means_sin[0]->Fill(sin(RXNP_Neg));
+			RXNP_means_cos[0]->Fill(cos(RXNP_Neg));
+		}
+		
+		//positive
+		if (RXNP_Pos != -10) {
+			RXNP_means_sin[1]->Fill(sin(RXNP_Pos));
+			RXNP_means_cos[1]->Fill(cos(RXNP_Pos));
+		}
+	}
+	
+	//calculate means using histograms
+	double RXNP_neg_mean_sin = RXNP_means_sin[0]->GetMean();
+	double RXNP_neg_mean_cos = RXNP_means_cos[0]->GetMean();
+	double RXNP_pos_mean_sin = RXNP_means_sin[1]->GetMean();
+	double RXNP_pos_mean_cos = RXNP_means_cos[1]->GetMean();
+	
+	//iterate over map values for correction
+	for (auto& RXNP_Event_Pair : RXNP_Event_Map) {
+		RXNP_ValuePair& value_pair = RXNP_Event_Pair.second;
+		double& RXNP_Neg = value_pair.RXNP_Neg;
+		double& RXNP_Pos = value_pair.RXNP_Pos;
+		
+		
+		if (RXNP_Neg != -10) {
+			RXNP_Neg = CalculatesandReturns_I_CORRECTED_I_ReactionPlane("Neg", 2, RXNP_Neg, RXNP_neg_mean_sin, RXNP_neg_mean_cos);
+			EP1dist[0]->Fill(RXNP_Neg); //populate reaction neg plane histogram
+		}
+		
+		if (RXNP_Pos != -10) {
+			RXNP_Pos = CalculatesandReturns_I_CORRECTED_I_ReactionPlane("Pos", 2, RXNP_Pos, RXNP_pos_mean_sin, RXNP_pos_mean_cos);
+			EP1dist[1]->Fill(RXNP_Pos); //populate reaction pos plane histogram
+		}
+	}
+
+	//Outputs_Resolution_ReactionPlane_to_Mean( POS_OutPut_RPD_Event_Plane_Psi, NEG_OutPut_RPD_Event_Plane_Psi, Output_ReactionPlaneResolution_All_mustbeMeaned);
+	
 	cout << "NumberofZDCTreeEntries" << NumberofZDCTreeEntries << endl;
 	
 	double RXN_Plane_Resolution = RXN_Plane_Resolution_Histo->GetMean();

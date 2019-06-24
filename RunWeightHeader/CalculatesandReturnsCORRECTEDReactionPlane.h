@@ -24,7 +24,7 @@ You can do it, attend LPC CMS DAS<< "\n"; in the winter.
 #ifndef CalculatesandReturnsCORRECTEDReactionPlane
 #define CalculatesandReturnsCORRECTEDReactionPlane
 
-void CalculatesandReturns_I_CORRECTED_I_ReactionPlane(const std::string& PosorNeg, double INPUT_Flattening_Order, double INPUT_Event_Plane, double INPUT_Meaned_SinRXN_Plane, double INPUT_Meaned_CosRXN_Plane, double (&OutPut_CORRECTED_RPD_Event_Plane_Psi)){
+double CalculatesandReturns_I_CORRECTED_I_ReactionPlane(const std::string& PosorNeg, int INPUT_Flattening_Order, double INPUT_Event_Plane, double INPUT_Meaned_SinRXN_Plane, double INPUT_Meaned_CosRXN_Plane){
 
 	//the software expects an array with millions of values it can pull the rxn plane from previously. I reccomend you initialize this double array (for 7 mill values a double array is 56 Mb not bad but not great) based on the number of events. NOTE this array will be millions long!!!
 	//make sure you put this header function in a look over the number of good events
@@ -33,6 +33,7 @@ void CalculatesandReturns_I_CORRECTED_I_ReactionPlane(const std::string& PosorNe
 		throw std::runtime_error("ERROR: PosorNeg must be set to Pos or Neg, input variable 3, CalculatesandReturnsReactionPlane.h");
 	}
 	/// pos or neg are irrelevant to this calculation and software, they are implemented so the user is forcibly reminded to keep pos and neg values from previous seperate.
+	/// the check above uses extra CPU cycles, so it may be removed later if it proves to be too expensive
 	if (INPUT_Flattening_Order <= 0) {
 		throw std::runtime_error("ERROR: The flattening order must be 1 (e.g. V1 is 1) or greater (it is not reccomended to exceed 6), input variable 2 , CalculatesandReturnsCORRECTEDReactionPlane.h");
 	}
@@ -43,12 +44,12 @@ void CalculatesandReturns_I_CORRECTED_I_ReactionPlane(const std::string& PosorNe
 
 	double Flattening_Order_x_INPUT_Event_Plane = (INPUT_Flattening_Order * INPUT_Event_Plane);
 
-	for ( int i = 1; i <= INPUT_Flattening_Order; i++){
-		Summed_Flattening_Equation_Component += ( (2/INPUT_Flattening_Order)*(-1*INPUT_Meaned_SinRXN_Plane*cos(Flattening_Order_x_INPUT_Event_Plane) + INPUT_Meaned_CosRXN_Plane*sin(Flattening_Order_x_INPUT_Event_Plane)) );
+	for ( int order = 1; order <= INPUT_Flattening_Order; order++){
+		Summed_Flattening_Equation_Component += ( (2/order)*(-1*INPUT_Meaned_SinRXN_Plane*cos(Flattening_Order_x_INPUT_Event_Plane) + INPUT_Meaned_CosRXN_Plane*sin(Flattening_Order_x_INPUT_Event_Plane)) );
 	}
 
-	OutPut_CORRECTED_RPD_Event_Plane_Psi = INPUT_Event_Plane + Summed_Flattening_Equation_Component;
-
+	double OutPut_CORRECTED_RPD_Event_Plane_Psi = INPUT_Event_Plane + Summed_Flattening_Equation_Component;
+	return OutPut_CORRECTED_RPD_Event_Plane_Psi;
 }
 
 #endif

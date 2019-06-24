@@ -25,7 +25,7 @@ TH1F* spectrum_noise;
 
 const double MU = 59.92;
 
-void ADC_Meaninator(int runnumber=326776){
+void TCHAIN_TEST_em(int runnumber=326776){
   initRootStyle();
 
 
@@ -36,87 +36,132 @@ void ADC_Meaninator(int runnumber=326776){
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
  
-  //TFile *f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening the root file
- 
-  TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root");
+  // TChain *ZDCDigiTree = new TChain("analyzer/zdcdigi"); 
+  
+  // ZDCDigiTree->Add("/home/ebadams/PbPb2018_CMS_DATA_MB2/HIMinimumBias2/crab_fixed_PbPb2018_AOD_MinBias2_326776_RPDZDC/190516_140233/0000/PbPb2018_AOD_MinBias2_326776_RPDZDC_1.root");
+  // ZDCDigiTree->Add("/home/ebadams/PbPb2018_CMS_DATA_MB2/HIMinimumBias2/crab_fixed_PbPb2018_AOD_MinBias2_326776_RPDZDC/190516_140233/0000/PbPb2018_AOD_MinBias2_326776_RPDZDC_2.root");
+  // ZDCDigiTree->Add("/home/ebadams/PbPb2018_CMS_DATA_MB2/HIMinimumBias2/crab_fixed_PbPb2018_AOD_MinBias2_326776_RPDZDC/190516_140233/0000/PbPb2018_AOD_MinBias2_326776_RPDZDC_3.root");
+  // ZDCDigiTree->Add("/home/ebadams/PbPb2018_CMS_DATA_MB2/HIMinimumBias2/crab_fixed_PbPb2018_AOD_MinBias2_326776_RPDZDC/190516_140233/0000/PbPb2018_AOD_MinBias2_326776_RPDZDC_4.root");
+  // ZDCDigiTree->Add("/home/ebadams/PbPb2018_CMS_DATA_MB2/HIMinimumBias2/crab_fixed_PbPb2018_AOD_MinBias2_326776_RPDZDC/190516_140233/0000/PbPb2018_AOD_MinBias2_326776_RPDZDC_5.root");
+  
 
+ // TFile *f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening the root file
+ 
+  TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/TESTAOD_zdc_digi_tree_326776_many_4.root");
   //don't bother uncommenting this
   //TTree *ZDCRecTree = (TTree*)f->Get("ZDCRecTree"); // reading ZDC rec tree
 
   TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 
   const int NSIDE=2; const char* stit[NSIDE] = {"#minus","#plus"};  const char* stit2[NSIDE] = {"neg","pos"};
+  const int NTYPE=2; const char* ttit[NTYPE] = {"EM","HAD"};
+  const int NCH=5; const char* ctit[NTYPE][NCH] = {
+                                                    {"1","2","3","4","5"}, //HD sections run only 1-4
+                                                    {"1","2","3","4","5"} //EM sections run 1-5
+                                                  };
  
-  TH1F* ADC_DIST_RPD[NSIDE][16];
-  TH1F* MEAN_ADC_DIST_RPD[NSIDE];
+  TH1F* em[2][5];
 
-  for(int iside = 0; iside < 2; iside++){
-    MEAN_ADC_DIST_RPD[iside] = new TH1F(Form("ADC_DIST_RPD %s",stit2[iside]),Form("ADC_DIST_RPD %s",stit[iside]), 16,0,16);
-    for (int a = 0; a < 16; a++){
-      ADC_DIST_RPD[iside][a] = new TH1F(Form("ADC_DIST_RPD %s %d",stit2[iside], a),Form("ADC_DIST_RPD %s arbitrary %d",stit[iside], a), 16,100,0);
-    } 
-  }
+  for(int iside = 0; iside < 2; iside++)
+    for(int ich = 0; ich < 5; ich++)
+      em[iside][ich] = new TH1F(Form("em %s %d",stit2[iside],ich+1),Form("EM%s channel %d",stit[iside],ich+1),100,0,100000);
+
 
   const int NTS=10;            // number of timeslices
+
   TLeaf* bxidLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("bxid");
+  TLeaf* eventLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("event");
   TLeaf* zsideLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("zside");
   TLeaf* sectionLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("section");
   TLeaf* channelLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("channel");
- /* TLeaf* random = (TLeaf*) ZDCDigiTree->GetLeaf("HLT_HIRandom_v1");
+  TLeaf* random = (TLeaf*) ZDCDigiTree->GetLeaf("HLT_HIRandom_v1");
   TLeaf* ntrk = (TLeaf*) ZDCDigiTree->GetLeaf("nTrack");
   TLeaf* nHFneg = (TLeaf*) ZDCDigiTree->GetLeaf("nHFneg");
   TLeaf* nHFpos = (TLeaf*) ZDCDigiTree->GetLeaf("nHFpos");
-  */
-
+  
   TLeaf* adcLeaf[NTS];
   TLeaf* fCleaf[NTS];
+
+  double w[2][2][5] = {
+    {{1.0,1.0,1.0,1.0,1.0},{1.0,0.617/0.4,0.315/0.23,0.259/0.17,0.0}},  // negative side
+    {{1.0,1.0,1.0,1.0,1.0},{1.0,0.618,0.315/0.5,0.259/0.33,0.0}}}; // positive side
 
   for(int iTS = 0; iTS < NTS; iTS++){
     adcLeaf[iTS] = (TLeaf*) ZDCDigiTree->GetLeaf(Form("adc%d",iTS));
     fCleaf[iTS] = (TLeaf*) ZDCDigiTree->GetLeaf(Form("nfC%d",iTS));
   }
   
-
-  double CHANNEL_ARBITRARY_ADC_TS456 = 0;
-  double MEANS_OF_ADC_RPD[2][16] = {0};
-
   for(int i = 0; i < ZDCDigiTree->GetEntries(); i++){
     ZDCDigiTree->GetEntry(i);
+
+    int event = eventLeaf->GetValue();
+
+    cout << "event" << event << endl;
+
+    int iMax;
+    double qMax = 0, qMaxEm_pos, qMaxEm_neg;
+    int iMaxHad_pos[4], iMaxHad_neg[4];
+    int nMaxEm_pos = 0, nMaxEm_neg = 0;
+    int chMaxEm_pos, chMaxEm_neg;
+
+    double totHAD[2] = {0,0};
+    double totEM[2] = {0,0};
 
     for(int n = 0; n < 50; n++){
       int side = (int)((zsideLeaf->GetValue(n)+1)/2.0);
       int type = (int)(sectionLeaf->GetValue(n))-1;
       int channel = (int)(channelLeaf->GetValue(n))-1;
-      
-      if (type == 3){
-        CHANNEL_ARBITRARY_ADC_TS456 = (adcLeaf[4]->GetValue(n) + adcLeaf[5]->GetValue(n) + adcLeaf[6]->GetValue(n));
-        if (CHANNEL_ARBITRARY_ADC_TS456 > 17){
-          //cout << CHANNEL_ARBITRARY_ADC_TS456 << endl;
-          if(side == 0){
-            ADC_DIST_RPD[0][channel]->Fill(CHANNEL_ARBITRARY_ADC_TS456);
-          }
-          else{
-            ADC_DIST_RPD[1][channel]->Fill(CHANNEL_ARBITRARY_ADC_TS456);
-          }
+      double signal = fCleaf[4]->GetValue(n) + fCleaf[5]->GetValue(n) + fCleaf[6]->GetValue(n);
+
+      for(int iTS = 0; iTS < 10; iTS++)
+        if(fCleaf[iTS]->GetValue(n) > qMax){
+          qMax = fCleaf[iTS]->GetValue(n);
+          iMax = iTS;
         }
+
+      if(type == 1){ // HAD section
+        if(side == 1)
+          iMaxHad_pos[channel] = iMax;
+        else
+          iMaxHad_neg[channel] = iMax;
+      }
+      else if(type == 0){ // EM section
+        if(side == 1 && (iMax == 4 || iMax == 5) && adcLeaf[iMax]->GetValue(n) > 100){
+          nMaxEm_pos++;
+          chMaxEm_pos = channel;
+          qMaxEm_pos = signal;
+        }
+        else if(side == 0 && (iMax == 4 || iMax == 5) && adcLeaf[iMax]->GetValue(n) > 100){
+          nMaxEm_neg++;
+          chMaxEm_neg = channel;
+          qMaxEm_neg = signal;
+        }
+      }
+    
+      if(type == 1 && (iMax == 4 || iMax == 5)){
+        totHAD[side] += w[side][type][channel] * signal;
+        //if(iside == 0)
+        //  signal_array[5+channel] = signal;
+      }
+      else if(type == 0){
+        totEM[side] +=  w[side][type][channel] * signal;
+        //if(iside == 0)
+        //  signal_array[channel] = signal;
       }
     }
 
+    /*if(nMaxEm_pos > 0 || nMaxEm_neg > 0){
+      std::cout << nMaxEm_pos << " " << nMaxEm_neg << std::endl;
+      std::cout << totHAD[1]+0.1*totEM[1] << " " << totHAD[0]+0.1*totEM[0] << std::endl;
+      while(!getchar());
+    }*/
+
+    if(totHAD[1]+0.1*totEM[1] < 20000 && /*iMaxHad_pos[0] != 4 && iMaxHad_pos[1] != 4 && iMaxHad_pos[2] != 4 && iMaxHad_pos[3] != 4 &&*/ nMaxEm_pos == 1)
+      em[1][chMaxEm_pos]->Fill(qMaxEm_pos);
+    if(totHAD[0]+0.1*totEM[0] < 45000 && /*iMaxHad_neg[0] != 4 && iMaxHad_neg[1] != 4 && iMaxHad_neg[2] != 4 && iMaxHad_neg[3] != 4 &&*/ nMaxEm_neg == 1)
+      em[0][chMaxEm_neg]->Fill(qMaxEm_neg);
+
     if(i % 100000 == 0) std::cout << i << " events are processed." << std::endl;
-  }
-
-  for (int b = 0; b < 16; b++){
-    MEANS_OF_ADC_RPD[0][b]=ADC_DIST_RPD[0][b]->GetMean();
-    MEANS_OF_ADC_RPD[1][b]=ADC_DIST_RPD[1][b]->GetMean();
-  }
-
-
-  for (int k = 0; k < 16; k++){
-    MEAN_ADC_DIST_RPD[0]->Fill(k, MEANS_OF_ADC_RPD[0][k]);
-  }
-
-  for (int k = 0; k < 16; k++){
-    MEAN_ADC_DIST_RPD[1]->Fill(k, MEANS_OF_ADC_RPD[1][k]);
   }
 
   ///////////////////////////////////////
@@ -126,14 +171,16 @@ void ADC_Meaninator(int runnumber=326776){
 
   //c1->SetLogy();
 
-  TFile f2("ADC_Meaninator.root","RECREATE"); 
+  TFile f2("em.root","RECREATE"); 
 
-  MEAN_ADC_DIST_RPD[0]->Draw("hist e");
-  c1->Print(Form("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/ADC_Meaninator/ZDC_figures/MEAN_ADC_DIST_RPD_NEG_%d.png", runnumber));
-
-  MEAN_ADC_DIST_RPD[1]->Draw("hist e");
-  c1->Print(Form("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/ADC_Meaninator/ZDC_figures/MEAN_ADC_DIST_RPD_POS_%d.png", runnumber));
-  f2.Write();
+  for(int iside = 0; iside < 2; iside++)
+    for(int ich = 0; ich < 5; ich++){
+      em[iside][ich]->SetLineColor(4);
+      em[iside][ich]->Draw("hist e");
+      //c1->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.pdf",stit2[iside],ich+1));
+      c1->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
+      f2.Write();
+    }
 
 
 
@@ -177,7 +224,7 @@ void initRootStyle(){
 
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
-  gStyle->SetOptStat(1);
+  gStyle->SetOptStat(0);
   gStyle->SetOptTitle(1);
   gStyle->SetOptFit(0);
 
