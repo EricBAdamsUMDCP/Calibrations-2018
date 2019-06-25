@@ -17,11 +17,11 @@ using namespace std;
 
 //void initRootStyle();
 
-void BinLogX(TH1*);
+/*void BinLogX(TH1*);
 double fit_noise(double*, double*);
 Double_t sumOfGauss(Double_t*, Double_t*);
 
-TH1F* spectrum_noise;
+TH1F* spectrum_noise;*/
 
 
 void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
@@ -36,14 +36,14 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH1::SetDefaultSumw2();
 
   
-  cout << "running software EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C 6/19/2019 3:41:15 PM" << endl;
+  cout << "running software EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C 6/25/2019 11:49:20 AM" << endl;
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
   
-  //TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
+  TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
 
-  TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+  //TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
   
   //TTree *ZDCRecTree = (TTree*)f->Get("ZDCRecTree"); // reading ZDC rec tree
   TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
@@ -59,10 +59,10 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   double N_ratiovalue = 4.0; //used to be 3
   //ratio value for pos is 6 and for neg is 3
   int cutoff = 00; //cutoff of 70 appears to be good
-  int graphMaxPos = 45000; //was 5000 this is for coloration test
-  int graphMaxNeg = 50000;
-  int graphMinPos = 2500;
-  int graphMinNeg = 4000;
+  int graphMaxPos = 50000; //was 5000 this is for coloration test
+  int graphMaxNeg = 60000;
+  int graphMinPos = 100;
+  int graphMinNeg = 100;
 
   TH1F* em[2][5];
   TH1F* emfC[2][5];
@@ -113,12 +113,12 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
 
 
-  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 4000, 60000, 100, 5000, 80000); //used to be 50
-  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 5000, 60000, 100, 5000, 80000); //nin used to be 700
+  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 40, 60000, 100, 50, 80000); //used to be 50
+  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 40, 60000, 100, 50, 80000); //nin used to be 700
 
 
-  P_45vTotalE = new TH2F(Form("P_45vTotalE"),Form("ts4/5 em and had vTotalE ts 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 60, 3000, 20000, 60, 0, 200);
-  N_45vTotalE = new TH2F(Form("N_45vTotalE"),Form("ts4/5 em and had vTotalE TS 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 60, 3000, 20000, 60, 0, 200);
+  P_45vTotalE = new TH2F(Form("P_45vTotalE"),Form("ts4/5 em and had vTotalE ts 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 60, 50, 20000, 60, 0, 200);
+  N_45vTotalE = new TH2F(Form("N_45vTotalE"),Form("ts4/5 em and had vTotalE TS 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 60, 50, 20000, 60, 0, 200);
 
   const int NTS=10;            // number of timeslices
   TLeaf* bxidLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("bxid");
@@ -130,7 +130,7 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TLeaf* nHFneg = (TLeaf*) ZDCDigiTree->GetLeaf("nHFneg");
   TLeaf* nHFpos = (TLeaf*) ZDCDigiTree->GetLeaf("nHFpos");
  
-   TLeaf* adcLeaf[NTS];
+  TLeaf* adcLeaf[NTS];
   TLeaf* fCleaf[NTS];
 
 
@@ -332,6 +332,15 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   
   TCanvas* c2 = new TCanvas(Form("c2"), Form("RUN_%d", runnumber), 2000, 2000);
   
+  //TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
+  //c3->SetLogy();
+  P_HADSUM->Draw("HIST L");
+  c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
+ // TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
+ // c4->SetLogy();
+  N_HADSUM->Draw("HIST L");
+  c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
+
 
   c2->SetLogz();
   PEMvTotalE->Draw("Colz");
@@ -343,7 +352,7 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   N_45vTotalE->Draw("Colz");
   c2->SaveAs(Form("ZDC_figures/EM_HAD/N_45vTotalE_%d.png",runnumber));
   
-  c2->SetLogy();
+  //c2->SetLogy();
 
 
  /* for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
@@ -393,16 +402,6 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                        c2->SaveAs(Form("ZDC_figures/em/RATIOPN_FivetoThree_%d.png",runnumber));
                                       */
 
-  TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
-  //c3->SetLogy();
-  P_HADSUM->Draw("");
-   c3->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
-  TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
- // c4->SetLogy();
-  N_HADSUM->Draw("");
-   c4->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
-
-
 /*  for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
     for(int ich = 0; ich < 4; ich++){
       HAD[iside][ich]->Draw("");
@@ -432,7 +431,7 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 
   return;
 }
-
+/*
 double fit_noise(double* x, double* p){
   int N = 10;
   double f = 0.0;
@@ -452,7 +451,7 @@ Double_t sumOfGauss(Double_t* x, Double_t* p){
   
   return f;
 }
-
+*/
 // void initRootStyle(){
 //   //  using namespace RooFit ;
 // 
