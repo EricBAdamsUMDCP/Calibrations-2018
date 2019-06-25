@@ -27,19 +27,24 @@ using namespace std;
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
+//!!!!!!!!!!!!!!!!!!!! turned off weighting 
+
+
 //function headers
 void initRootStyle();
 
 //main function macro
-void WeightCalculatorusingJeffs10_0Weights(int runnumber=326776)
-{
+void WeightCalculatorusingJeffs10_0Weights(int runnumber=326776){
 	initRootStyle();
 	
 	cout << "Running SOFTWARE: WeightCalculatorusingJeffs10_0Weights.C" << endl;
 	cout << "Dataset=" << " AOD_zdc_digi_tree_326776_many_3" << endl;
 	
 	
+	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root");
+
 	TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+	
 	TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 	
 	
@@ -92,15 +97,15 @@ void WeightCalculatorusingJeffs10_0Weights(int runnumber=326776)
 											
 										     
 	//WEIGHTS ARE FROM JEFFS GEANT 10_0 .txt (or something like that)
-	float Jeffsweights[NSIDE][NRPD] = {
+	/*float Jeffsweights[NSIDE][NRPD] = {
 	                                   {0.2292, 0.4652, 0.0147, 0.1123, 0.0238, 0.0246, 0.0068, 0.0118, 0.0046, 0.0050, 0.0037, 0.0027, 0.0370, 0.0341, 0.0159, 0.0086}, //neg
 	                                   {0.2292, 0.4652, 0.0147, 0.1123, 0.0238, 0.0068, 0.0246, 0.0118, 0.0046, 0.0050, 0.0037, 0.0027, 0.0370, 0.0341, 0.0159, 0.0086}  //pos  (in block order)
 									  }; //these weights are constructed from jeffs geant code output for x position + 1 cm and y position 0 approximating the measured beam position of 9.4 and 9.6 cm (side based)
-
-	float DATAWeightsFromRun_326776[NSIDE][NRPD] = {///testing new weights might actually be correct due too quartz block ordering issue
-													{3.39726  ,7.07844	,0.247214 ,1.92548	,0.44108 ,0.426838 ,0.137877 ,0.230744 ,0.0580657,0.0727995,0.0677315,0.0409478,0.505317 ,0.499022 ,0.280635 ,0.122337},
-													{4.11798  ,6.0687 	,0.204047 ,1.76127 ,0.445609 ,0.10001 ,0.332942, 0.18884 ,0.0828367,0.102349 ,0.0564283,0.0432092,0.572129,0.595776,0.235725 ,0.164413}
-												   };
+*/
+	/*float DATAWeightsFromRun_326776[NSIDE][NRPD] = { //data weights from run 326776 v3 many
+													{3.47739, 6.60942, 0.247125, 2.27794, 0.300449, 0.335989, 0.103448, 0.204801, 0.0670038, 0.0731469, 0.054854, 0.0500585, 0.677206, 0.601912, 0.272565, 0.168236}, //neg
+													{3.66906, 8.89194, 0.20407, 1.65145, 0.428617, 0.105179, 0.321009, 0.159772, 0.09413, 0.0873638, 0.0664756, 0.0505492, 0.564331, 0.50565, 0.249457, 0.137384} //pos
+												   }; */
 
 	double RPD_Pos_TS456[NRPD] = {0}; //initializing all values to 0
 	double RPD_Neg_TS456[NRPD] = {0}; //initializing all values to 0
@@ -210,13 +215,13 @@ void WeightCalculatorusingJeffs10_0Weights(int runnumber=326776)
 			//EM cut off un comment to reactivate
 			if (/* EM_Beam_Position_Cut_and_Value(TS_Four, TS_Five, n, side, type, channel, EM_CUT_P_Xmin, EM_CUT_P_Xmax, EM_CUT_N_Xmin, EM_CUT_N_Xmax, 0, 0) == 1 */ true){ //logic dictates the EM position function tells us beam position and then a cut is applied
 				if (type == 3){
-					double Weighted_fC_of_TS456_Summed = ((TS_Four + TS_Five + TS_Six) *  DATAWeightsFromRun_326776[side][channel]); // weighting applied here as improves efficiency
+					double Weighted_fC_of_TS456_Summed = ((TS_Four + TS_Five + TS_Six) /* *  DATAWeightsFromRun_326776[side][channel]*/); // weighting applied here as improves efficiency
 					if ( (fC_of_TS456_Summed > 50) && (fC_of_TS45_Summed/fC_of_TS456_Summed > .8) && (TS_Seven <= TS_Five) && (TS_One/TS_Zero < 1000) && (TS_Zero != 0)){
 						NumberofProcessedRPDEvents++;
 							
 						///for math calcualting values use histograms as u KNOW EXACTLY WHAT the weights are coming from!!
-						fC_RPD[side][channel]->Fill((fC_of_TS456_Summed * DATAWeightsFromRun_326776[side][channel])); 
-						fC_RPD_Pure[side][channel]->Fill(fC_of_TS456_Summed * 100); /// DELETE THE 100?
+						fC_RPD[side][channel]->Fill((fC_of_TS456_Summed /** DATAWeightsFromRun_326776[side][channel]*/)); 
+						fC_RPD_Pure[side][channel]->Fill(fC_of_TS456_Summed /** 100*/); /// DELETE THE 100?
 						///.........
 						
 						
@@ -242,67 +247,68 @@ void WeightCalculatorusingJeffs10_0Weights(int runnumber=326776)
 	
 	
 	/// Begin filling sums with data put into histograms (reasoning behind this is I know what I'm putting in my calculations as I can see it, was getting weird bugs before)
-	for ( int NBin = 0; NBin < NumberOfBins; NBin++) { //pos
-		RPD_Pos_TS456_ChannelSum += ( fC_RPD_Pure[1][0]->GetBinContent(NBin) + fC_RPD_Pure[1][1]->GetBinContent(NBin) + fC_RPD_Pure[1][2]->GetBinContent(NBin) + fC_RPD_Pure[1][3]->GetBinContent(NBin)
-									+ fC_RPD_Pure[1][4]->GetBinContent(NBin) + fC_RPD_Pure[1][5]->GetBinContent(NBin) + fC_RPD_Pure[1][6]->GetBinContent(NBin) + fC_RPD_Pure[1][7]->GetBinContent(NBin)
-									+ fC_RPD_Pure[1][8]->GetBinContent(NBin) + fC_RPD_Pure[1][9]->GetBinContent(NBin) + fC_RPD_Pure[1][10]->GetBinContent(NBin) + fC_RPD_Pure[1][11]->GetBinContent(NBin)
-									+ fC_RPD_Pure[1][12]->GetBinContent(NBin) + fC_RPD_Pure[1][13]->GetBinContent(NBin) + fC_RPD_Pure[1][14]->GetBinContent(NBin) + fC_RPD_Pure[1][15]->GetBinContent(NBin));
-	}
-	
-	for ( int NBin = 0; NBin < NumberOfBins; NBin++) { //neg
-		RPD_Neg_TS456_ChannelSum += ( fC_RPD_Pure[0][0]->GetBinContent(NBin) + fC_RPD_Pure[0][1]->GetBinContent(NBin) + fC_RPD_Pure[0][2]->GetBinContent(NBin) + fC_RPD_Pure[0][3]->GetBinContent(NBin)
-									+ fC_RPD_Pure[0][4]->GetBinContent(NBin) + fC_RPD_Pure[0][5]->GetBinContent(NBin) + fC_RPD_Pure[0][6]->GetBinContent(NBin) + fC_RPD_Pure[0][7]->GetBinContent(NBin)
-									+ fC_RPD_Pure[0][8]->GetBinContent(NBin) + fC_RPD_Pure[0][9]->GetBinContent(NBin) + fC_RPD_Pure[0][10]->GetBinContent(NBin) + fC_RPD_Pure[0][11]->GetBinContent(NBin)
-									+ fC_RPD_Pure[0][12]->GetBinContent(NBin) + fC_RPD_Pure[0][13]->GetBinContent(NBin) + fC_RPD_Pure[0][14]->GetBinContent(NBin) + fC_RPD_Pure[0][15]->GetBinContent(NBin));
-	}
-	
-	for ( int c = 0; c < 16; c++){
-		for ( int NBin = 0; NBin < NumberOfBins; NBin++) { //pos
-		RPD_Pos_TS456[c] += fC_RPD_Pure[1][c]->GetBinContent(NBin); /// check to make sure QB order is working intended way
-		}
-	}
-	
-	for ( int c = 0; c < 16; c++){
-		for ( int NBin = 0; NBin < NumberOfBins; NBin++) { //neg
-		RPD_Neg_TS456[c] += fC_RPD_Pure[0][c]->GetBinContent(NBin); /// check to make sure QB order is working intended way
-		}
-	}
+				/*	for ( int NBin = 0; NBin < NumberOfBins; NBin++) { //pos
+						RPD_Pos_TS456_ChannelSum += ( fC_RPD_Pure[1][0]->GetBinContent(NBin) + fC_RPD_Pure[1][1]->GetBinContent(NBin) + fC_RPD_Pure[1][2]->GetBinContent(NBin) + fC_RPD_Pure[1][3]->GetBinContent(NBin)
+													+ fC_RPD_Pure[1][4]->GetBinContent(NBin) + fC_RPD_Pure[1][5]->GetBinContent(NBin) + fC_RPD_Pure[1][6]->GetBinContent(NBin) + fC_RPD_Pure[1][7]->GetBinContent(NBin)
+													+ fC_RPD_Pure[1][8]->GetBinContent(NBin) + fC_RPD_Pure[1][9]->GetBinContent(NBin) + fC_RPD_Pure[1][10]->GetBinContent(NBin) + fC_RPD_Pure[1][11]->GetBinContent(NBin)
+													+ fC_RPD_Pure[1][12]->GetBinContent(NBin) + fC_RPD_Pure[1][13]->GetBinContent(NBin) + fC_RPD_Pure[1][14]->GetBinContent(NBin) + fC_RPD_Pure[1][15]->GetBinContent(NBin));
+					}
+					
+					for ( int NBin = 0; NBin < NumberOfBins; NBin++) { //neg
+						RPD_Neg_TS456_ChannelSum += ( fC_RPD_Pure[0][0]->GetBinContent(NBin) + fC_RPD_Pure[0][1]->GetBinContent(NBin) + fC_RPD_Pure[0][2]->GetBinContent(NBin) + fC_RPD_Pure[0][3]->GetBinContent(NBin)
+													+ fC_RPD_Pure[0][4]->GetBinContent(NBin) + fC_RPD_Pure[0][5]->GetBinContent(NBin) + fC_RPD_Pure[0][6]->GetBinContent(NBin) + fC_RPD_Pure[0][7]->GetBinContent(NBin)
+													+ fC_RPD_Pure[0][8]->GetBinContent(NBin) + fC_RPD_Pure[0][9]->GetBinContent(NBin) + fC_RPD_Pure[0][10]->GetBinContent(NBin) + fC_RPD_Pure[0][11]->GetBinContent(NBin)
+													+ fC_RPD_Pure[0][12]->GetBinContent(NBin) + fC_RPD_Pure[0][13]->GetBinContent(NBin) + fC_RPD_Pure[0][14]->GetBinContent(NBin) + fC_RPD_Pure[0][15]->GetBinContent(NBin));
+					}
+					
+					for ( int c = 0; c < 16; c++){
+						for ( int NBin = 0; NBin < NumberOfBins; NBin++) { //pos
+						RPD_Pos_TS456[c] += fC_RPD_Pure[1][c]->GetBinContent(NBin); /// check to make sure QB order is working intended way
+						}
+					}
+					
+					for ( int c = 0; c < 16; c++){
+						for ( int NBin = 0; NBin < NumberOfBins; NBin++) { //neg
+						RPD_Neg_TS456[c] += fC_RPD_Pure[0][c]->GetBinContent(NBin); /// check to make sure QB order is working intended way
+						}
+					}
+					*/
 	/// END filling sums with data put into histograms...
 	
 	/* for ( int i = 0; i < NRPD; i++){ // fill RPD_???_TS456_ChannelSum with the fC values from all of the RPD channels for ratio calculations
 		RPD_Neg_TS456_ChannelSum += RPD_Neg_TS456[i];
 		RPD_Pos_TS456_ChannelSum += RPD_Pos_TS456[i];
 	} */
-	cout << "RPD_Neg_TS456_ChannelSum=" << RPD_Neg_TS456_ChannelSum << endl;
-	cout << "RPD_Pos_TS456_ChannelSum=" << RPD_Pos_TS456_ChannelSum << endl;
-	
+				/*	cout << "RPD_Neg_TS456_ChannelSum=" << RPD_Neg_TS456_ChannelSum << endl;
+					cout << "RPD_Pos_TS456_ChannelSum=" << RPD_Pos_TS456_ChannelSum << endl;
+					*/
 	//////////////////////////////////////////
     //CREATING NORMALIZATION OF REAL WEIGHTS//
     //////////////////////////////////////////
 	
 	//MATH: jeffsweight = N * RPDDataWeight ---> R = Jeffs weight/DataWeight // here N represents the number being calculated
 	
-	cout << "Jeffsweights = N * RPDDataWeight" << endl;
-	
-	cout << endl;
-	
-	for ( int c = 0; c < NRPD; c++){ // c stands for channel
-	//NEG = 0
-		//int QuartzBlockOrdering = RPDCorrectBlockOrder[0][c];
-		double RPDDataWeight = (RPD_Neg_TS456[c/* QuartzBlockOrdering */]/RPD_Neg_TS456_ChannelSum); // was typo here RPDCorrectBlockOrder was not implemented
-		double N = (Jeffsweights[0][c]/RPDDataWeight);
-		cout << "Neg Channel RPDDataWeight " << c + 1/* QuartzBlockOrdering+1 */ << ":  " << RPDDataWeight << "  Calculated N: " << N << " Jeffsweight" << Jeffsweights[0][c] << endl; /// check to make sure QB order is working intended way
-	}
-	
-	cout << endl;
-	
-	for ( int c = 0; c < NRPD; c++){ // c stands for channel
-	//Pos = 1
-		//int QuartzBlockOrdering = RPDCorrectBlockOrder[1][c];
-		double RPDDataWeight = (RPD_Pos_TS456[c/* QuartzBlockOrdering */]/RPD_Pos_TS456_ChannelSum);  // was typo here RPDCorrectBlockOrder was not implemented
-		double N = (Jeffsweights[1][c]/RPDDataWeight);
-		cout << "Pos Channel RPDDataWeight " << c + 1/* QuartzBlockOrdering+1 */ << ":  " << RPDDataWeight << "  Calculated N: " << N << " Jeffsweight" << Jeffsweights[1][c] << endl; /// check to make sure QB order is working intended way
-	}
+	//              cout << "Jeffsweights = N * RPDDataWeight" << endl;
+	//              
+	//              cout << endl;
+	//              
+	//              for ( int c = 0; c < NRPD; c++){ // c stands for channel
+	//              //NEG = 0
+	//              	//int QuartzBlockOrdering = RPDCorrectBlockOrder[0][c];
+	//              	double RPDDataWeight = (RPD_Neg_TS456[c/* QuartzBlockOrdering */]/RPD_Neg_TS456_ChannelSum); // was typo here RPDCorrectBlockOrder was not implemented
+	//              	double N = (Jeffsweights[0][c]/RPDDataWeight);
+	//              	cout << "Neg Channel RPDDataWeight " << c + 1/* QuartzBlockOrdering+1 */ << ":  " << RPDDataWeight << "  Calculated N: " << N << " Jeffsweight" << Jeffsweights[0][c] << endl; /// check to make sure QB order is working intended way
+	//              }
+	//              
+	//              cout << endl;
+	//              
+	//              for ( int c = 0; c < NRPD; c++){ // c stands for channel
+	//              //Pos = 1
+	//              	//int QuartzBlockOrdering = RPDCorrectBlockOrder[1][c];
+	//              	double RPDDataWeight = (RPD_Pos_TS456[c/* QuartzBlockOrdering */]/RPD_Pos_TS456_ChannelSum);  // was typo here RPDCorrectBlockOrder was not implemented
+	//              	double N = (Jeffsweights[1][c]/RPDDataWeight);
+	//              	cout << "Pos Channel RPDDataWeight " << c + 1/* QuartzBlockOrdering+1 */ << ":  " << RPDDataWeight << "  Calculated N: " << N << " Jeffsweight" << Jeffsweights[1][c] << endl; /// check to make sure QB order is working intended way
+	//              }
 	
 	//cout<< "here2" << endl;
 	

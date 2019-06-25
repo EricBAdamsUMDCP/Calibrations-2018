@@ -29,6 +29,8 @@ You can do it, attend LPC CMS DAS in the winter.
 
 // last edited (if I remebered to change this... 5/7/2019 11:49:39 AM)
 
+//IF YOU ARE SETTING THINGS TO 1 TO MAKE IT SO NO WEIGHTS ARE APPLIED REATE INDIVIDUAL ARRAYS FOR EACH INDEPENDENT FUNCTION OTHERWISE THE CODE READS OUTSIDE OF THE ARRAY
+
 #include <sstream>
 #include <iostream>
 #include <cstdio>
@@ -178,7 +180,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double Input
 					valuereturned = WeightedAverageRPD_P_X;
 				}
 				else {
-					valuereturned = -101;
+					valuereturned = -10;
 				}
 			}
 			else if (XorY == "Y"){
@@ -192,7 +194,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double Input
 					valuereturned = WeightedAverageRPD_P_Y;
 				}
 				else{
-					valuereturned = -102;
+					valuereturned = -10;
 				}
 			}
 		}
@@ -208,7 +210,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double Input
 					valuereturned = WeightedAverageRPD_N_X;
 				}
 				else{
-					valuereturned = -103;
+					valuereturned = -10;
 				}
 			}
 			else if (XorY == "Y"){
@@ -222,7 +224,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double Input
 					valuereturned = WeightedAverageRPD_N_Y;
 				}
 				else{
-					valuereturned = -104;
+					valuereturned = -10;
 				}
 			}
 		}
@@ -237,7 +239,7 @@ double RPD_Beam_Position_Value_X_or_Y(double RawDataRPD[2][16][10], double Input
 		/// above used for debugging purposes
 	}
 	else if (EM_BEAM_POSITION == -10 || Input_Weightedjeffsweights[15] == -10 || Input_Weightedjeffsweights[0] == -10){
-		valuereturned = -105;
+		valuereturned = -10;
 	}
 
 	return valuereturned;

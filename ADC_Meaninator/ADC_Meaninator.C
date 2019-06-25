@@ -110,13 +110,24 @@ void ADC_Meaninator(int runnumber=326776){
     MEANS_OF_ADC_RPD[1][b]=ADC_DIST_RPD[1][b]->GetMean();
   }
 
+  double weightsforADC[2][16] = {0};
 
-  for (int k = 0; k < 16; k++){
-    MEAN_ADC_DIST_RPD[0]->Fill(k, MEANS_OF_ADC_RPD[0][k]);
+
+  for (int c = 0; c < 16; c++){
+    weightsforADC[0][c] = 1/(MEANS_OF_ADC_RPD[0][c]/MEANS_OF_ADC_RPD[0][0]);
+    weightsforADC[1][c] = 1/(MEANS_OF_ADC_RPD[1][c]/MEANS_OF_ADC_RPD[1][0]);
   }
 
   for (int k = 0; k < 16; k++){
-    MEAN_ADC_DIST_RPD[1]->Fill(k, MEANS_OF_ADC_RPD[1][k]);
+    double NEG_mean_weighted_ADC = (MEANS_OF_ADC_RPD[0][k] * weightsforADC[0][k]);
+   
+    MEAN_ADC_DIST_RPD[0]->Fill(k, NEG_mean_weighted_ADC);
+  }
+
+  for (int k = 0; k < 16; k++){
+    double POS_mean_weighted_ADC = (MEANS_OF_ADC_RPD[1][k]  * weightsforADC[1][k]);
+
+    MEAN_ADC_DIST_RPD[1]->Fill(k, POS_mean_weighted_ADC);
   }
 
   ///////////////////////////////////////

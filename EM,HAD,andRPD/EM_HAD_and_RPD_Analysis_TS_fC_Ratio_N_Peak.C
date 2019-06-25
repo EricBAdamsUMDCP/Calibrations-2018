@@ -15,7 +15,8 @@
 
 using namespace std;
 
-void initRootStyle();
+//void initRootStyle();
+
 void BinLogX(TH1*);
 double fit_noise(double*, double*);
 Double_t sumOfGauss(Double_t*, Double_t*);
@@ -24,7 +25,8 @@ TH1F* spectrum_noise;
 
 
 void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
-  initRootStyle();
+ 
+  //initRootStyle();
 
   int iPeriod = 0;
 
@@ -39,9 +41,9 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
   
-  TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
+  //TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
 
-  //TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+  TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
   
   //TTree *ZDCRecTree = (TTree*)f->Get("ZDCRecTree"); // reading ZDC rec tree
   TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
@@ -51,15 +53,15 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
-  double EMmultiplicativevalue = 0.19; 
-  double RPDmultiplicativevalue = 0.08;
+  double EMmultiplicativevalue = 0.15; 
+  double RPDmultiplicativevalue = 0.80;
   double P_ratiovalue = 7.0; //used to be 6
   double N_ratiovalue = 4.0; //used to be 3
   //ratio value for pos is 6 and for neg is 3
   int cutoff = 00; //cutoff of 70 appears to be good
   int graphMaxPos = 45000; //was 5000 this is for coloration test
   int graphMaxNeg = 50000;
-  int graphMinPos = 3000;
+  int graphMinPos = 2500;
   int graphMinNeg = 4000;
 
   TH1F* em[2][5];
@@ -83,13 +85,13 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 5; ich++){
-      em[iside][ich]   = new TH1F(Form("em %s %d",stit2[iside],ich+1),Form("EM%s channel %d",stit[iside],ich+1),10,0,9);
+      em[iside][ich]   = new TH1F(Form("em %s %d",stit2[iside],ich+1), Form("EM%s channel %d",stit[iside],ich+1),10,0,9);
       //emfC[iside][ich] = new TH1F(Form("emfC %s %d",stit2[iside],ich+1),Form("EMfC%s channel %d fC",stit[iside],ich+1),500,0,2000);
     }
   }
 
-  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC", runnumber, EMmultiplicativevalue),300,0,100000);
-  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC", runnumber, EMmultiplicativevalue),300,0,100000);
+  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC + %f*P_SumRPDfC", runnumber, EMmultiplicativevalue, RPDmultiplicativevalue),300,0,100000);
+  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC + %f*N_SumRPDfC", runnumber, EMmultiplicativevalue, RPDmultiplicativevalue),300,0,100000);
 
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 4; ich++){
@@ -111,12 +113,12 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   RATIOPN_FivetoThree = new TH2F(("RATIOPN_FivetoThree"),("RATIOPN_FivetoThree; Pos; Neg"), 40, 0, 2, 40, 0, 2);*/
 
 
-  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC); EM (fC)", EMmultiplicativevalue), 100, 5000, 60000, 100, 5000, 80000); //used to be 50
-  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC); EM (fC)", EMmultiplicativevalue), 100, 5000, 60000, 100, 5000, 80000); //nin used to be 700
+  PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 4000, 60000, 100, 5000, 80000); //used to be 50
+  NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 5000, 60000, 100, 5000, 80000); //nin used to be 700
 
 
-  P_45vTotalE = new TH2F(Form("P_45vTotalE"),Form("ts4/5 em and had vTotalE ts 4; Sum HAD + %f * EM (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue), 60, 3000, 20000, 60, 0, 200);
-  N_45vTotalE = new TH2F(Form("N_45vTotalE"),Form("ts4/5 em and had vTotalE TS 4; Sum HAD + %f * EM (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue), 60, 3000, 20000, 60, 0, 200);
+  P_45vTotalE = new TH2F(Form("P_45vTotalE"),Form("ts4/5 em and had vTotalE ts 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 60, 3000, 20000, 60, 0, 200);
+  N_45vTotalE = new TH2F(Form("N_45vTotalE"),Form("ts4/5 em and had vTotalE TS 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 60, 3000, 20000, 60, 0, 200);
 
   const int NTS=10;            // number of timeslices
   TLeaf* bxidLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("bxid");
@@ -344,14 +346,14 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   c2->SetLogy();
 
 
-  for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
+ /* for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
     for(int ich = 0; ich < 5; ich++){
       
       em[iside][ich]->SetLineColor(4);
       em[iside][ich]->Draw("hist e");
       c2->SaveAs(Form("ZDC_figures/em/em_%s_channel_%d_%d.png",stit2[iside],ich+1,runnumber));
       //f2.Write();
-    }
+    }*/
 /*  for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
     for(int ich = 0; ich < 5; ich++){
       c2->SetLogy();
@@ -393,22 +395,22 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 
   TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
   //c3->SetLogy();
-  P_HADSUM->Draw("c");
+  P_HADSUM->Draw("");
    c3->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
   TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
  // c4->SetLogy();
-  N_HADSUM->Draw("c");
+  N_HADSUM->Draw("");
    c4->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
 
 
-  for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
+/*  for(int iside = 0; iside < 2; iside++){ //uncomment to get graphs
     for(int ich = 0; ich < 4; ich++){
-      HAD[iside][ich]->Draw("hist e");
+      HAD[iside][ich]->Draw("");
       c2->SaveAs(Form("ZDC_figures/had/HAD_%s_TS_%d_%d.png", stit2[iside], ich+1,runnumber));
-      HADfC[iside][ich]->Draw("hist e");
+      HADfC[iside][ich]->Draw("");
       c2->SaveAs(Form("ZDC_figures/had/HAD_%s_fC_%d_%d.png", stit2[iside], ich+1,runnumber));
     }
-  }
+  }*/
 
  
 
@@ -451,67 +453,67 @@ Double_t sumOfGauss(Double_t* x, Double_t* p){
   return f;
 }
 
-void initRootStyle(){
-  //  using namespace RooFit ;
-
-  gROOT->SetStyle("Plain");
-  gStyle->SetPalette(1);
-  gStyle->SetOptStat(1);
-  gStyle->SetOptTitle(1);
-  gStyle->SetOptFit(1);
-
-  gStyle->SetTitleBorderSize(0);
-  gStyle->SetTitleFillColor(0);
-  gStyle->SetStatColor(0);
-
-  gStyle->SetFrameBorderMode(0);
-  gStyle->SetFrameFillColor(0);
-  gStyle->SetFrameLineColor(kBlack);
-
-  gStyle->SetCanvasColor(0);
-  gStyle->SetCanvasBorderMode(0);
-  gStyle->SetCanvasBorderSize(0);
-
-  gStyle->SetPadColor(0);
-  gStyle->SetPadBorderMode(0);
-  gStyle->SetPadBorderSize(0);
-
-  gStyle->SetLegendBorderSize(0);
-  //gStyle->SetTextSize(0.04);
-  gStyle->SetTextFont(42);
-  gStyle->SetLabelFont(42,"xyz");
-  gStyle->SetTitleFont(42,"xyz");
-  gStyle->SetTitleSize(0.05,"xyz");
-  gStyle->SetPadBottomMargin(0.13);
-  gStyle->SetPadTopMargin(0.10);
-  gStyle->SetPadRightMargin(0.12); // 0.10
-  gStyle->SetPadLeftMargin(0.15); // 0.12
-
-  gStyle->SetTitleXOffset(1.1);
-  gStyle->SetTitleYOffset(1.5); // 1.2
-
-  gStyle->SetPadTickX(1);
-  gStyle->SetPadTickY(1);
-
-  gStyle->SetCanvasDefH(600);
-  gStyle->SetCanvasDefW(1200);
-/*
-  gStyle->SetStatX(0.92); // 0.36
-  gStyle->SetStatY(0.92);
-*/
-  //gStyle->SetHistMinimumZero(kTRUE);
-
-  //gStyle->SetErrorX(0); //disable if you want to draw horizontal error bars, e.g. when having variable bin size
-  gStyle->SetEndErrorSize(1);
-
-  gStyle->SetMarkerStyle(20);
-  gStyle->SetMarkerColor(2);
-  gStyle->SetMarkerSize(0.2);
-
-  //gROOT->ForceStyle();
-
-  std::cout << "ROOT style loaded." << std::endl;
-}
+// void initRootStyle(){
+//   //  using namespace RooFit ;
+// 
+//   gROOT->SetStyle("Plain");
+//   gStyle->SetPalette(1);
+//   gStyle->SetOptStat(1);
+//   gStyle->SetOptTitle(1);
+//   gStyle->SetOptFit(1);
+// 
+//   gStyle->SetTitleBorderSize(0);
+//   gStyle->SetTitleFillColor(0);
+//   gStyle->SetStatColor(0);
+// 
+//   gStyle->SetFrameBorderMode(0);
+//   gStyle->SetFrameFillColor(0);
+//   gStyle->SetFrameLineColor(kBlack);
+// 
+//   gStyle->SetCanvasColor(0);
+//   gStyle->SetCanvasBorderMode(0);
+//   gStyle->SetCanvasBorderSize(0);
+// 
+//   gStyle->SetPadColor(0);
+//   gStyle->SetPadBorderMode(0);
+//   gStyle->SetPadBorderSize(0);
+// 
+//   gStyle->SetLegendBorderSize(0);
+//   //gStyle->SetTextSize(0.04);
+//   gStyle->SetTextFont(42);
+//   gStyle->SetLabelFont(42,"xyz");
+//   gStyle->SetTitleFont(42,"xyz");
+//   gStyle->SetTitleSize(0.05,"xyz");
+//   gStyle->SetPadBottomMargin(0.13);
+//   gStyle->SetPadTopMargin(0.10);
+//   gStyle->SetPadRightMargin(0.12); // 0.10
+//   gStyle->SetPadLeftMargin(0.15); // 0.12
+// 
+//   gStyle->SetTitleXOffset(1.1);
+//   gStyle->SetTitleYOffset(1.5); // 1.2
+// 
+//   gStyle->SetPadTickX(1);
+//   gStyle->SetPadTickY(1);
+// 
+//   gStyle->SetCanvasDefH(600);
+//   gStyle->SetCanvasDefW(1200);
+// /*
+//   gStyle->SetStatX(0.92); // 0.36
+//   gStyle->SetStatY(0.92);
+// */
+//   //gStyle->SetHistMinimumZero(kTRUE);
+// 
+//   //gStyle->SetErrorX(0); //disable if you want to draw horizontal error bars, e.g. when having variable bin size
+//   gStyle->SetEndErrorSize(1);
+// 
+//   gStyle->SetMarkerStyle(20);
+//   gStyle->SetMarkerColor(2);
+//   gStyle->SetMarkerSize(0.2);
+// 
+//   //gROOT->ForceStyle();
+// 
+//   std::cout << "ROOT style loaded." << std::endl;
+// }
 
 /*void BinLogX(TH1* h){
   TAxis *axis = h->GetXaxis();
