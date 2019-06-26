@@ -15,16 +15,18 @@ void Fiber_Ridge_Subtractor_Outputs_Array( double RawDataRPD[2][16][10], double 
 			TS45Array[s][c] = RawDataRPD[s][c][4] + RawDataRPD[s][c][5];
 			TS456Array[s][c] = TS45Array[s][c] + RawDataRPD[s][c][6];
 	
-			/*if ((TS456Array[s][c] < 40) || (TS45Array[s][c] / TS456Array[s][c] < .8) || //WARNING THIS IS CUTTING FOR BAD EVENTS!!!!!!!!!!!!!!!!!!!!!!! (for good invert all operators and change || to &&)
-			   (RawDataRPD[s][c][7] >= RawDataRPD[s][c][5]) || (RawDataRPD[s][c][1] / RawDataRPD[s][c][0] > 1000) //WARNING THIS IS CUTTING FOR BAD EVENTS!!!!!!!!!!!!!!!!!!!!!!!
-			   || (RawDataRPD[s][c][0] = 0)){ //WARNING THIS IS CUTTING FOR BAD EVENTS!!!!!!!!!!!!!!!!!!!!!!!
+			if((TS456Array[s][c] > 40) && (TS45Array[s][c] / TS456Array[s][c] > .8) && //WARNING THIS IS CUTTING FOR BAD EVENTS!!!!!!!!!!!!!!!!!!!!!!! (for good invert all operators and change || to &&)
+			   (RawDataRPD[s][c][7] <= RawDataRPD[s][c][5]) && (RawDataRPD[s][c][1] / RawDataRPD[s][c][0] < 1000) //WARNING THIS IS CUTTING FOR BAD EVENTS!!!!!!!!!!!!!!!!!!!!!!!
+			   && (RawDataRPD[s][c][0] != 0)){ //WARNING THIS IS CUTTING FOR BAD EVENTS!!!!!!!!!!!!!!!!!!!!!!!
+			}
+			else{
 				for (int i = 0; i < 2; i++){
 					for (int j = 0; j < 16; j++){	//if a bad waveform is detected the entire event is rejected by retuning all values of -10		                                                              
 						Ridge_Subtracted_RPD_Data[i][j] =  -10; //bc array is declared early it is difficult to initialie array again
 					}
 				}
 				return; // exits function
-			}*/
+			}
 		}
 	}
 		//4 Row, 2 side, 4 col RPD
