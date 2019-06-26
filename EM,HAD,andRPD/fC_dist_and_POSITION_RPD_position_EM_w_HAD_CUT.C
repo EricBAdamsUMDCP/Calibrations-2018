@@ -18,6 +18,7 @@
 
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h"
 #include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/X_Y_P_N_RPD_Beam_Position_Calculator.h"
+#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/Fiber_Ridge_Subtractor.h"
 //#include "EM_Beam_Position_Cut_and_Value_Header.h" //custom header written by Eric A to measure beam position
 
 using namespace std;
@@ -188,6 +189,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	double RawDataRPD[NSIDE][NRPD][NTS] = { {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}},    //neg  // these are used to store the raw data 
 										    {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}} }; //pos
 	
+	double Ridge_Subtracted_RPD_Data[2][16] = {0};
 
 	double HAD_TS_BLOB_Ratios[2][4] = {0};
 
@@ -205,6 +207,9 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	int EM = 0;
 	int HAD = 1;
 	int RPD = 3;
+
+	double cutEMPos = 0;
+	double cutEMNeg = 0;
 	/// END Declaring TLeaf... /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/// Begin filling variables with DATA/fC LOOP https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
@@ -265,11 +270,23 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
 				}
 			}
+		} //end channel loop
+
+		
+		Fiber_Ridge_Subtractor_Outputs_Array( RawDataRPD, 0.10, Ridge_Subtracted_RPD_Data);
+
+
+
+		for (int s = 0; s < 2; s++){
+			for (int c = 0; c < 16; c++){
+				cout << "side " << s << " channel " << c << " Data: " << Ridge_Subtracted_RPD_Data[s][c] << endl;
+			}
 		}
+
 
 		for ( int s = 0; s < 2; s++){
 			for (int c = 0; c < 4; c++){
-	mn 		HAD_TS_BLOB_Ratios[s][c] = (RawDataHAD[s][c][4]/RawDataHAD[s][c][5]);
+			HAD_TS_BLOB_Ratios[s][c] = (RawDataHAD[s][c][4]/RawDataHAD[s][c][5]);
 			}
 		}
 
@@ -309,8 +326,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 		double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
 		double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
 		//cout << "EMPos" << POS_EM_BEAM_POSITION << endl;
-		double cutEMPos = 0;
-		double cutEMNeg = 0;
+		
 		if (true){
 			if (RawDataEM[1][2][4]/RawDataEM[1][2][5] > 8){
 				EM_B_Position[1]->Fill(POS_EM_BEAM_POSITION);
@@ -326,19 +342,18 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 
 		if (HAD_TS_BLOB_Ratios[1][0] > HADvaluePos && HAD_TS_BLOB_Ratios[1][1] > HADvaluePos && HAD_TS_BLOB_Ratios[1][2] > HADvaluePos && HAD_TS_BLOB_Ratios[1][3] > HADvaluePos &&
 		 HAD_TS_BLOB_Ratios[0][0] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][1] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][2] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][3] > HADvalueNeg){
-			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, RPDXP, RPDYP, RPDXN, RPDYN){
+			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, RPDXP, RPDYP, RPDXN, RPDYN);
 		
 		
-				cout << "RDPXP" << RPDXP << endl;
-				cout << "RDPYP" << RPDYP << endl;
-				cout << "RDPXN" << RPDXN << endl;
-				cout << "RDPYN" << RPDYN << endl;
-				if (RPDXP != -10 && RPDYP != -10 && RPDXP != -10 && RPDYP != -10){
-					Pos_RPDvRPD->Fill(RPDXP, RPDYP);
-					Neg_RPDvRPD->Fill(RPDXN,RPDYN);
-					PassedHADCheckPos = 1; //ensuring cuts were satisfied for rpd cuts neg v pos
-					PassedHADCheckNeg = 1;
-				}
+			cout << "RDPXP" << RPDXP << endl;
+			cout << "RDPYP" << RPDYP << endl;
+			cout << "RDPXN" << RPDXN << endl;
+			cout << "RDPYN" << RPDYN << endl;
+			if (RPDXP != -10 && RPDYP != -10 && RPDXP != -10 && RPDYP != -10){
+				Pos_RPDvRPD->Fill(RPDXP, RPDYP);
+				Neg_RPDvRPD->Fill(RPDXN,RPDYN);
+				PassedHADCheckPos = 1; //ensuring cuts were satisfied for rpd cuts neg v pos
+				PassedHADCheckNeg = 1;
 			}
 		}
 
