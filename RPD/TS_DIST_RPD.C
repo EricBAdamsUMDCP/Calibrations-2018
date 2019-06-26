@@ -231,7 +231,7 @@ void TS_DIST_RPD(int runnumber=326776){
 				double fC_of_TS45_Summed  = RawDataRPD[s][c][4] + RawDataRPD[s][c][5];
 				double fC_of_TS456_Summed = fC_of_TS45_Summed + RawDataRPD[s][c][6];
 		
-				if ( (fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed/fC_of_TS456_Summed > .8) && (RawDataRPD[s][c][7] <= RawDataRPD[s][c][5]) && (RawDataRPD[s][c][1]/RawDataRPD[s][c][0] < 1000) && (RawDataRPD[s][c][0] != 0)){
+				if ( (RawDataRPD[s][c][4] < RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] < RawDataRPD[s][c][7]) /*bad event cut*/){
 					for (int ts = 0; ts < 10; ts++){
 						fC_RPD[s][c]->Fill(ts, RawDataRPD[s][c][ts]);
 					}

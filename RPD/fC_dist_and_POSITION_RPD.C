@@ -40,7 +40,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	initRootStyle();
 	
 	cout << "Running SOFTWARE: fC_dist_and_POSITION_RPD.C" << endl;
-	cout << "Dataset=" << " AOD_zdc_digi_tree_326776_many_3" << endl;
+	cout << "Dataset=" << " AOD_zdc_digi_tree_326776_many_3 EDITED: 6/26/2019 6:42:31 PM " << endl;
 	
 	
 	TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root");
@@ -135,8 +135,8 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	//s stands for side
 		for( int c = 0; c < 16; c++){
 		//c stands for channel
-			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776Weighted_RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,10/* MinXTH1F */,1 /* ArrayMaxXTH1F[s][c] */); /// lower bound is set higher than upper bound bc when rene burn designed this thing HE MADE THAT THE ONLY GOD DAMN WAY FOR IT TO AUTOFIT THE AXES .....
-			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,10,1);
+			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776Weighted_RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,0/* MinXTH1F */, 310000 /* ArrayMaxXTH1F[s][c] */); /// lower bound is set higher than upper bound bc when rene burn designed this thing HE MADE THAT THE ONLY GOD DAMN WAY FOR IT TO AUTOFIT THE AXES .....
+			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,0, 310000);
 		}
 	}
 	
@@ -268,24 +268,24 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 		}
 
 		
-		if (false /*true*/){ //logic dictates the EM position function tells us beam position and then a cut is applied	
+		if (true /*true*/){ //logic dictates the EM position function tells us beam position and then a cut is applied	
 			for (int s = 0; s < 2; s++){
-				if (s = 0) {
+				if (s == 0) {
 					HADvalue = 4;
 				}
 				else{
 					HADvalue = 7;
 				}
-				if (HAD_TS_BLOB_Ratios[s][0] > HADvalue && HAD_TS_BLOB_Ratios[s][1] > HADvalue && HAD_TS_BLOB_Ratios[s][2] > HADvalue && HAD_TS_BLOB_Ratios[s][3] > HADvalue && HAD_TS_BLOB_Ratios[s][4] > HADvalue){
+				if (HAD_TS_BLOB_Ratios[s][0] > HADvalue && HAD_TS_BLOB_Ratios[s][1] > HADvalue && HAD_TS_BLOB_Ratios[s][2] > HADvalue && HAD_TS_BLOB_Ratios[s][3] > HADvalue){
 					for (int c = 0; c < 16; c++){
-						double fC_of_TS456_Summed = RawDataRPD[s][c][4] + RawDataRPD[s][c][5] + RawDataRPD[s][c][6];
+						double fC_of_TS345_Summed = RawDataRPD[s][c][4] + RawDataRPD[s][c][5] + RawDataRPD[s][c][3];
 						double fC_of_TS45_Summed  = RawDataRPD[s][c][4] + RawDataRPD[s][c][5];
 		
-						if ( (fC_of_TS456_Summed > 40) && (fC_of_TS45_Summed/fC_of_TS456_Summed > .8) && (RawDataRPD[s][c][7] <= RawDataRPD[s][c][5]) && (RawDataRPD[s][c][1]/RawDataRPD[s][c][0] < 1000) && (RawDataRPD[s][c][0] != 0)){
+						if ( (RawDataRPD[s][c][4] > RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] > RawDataRPD[s][c][7])){
 							NumberofProcessedRPDEvents++;	
 							///for math calcualting values use histograms as u KNOW EXACTLY WHAT the weights are coming from!!
-							fC_RPD[side][channel]->Fill(fC_of_TS456_Summed); 
-							fC_RPD_Pure[side][channel]->Fill(fC_of_TS456_Summed); 
+							fC_RPD[s][c]->Fill(fC_of_TS345_Summed); 
+							fC_RPD_Pure[s][c]->Fill(fC_of_TS345_Summed); 
 				
 						}
 					}
@@ -303,7 +303,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 		
 		HADvalue = 7;
 
-		if (HAD_TS_BLOB_Ratios[1][0] > HADvalue && HAD_TS_BLOB_Ratios[1][1] > HADvalue && HAD_TS_BLOB_Ratios[1][2] > HADvalue && HAD_TS_BLOB_Ratios[1][3] > HADvalue && HAD_TS_BLOB_Ratios[1][4] > HADvalue){
+		if (HAD_TS_BLOB_Ratios[1][0] > HADvalue && HAD_TS_BLOB_Ratios[1][1] > HADvalue && HAD_TS_BLOB_Ratios[1][2] > HADvalue && HAD_TS_BLOB_Ratios[1][3] > HADvalue ){
 			double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
 			RPDXP = RPD_Beam_Position_Value_X_or_Y( RawDataRPD, weightsareonea, POS_EM_BEAM_POSITION, "Pos", "X");
 			RPDYP = RPD_Beam_Position_Value_X_or_Y( RawDataRPD, weightsareoneb, POS_EM_BEAM_POSITION, "Pos", "Y");
@@ -314,7 +314,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 
 		HADvalue = 4;
 		
-		if (HAD_TS_BLOB_Ratios[0][0] > HADvalue && HAD_TS_BLOB_Ratios[0][1] > HADvalue && HAD_TS_BLOB_Ratios[0][2] > HADvalue && HAD_TS_BLOB_Ratios[0][3] > HADvalue && HAD_TS_BLOB_Ratios[0][4] > HADvalue){
+		if (HAD_TS_BLOB_Ratios[0][0] > HADvalue && HAD_TS_BLOB_Ratios[0][1] > HADvalue && HAD_TS_BLOB_Ratios[0][2] > HADvalue && HAD_TS_BLOB_Ratios[0][3] > HADvalue ){
 			double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
 			RPDXN = RPD_Beam_Position_Value_X_or_Y( RawDataRPD, weightsareonec, NEG_EM_BEAM_POSITION, "Neg", "X");
 			RPDYN = RPD_Beam_Position_Value_X_or_Y( RawDataRPD, weightsareoned, NEG_EM_BEAM_POSITION, "Neg", "Y");
@@ -347,21 +347,22 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	TCanvas *c4 = new TCanvas("c4", "RUN 326776", 2000, 1500);
 	//gPad-> SetLogy();
 	
-	Pos_RPDvRPD->Draw("colz");
-	c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[1], runnumber));
-	Neg_RPDvRPD->Draw("colz");
-	c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[0], runnumber));
-
-	X_RPDvRPD->Draw("colz");
-	c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_XvX_%d.png", runnumber));
-	Y_RPDvRPD->Draw("colz");
-	c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_YvY_%d.png", runnumber));
-
+	if (false){
+		Pos_RPDvRPD->Draw("colz");
+		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[1], runnumber));
+		Neg_RPDvRPD->Draw("colz");
+		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[0], runnumber));
+	
+		X_RPDvRPD->Draw("colz");
+		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_XvX_%d.png", runnumber));
+		Y_RPDvRPD->Draw("colz");
+		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_YvY_%d.png", runnumber));
+	}
 	int A = 4;
 	int B = 2;
 	//int Value =0; was used for debugging correct quartz block order
 	//cout << "here2" << endl;
-	if (false /*true*/)	{
+	if (true)	{
 		for(int i =0; i < 2; i++){ 
 			for(int j=0 ; j < 16; j++){
 				c4->cd(); /// this resets and clears the canvas idky blame rene burn...
