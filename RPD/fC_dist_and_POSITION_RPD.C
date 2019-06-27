@@ -16,8 +16,8 @@
 #include "THStack.h" // ERIC ADDED
 #include "TPaveLabel.h" //Eric ADDDED
 
-#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h"
-#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h"
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
 //#include "EM_Beam_Position_Cut_and_Value_Header.h" //custom header written by Eric A to measure beam position
 
 using namespace std;
@@ -45,7 +45,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	
 	TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root");
 
-	//TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+	//TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
 	
 	TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 	
@@ -110,6 +110,9 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	
 	double RPD_Pos_TS456_ChannelSum = 0;
 	double RPD_Neg_TS456_ChannelSum = 0;
+
+	double P_ratiovalue = 7.0;
+ 	double N_ratiovalue = 4.0;
 	
 	/// END Variable and constant declaration ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -135,8 +138,8 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	//s stands for side
 		for( int c = 0; c < 16; c++){
 		//c stands for channel
-			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776Weighted_RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,0/* MinXTH1F */, 310000 /* ArrayMaxXTH1F[s][c] */); /// lower bound is set higher than upper bound bc when rene burn designed this thing HE MADE THAT THE ONLY GOD DAMN WAY FOR IT TO AUTOFIT THE AXES .....
-			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,0, 310000);
+			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776_RPD%s channel %d %d; fC; counts",stit[s],c+1, runnumber),NumberOfBins,0/* MinXTH1F */, 50000/*310000*/ /* ArrayMaxXTH1F[s][c] */); /// lower bound is set higher than upper bound bc when rene burn designed this thing HE MADE THAT THE ONLY GOD DAMN WAY FOR IT TO AUTOFIT THE AXES .....
+			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d; fC; counts",stit[s],c+1, runnumber),NumberOfBins,0, 50000/*310000*/);
 		}
 	}
 	
@@ -269,28 +272,53 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 			HAD_TS_BLOB_Ratios[s][c] = (RawDataHAD[s][c][4]/RawDataHAD[s][c][5]);
 			}
 		}
+		double HADandEMfC = 0;
+		double EMfC = 0;
+		double HADfC = 0;
 
 		
 		if (true /*true*/){ //logic dictates the EM position function tells us beam position and then a cut is applied	
 			for (int s = 0; s < 2; s++){
 				if (s == 0) {
 					HADvalue = 4;
-
+					for (int emc = 0; emc < 5; emc++){ //em cut for 10 N peak
+						if (RawDataEM[s][emc][4]/RawDataEM[s][emc][5] > N_ratiovalue ){
+       					   EMfC += RawDataEM[s][emc][4];
+          				}
+          			}
+          			for (int hadc = 0; hadc < 4; hadc++){ //HAD cut for 10 N peak
+						if (RawDataHAD[s][hadc][4]/RawDataHAD[s][hadc][5] > N_ratiovalue ){
+       					   HADfC += RawDataEM[s][hadc][4];
+          				}
+          			}
+          			HADandEMfC = (EMfC*.19 + HADfC); // total fC value based on software used to make n peaks EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C
 					lowerbound10Neutron = 121500;
 					upperbound10Neutron = 138500;
+
 				}
 				else{
 					HADvalue = 7;
-
-					lowerbound10Neutron = 124000;
-					upperbound10Neutron = 136000;
+					for (int emc = 0; emc < 5; emc++){ // em cut for 10 n peak
+						if (RawDataEM[s][emc][4]/RawDataEM[s][emc][5] > N_ratiovalue ){
+       					   EMfC += RawDataEM[s][emc][4];
+          				}
+          			}
+          			for (int hadc = 0; hadc < 4; hadc++){ //HAD cut for 10 N peak
+						if (RawDataHAD[s][hadc][4]/RawDataHAD[s][hadc][5] > N_ratiovalue ){
+       					   HADfC += RawDataEM[s][hadc][4];
+          				}
+          			}
+          			HADandEMfC = (EMfC*.19 + HADfC); // total fC value based on software used to make n peaks EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C
+					
+					lowerbound10Neutron = 74000;
+					upperbound10Neutron = 86000;
 				}
 				if (HAD_TS_BLOB_Ratios[s][0] > HADvalue && HAD_TS_BLOB_Ratios[s][1] > HADvalue && HAD_TS_BLOB_Ratios[s][2] > HADvalue && HAD_TS_BLOB_Ratios[s][3] > HADvalue){
 					for (int c = 0; c < 16; c++){
 						double fC_of_TS345_Summed = RawDataRPD[s][c][4] + RawDataRPD[s][c][5] + RawDataRPD[s][c][3];
 						double fC_of_TS45_Summed  = RawDataRPD[s][c][4] + RawDataRPD[s][c][5];
 		
-						if ( (RawDataRPD[s][c][4] > RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] > RawDataRPD[s][c][7]) && lowerbound10Neutron < fC_of_TS345_Summed &&  upperbound10Neutron > fC_of_TS345_Summed){
+						if ( (RawDataRPD[s][c][4] > RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] > RawDataRPD[s][c][7]) && lowerbound10Neutron < HADandEMfC &&  upperbound10Neutron > HADandEMfC){
 							NumberofProcessedRPDEvents++;	
 							///for math calcualting values use histograms as u KNOW EXACTLY WHAT the weights are coming from!!
 							fC_RPD[s][c]->Fill(fC_of_TS345_Summed); 
@@ -305,7 +333,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 		PassedHADCheckPos = 0;
 		PassedHADCheckNeg = 0;
 
-		double weightsareonea[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+		/*double weightsareonea[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 		double weightsareoneb[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 		double weightsareonec[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 		double weightsareoned[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
@@ -335,7 +363,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 		if (PassedHADCheckNeg == 1 && PassedHADCheckPos == 1){
 			X_RPDvRPD->Fill(RPDXP, RPDXN);
 			Y_RPDvRPD->Fill(RPDYP, RPDYN);
-		}
+		}*/
 
 		if(i % 100000 == 0) cout << i << " events are processed." << endl;
 	}

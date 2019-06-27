@@ -356,10 +356,10 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, RPDXP, RPDYP, RPDXN, RPDYN);
 		
 		
-			cout << "RDPXP" << RPDXP << endl;
-			cout << "RDPYP" << RPDYP << endl;
-			cout << "RDPXN" << RPDXN << endl;
-			cout << "RDPYN" << RPDYN << endl;
+			//cout << "RDPXP" << RPDXP << endl;
+			//cout << "RDPYP" << RPDYP << endl;
+			//cout << "RDPXN" << RPDXN << endl;
+			//cout << "RDPYN" << RPDYN << endl;
 			if (RPDXP != -10 && RPDYP != -10 && RPDXP != -10 && RPDYP != -10){
 				Pos_RPDvRPD->Fill(RPDXP, RPDYP);
 				Neg_RPDvRPD->Fill(RPDXN,RPDYN);
