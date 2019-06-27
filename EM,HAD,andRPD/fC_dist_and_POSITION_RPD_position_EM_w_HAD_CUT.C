@@ -277,7 +277,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 
 		double testvalue = 0;
 
-		
+	/*	
 		Fiber_Ridge_Subtractor_Outputs_Array( RawDataRPD, testvalue, 0.05, Ridge_Subtracted_RPD_Data);
 
 		//cout << "testvalue" << testvalue << endl;
@@ -291,7 +291,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 				}
 			}
 		}
-
+*/
 
 
 
@@ -303,7 +303,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 
 		int HADvalue = 0;
 
-		if (true){ //logic dictates the EM position function tells us beam position and then a cut is applied	
+		if (false){ //logic dictates the EM position function tells us beam position and then a cut is applied	
 			for (int s = 0; s < 2; s++){
 				if (s == 0) {
 					HADvalue = 4;
@@ -338,7 +338,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 		double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
 		//cout << "EMPos" << POS_EM_BEAM_POSITION << endl;
 		
-		if (false){
+		if (true){
 			if (RawDataEM[1][2][4]/RawDataEM[1][2][5] > 8){
 				EM_B_Position[1]->Fill(POS_EM_BEAM_POSITION);
 				cutEMPos = POS_EM_BEAM_POSITION; // making so em vs rpd plot retains cuts from other plots
@@ -349,17 +349,17 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 			}
 		}
 
-		double InputJeffWeighter[16] = {0};
+		double InputJeffWeighter[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 
 		if (HAD_TS_BLOB_Ratios[1][0] > HADvaluePos && HAD_TS_BLOB_Ratios[1][1] > HADvaluePos && HAD_TS_BLOB_Ratios[1][2] > HADvaluePos && HAD_TS_BLOB_Ratios[1][3] > HADvaluePos &&
 		 HAD_TS_BLOB_Ratios[0][0] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][1] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][2] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][3] > HADvalueNeg){
 			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, RPDXP, RPDYP, RPDXN, RPDYN);
 		
 		
-			//cout << "RDPXP" << RPDXP << endl;
-			//cout << "RDPYP" << RPDYP << endl;
-			//cout << "RDPXN" << RPDXN << endl;
-			//cout << "RDPYN" << RPDYN << endl;
+			cout << "RDPXP" << RPDXP << endl;
+			cout << "RDPYP" << RPDYP << endl;
+			cout << "RDPXN" << RPDXN << endl;
+			cout << "RDPYN" << RPDYN << endl;
 			if (RPDXP != -10 && RPDYP != -10 && RPDXP != -10 && RPDYP != -10){
 				Pos_RPDvRPD->Fill(RPDXP, RPDYP);
 				Neg_RPDvRPD->Fill(RPDXN,RPDYN);
@@ -395,34 +395,34 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	TCanvas *c4 = new TCanvas("c4", "RUN 326776", 2000, 1500);
 	//gPad-> SetLogy();
-	if (false){
-		M_B_Position[1]->Draw("HIST E");
-		4->SaveAs(Form("ZDC_figures/EM_position_beam/EM_BEAM_%s__%d.png", stit2[1], runnumber));
-		M_B_Position[0]->Draw("HIST E");
-		4->SaveAs(Form("ZDC_figures/EM_position_beam/EM_BEAM_%s__%d.png", stit2[0], runnumber));
+	if (true){
+		EM_B_Position[1]->Draw("HIST E");
+		c4->SaveAs(Form("ZDC_figures/EM_position_beam/EM_BEAM_%s__%d.png", stit2[1], runnumber));
+		EM_B_Position[0]->Draw("HIST E");
+		c4->SaveAs(Form("ZDC_figures/EM_position_beam/EM_BEAM_%s__%d.png", stit2[0], runnumber));
 
-		os_RPDvEM->Draw("COLZ");
-		4->SaveAs(Form("ZDC_figures/RPDvEM_position_beam/RPDvEM_BEAM_%s__%d.png", stit2[1], runnumber));
-		eg_RPDvEM->Draw("COLZ");
-		4->SaveAs(Form("ZDC_figures/RPDvEM_position_beam/RPDvEM_BEAM_%s__%d.png", stit2[0], runnumber));
+		Pos_RPDvEM->Draw("COLZ");
+		c4->SaveAs(Form("ZDC_figures/RPDvEM_position_beam/RPDvEM_BEAM_%s__%d.png", stit2[1], runnumber));
+		Neg_RPDvEM->Draw("COLZ");
+		c4->SaveAs(Form("ZDC_figures/RPDvEM_position_beam/RPDvEM_BEAM_%s__%d.png", stit2[0], runnumber));
 
 
-		os_RPDvRPD->Draw("colz");
-		4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[1], runnumber));
-		eg_RPDvRPD->Draw("colz");
-		4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[0], runnumber));
+		Pos_RPDvRPD->Draw("colz");
+		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[1], runnumber));
+		Neg_RPDvRPD->Draw("colz");
+		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[0], runnumber));
 
-		_RPDvRPD->Draw("colz");
-		4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_XvX_%d.png", runnumber));
-		_RPDvRPD->Draw("colz");
-		4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_YvY_%d.png", runnumber));
+		X_RPDvRPD->Draw("colz");
+		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_XvX_%d.png", runnumber));
+		Y_RPDvRPD->Draw("colz");
+		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_YvY_%d.png", runnumber));
 	}
 
 	int A = 4;
 	int B = 2;
 	//int Value =0; was used for debugging correct quartz block order
 	//cout << "here2" << endl;
-	if (true)	{
+	if (false)	{
 		for(int i =0; i < 2; i++){ 
 			for(int j=0 ; j < 16; j++){
 				c4->cd(); /// this resets and clears the canvas idky blame rene burn...

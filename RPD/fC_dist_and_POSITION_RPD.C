@@ -53,7 +53,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	/// Begin Variable and constant decleration//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		  int NumberofProcessedRPDEvents = 0;	
-	const int NumberOfBins = 500; //number of bins in TH1F histograms produced by this code
+	const int NumberOfBins = 200; //number of bins in TH1F histograms produced by this code
 		 // double ArrayNumberofBins[16] = { 100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100}; /// this is for the plots not for the calcualtions
 	const int NChannels = 50;
 	const int NTS=10;// number of timeslices
@@ -191,6 +191,9 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	int PassedHADCheckPos = 0;
 	int PassedHADCheckNeg = 0;
 
+	int lowerbound10Neutron = 0;
+	int upperbound10Neutron = 0;
+
 	double RPDXP = 0;
 	double RPDYP = 0;
 	double RPDXN = 0;
@@ -272,16 +275,22 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 			for (int s = 0; s < 2; s++){
 				if (s == 0) {
 					HADvalue = 4;
+
+					lowerbound10Neutron = 121500;
+					upperbound10Neutron = 138500;
 				}
 				else{
 					HADvalue = 7;
+
+					lowerbound10Neutron = 124000;
+					upperbound10Neutron = 136000;
 				}
 				if (HAD_TS_BLOB_Ratios[s][0] > HADvalue && HAD_TS_BLOB_Ratios[s][1] > HADvalue && HAD_TS_BLOB_Ratios[s][2] > HADvalue && HAD_TS_BLOB_Ratios[s][3] > HADvalue){
 					for (int c = 0; c < 16; c++){
 						double fC_of_TS345_Summed = RawDataRPD[s][c][4] + RawDataRPD[s][c][5] + RawDataRPD[s][c][3];
 						double fC_of_TS45_Summed  = RawDataRPD[s][c][4] + RawDataRPD[s][c][5];
 		
-						if ( (RawDataRPD[s][c][4] > RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] > RawDataRPD[s][c][7])){
+						if ( (RawDataRPD[s][c][4] > RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] > RawDataRPD[s][c][7]) && lowerbound10Neutron < fC_of_TS345_Summed &&  upperbound10Neutron > fC_of_TS345_Summed){
 							NumberofProcessedRPDEvents++;	
 							///for math calcualting values use histograms as u KNOW EXACTLY WHAT the weights are coming from!!
 							fC_RPD[s][c]->Fill(fC_of_TS345_Summed); 
@@ -369,38 +378,38 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 				gPad->SetLogy();
 	
 				fC_RPD[i][j/*-1*/]->SetLineColor(B);
-				fC_RPD[i][j]->Draw("hist e"); //->Draw("same");
+				fC_RPD[i][j]->Draw("HIST L"); //->Draw("same");
 	
 				
 				
 	
 				 
-				 c4->SaveAs(Form("ZDC_figures/fC_Dist_SOLO/Solo_RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
+				 c4->SaveAs(Form("ZDC_figures/fC_Dist_SOLO/10NeutronCUT_Solo_RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
 			} 
 			
-			 for(int j=0 ; j < 16; j++){
-				
-				c4->cd(); /// this resets and clears the canvas idky blame rene burn...
-				gPad->SetLogy();
-				
-				hsRPD[i][j] = new THStack("hsRPD","");
-				fC_RPD[i][j/*-1*/]->SetLineColor(B);
-				
-				hsRPD[i][j]->Add(fC_RPD[i][j/*-1*/]);
-				fC_RPD_Pure[i][j/*-1*/]->SetLineColor(A);
-			
-				hsRPD[i][j]->Add(fC_RPD_Pure[i][j/*-1*/]);
-			
-				hsRPD[i][j]->Draw("hist c"); 
-				
-				TPad *newpad=new TPad("newpad","a transparent pad",0,0,1,1);
-				newpad->SetFillStyle(4000);
-				newpad->Draw();
-				newpad->cd();
-				//TPaveLabel *title = new TPaveLabel(0.1,0.94,0.9,0.98, Form("%s_%d_RPD_Channel_%d_Xmax_%d", stit2[i], runnumber, j+1, MaxXTH1F));
-			
-				 c4->SaveAs(Form("ZDC_figures/fC_DIST_COMPARE/RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
-			}  
+			// for(int j=0 ; j < 16; j++){
+			//	
+			//	c4->cd(); /// this resets and clears the canvas idky blame rene burn...
+			//	gPad->SetLogy();
+			//	
+			//	hsRPD[i][j] = new THStack("hsRPD","");
+			//	fC_RPD[i][j/*-1*/]->SetLineColor(B);
+			//	
+			//	hsRPD[i][j]->Add(fC_RPD[i][j/*-1*/]);
+			//	fC_RPD_Pure[i][j/*-1*/]->SetLineColor(A);
+			//
+			//	hsRPD[i][j]->Add(fC_RPD_Pure[i][j/*-1*/]);
+			//
+			//	hsRPD[i][j]->Draw("hist c"); 
+			//	
+			//	TPad *newpad=new TPad("newpad","a transparent pad",0,0,1,1);
+			//	newpad->SetFillStyle(4000);
+			//	newpad->Draw();
+			//	newpad->cd();
+			//	//TPaveLabel *title = new TPaveLabel(0.1,0.94,0.9,0.98, Form("%s_%d_RPD_Channel_%d_Xmax_%d", stit2[i], runnumber, j+1, MaxXTH1F));
+			//
+			//	 c4->SaveAs(Form("ZDC_figures/fC_DIST_COMPARE/RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
+			//}  
 			
 			//c4->SaveAs(Form("ZDC_figures/Data_Weights326776/RPD_Data_Weights_326776_10_0_%s_ALLQB_%d.png",stit2[i], runnumber));// this is the culprit and caused the loop to keep going
 			

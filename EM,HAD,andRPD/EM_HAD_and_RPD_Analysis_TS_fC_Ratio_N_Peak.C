@@ -53,16 +53,16 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
-  double EMmultiplicativevalue = 0.15; 
-  double RPDmultiplicativevalue = 0.80;
+  double EMmultiplicativevalue = 0.19; 
+  double RPDmultiplicativevalue = 0.0; //BASICALLY ABSORBS NO ENERGY
   double P_ratiovalue = 7.0; //used to be 6
   double N_ratiovalue = 4.0; //used to be 3
   //ratio value for pos is 6 and for neg is 3
-  int cutoff = 00; //cutoff of 70 appears to be good
+  int cutoff = 70; //cutoff of 70 appears to be good
   int graphMaxPos = 50000; //was 5000 this is for coloration test
   int graphMaxNeg = 60000;
-  int graphMinPos = 100;
-  int graphMinNeg = 100;
+  int graphMinPos = 3000;
+  int graphMinNeg = 4000;
 
   TH1F* em[2][5];
   TH1F* emfC[2][5];
@@ -90,8 +90,8 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
     }
   }
 
-  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC + %f*P_SumRPDfC", runnumber, EMmultiplicativevalue, RPDmultiplicativevalue),300,0,100000);
-  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC + %f*N_SumRPDfC", runnumber, EMmultiplicativevalue, RPDmultiplicativevalue),300,0,100000);
+  P_HADSUM = new TH1F(Form("SUMHADP"),Form("P_SUMHAD %d; P_SumHADfC + %f*P_SumEMfC + %f*P_SumRPDfC", runnumber, EMmultiplicativevalue, RPDmultiplicativevalue),200,0,40000);
+  N_HADSUM = new TH1F(Form("SUMHADN"),Form("N_SUMHAD %d; N_SumHADfC + %f*N_SumEMfC + %f*N_SumRPDfC", runnumber, EMmultiplicativevalue, RPDmultiplicativevalue),200,0,40000);
 
   for(int iside = 0; iside < 2; iside++){
     for(int ich = 0; ich < 4; ich++){
@@ -334,13 +334,7 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   
   //TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
   //c3->SetLogy();
-  P_HADSUM->Draw("HIST L");
-  c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
- // TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
- // c4->SetLogy();
-  N_HADSUM->Draw("HIST L");
-  c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
-
+ 
 
   c2->SetLogz();
   PEMvTotalE->Draw("Colz");
@@ -353,6 +347,14 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   c2->SaveAs(Form("ZDC_figures/EM_HAD/N_45vTotalE_%d.png",runnumber));
   
   //c2->SetLogy();
+
+  P_HADSUM->Draw("HIST L");
+  c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
+  // TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
+  // c4->SetLogy();
+  N_HADSUM->Draw("HIST L");
+  c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
+
 
 
  /* for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
