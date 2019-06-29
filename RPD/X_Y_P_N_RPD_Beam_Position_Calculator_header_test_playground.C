@@ -17,7 +17,7 @@
 #include <cstring> //colin added
 #include <string> // Eric Added
 //#include "EM_Beam_Position_Cut_and_Value_Header.h" //custom header written by Eric A to measure beam position
-#include "/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/X_Y_P_N_RPD_Beam_Position_Calculator.h" //custom header written by Eric A to measure RPD beam postion in X and Y
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/X_Y_P_N_RPD_Beam_Position_Calculator.h" //custom header written by Eric A to measure RPD beam postion in X and Y
 using namespace std;
 
 // I am a chemist not an englishist I cant spell
@@ -38,7 +38,7 @@ void X_Y_P_N_RPD_Beam_Position_Calculator_header_test_playground(int runnumber =
 	cout << "Dataset = " << Dataset << ".root"<< endl;
 
 
-	TFile* f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+	TFile* f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
 	TTree* ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 
 
@@ -63,10 +63,10 @@ void X_Y_P_N_RPD_Beam_Position_Calculator_header_test_playground(int runnumber =
 	double RPDYMax = 3;
 
 	double AxisRPD[NRPDColnRow] = { -3.0, -1.0, 1.0, 3.0 };
-	double RPD_COL_P[NRPD]; //make a double
-	double RPD_ROW_P[NRPD]; //make a double
-	double RPD_COL_N[NRPD]; //make a double
-	double RPD_ROW_N[NRPD]; //make a double
+	double RPD_COL_P[NRPD] = {0};
+	double RPD_ROW_P[NRPD] = {0};
+	double RPD_COL_N[NRPD] = {0};
+	double RPD_ROW_N[NRPD] = {0};
 
 	double sumWeightRPD_P_X = 0;
 	double sumRPD_P_X = 0;

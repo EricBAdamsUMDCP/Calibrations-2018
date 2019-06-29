@@ -18,7 +18,7 @@
 
 #include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h"
 #include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/X_Y_P_N_RPD_Beam_Position_Calculator.h"
-#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/Fiber_Ridge_Subtractor.h"
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/JeffWeighter3000.h"
 //#include "EM_Beam_Position_Cut_and_Value_Header.h" //custom header written by Eric A to measure beam position
 
 using namespace std;
@@ -37,16 +37,16 @@ using namespace std;
 void initRootStyle();
 
 //main function macro
-void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
+void fC_dist_and_POSITION_RPD_and_positionEM(int runnumber=326776){
 	initRootStyle();
 	
-	cout << "Running SOFTWARE: fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT.C  Edited: 6/25/2019 4:14:21 PM" << endl;
+	cout << "Running SOFTWARE: fC_dist_and_POSITION_RPD.C" << endl;
+	cout << "Dataset=" << " AOD_zdc_digi_tree_326776_many_3 EDITED: 6/28/2019 12:25:54 PM " << endl;
 	
 	
-	
-	TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); cout << "Dataset=" << " PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root" << endl;
+	TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root");
 
-	//TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); cout << "Dataset=" << " AOD_zdc_digi_tree_326776_many_3" << endl; // opening the root file
+	//TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
 	
 	TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 	
@@ -54,7 +54,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	/// Begin Variable and constant decleration//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		  int NumberofProcessedRPDEvents = 0;	
-	const int NumberOfBins = 500; //number of bins in TH1F histograms produced by this code
+	const int NumberOfBins = 200; //number of bins in TH1F histograms produced by this code
 		 // double ArrayNumberofBins[16] = { 100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100,  100}; /// this is for the plots not for the calcualtions
 	const int NChannels = 50;
 	const int NTS=10;// number of timeslices
@@ -67,8 +67,11 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	                                                    {"1","2","3","4","5"}, //HD sections run only 1-4
 	                                                    {"1","2","3","4","5"} //EM sections run 1-5
 	                                                };
-	
-
+	//Begin constant are for the function	from header file EM_Beam_Position_Cut_and_Value	
+	double EM_CUT_P_Xmin = .5; 			
+	double EM_CUT_P_Xmax = 1.5;           
+	double EM_CUT_N_Xmin = .5;          
+	double EM_CUT_N_Xmax = 1.5;     
 
 	int INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[NRPD] = {13, 12, 15, 14, 9, 11, 8, 10, 5, 4, 7, 6, 1, 0, 3, 2}; //tenative needs to be checked
 													 //{14, 13, 16, 15, 10, 12, 9, 11, 6, 5, 8, 7, 2, 1, 4, 3} // old bfopr noticed out of bounmds array issue and subtracted 1 kept for reference
@@ -108,6 +111,9 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	
 	double RPD_Pos_TS456_ChannelSum = 0;
 	double RPD_Neg_TS456_ChannelSum = 0;
+
+	double P_ratiovalue = 7.0;
+ 	double N_ratiovalue = 4.0;
 	
 	/// END Variable and constant declaration ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -124,8 +130,6 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	TH1D* EM_B_Position[2];
 	TH2D* Pos_RPDvRPD;
 	TH2D* Neg_RPDvRPD;
-	TH2D* Pos_RPDvEM;
-	TH2D* Neg_RPDvEM;
 	TH2D* X_RPDvRPD;
 	TH2D* Y_RPDvRPD;
 
@@ -134,23 +138,23 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	
 	for( int s = 0; s < 2; s++){ 
 	//s stands for side
-		EM_B_Position[s] = new TH1D(Form("EM%s Beam Position %d", stit[s], runnumber),Form("EM_B_Position %s %d; cm; counts",stit[s], runnumber), 200,-4.5, 4.5 );
 		for( int c = 0; c < 16; c++){
 		//c stands for channel
-			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776Weighted_RPD%s channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,0/* MinXTH1F */,300000 /* ArrayMaxXTH1F[s][c] */); /// lower bound is set higher than upper bound bc when rene burn designed this thing HE MADE THAT THE ONLY GOD DAMN WAY FOR IT TO AUTOFIT THE AXES .....
-			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d;TS [25 ns];Q [fC]",stit[s],c+1, runnumber),NumberOfBins,0,300000);
+			fC_RPD[s][c]      = new TH1F(Form("fC RPD%s channel %d %d", stit[s], c+1, runnumber),Form("326776_RPD%s channel %d %d; fC; counts",stit[s],c+1, runnumber),NumberOfBins,0/* MinXTH1F */, 50000/*310000*/ /* ArrayMaxXTH1F[s][c] */); /// lower bound is set higher than upper bound bc when rene burn designed this thing HE MADE THAT THE ONLY GOD DAMN WAY FOR IT TO AUTOFIT THE AXES .....
+			fC_RPD_Pure[s][c] = new TH1F(Form("fC RPD%s Pure channel %d %d", stit[s], c+1, runnumber),Form("RPD%s Pure channel %d %d; fC; counts",stit[s],c+1, runnumber),NumberOfBins,0, 50000/*310000*/);
 		}
 	}
 	
 	Pos_RPDvRPD = new TH2D(Form("Pos_RPDvRPD %d", runnumber), Form("Pos_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
 	Neg_RPDvRPD = new TH2D(Form("Neg_RPDvRPD %d", runnumber), Form("Neg_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
 
-	Pos_RPDvEM = new TH2D(Form("Pos_RPDvEM %d", runnumber), Form("Pos_RPDvEM_%d_NBins_%d_MB_2; RPDX cm; EMY cm", runnumber, 1000), 1000, -4, 4, 1000, -4.5, 4.5);
-	Neg_RPDvEM = new TH2D(Form("Neg_RPDvEM %d", runnumber), Form("Neg_RPDvEM_%d_NBins_%d_MB_2; RPDX cm; EMY cm", runnumber, 1000), 1000, -4, 4, 1000, -4.5, 4.5);
-
 	X_RPDvRPD = new TH2D(Form("X_RPDvRPD %d", runnumber), Form("X_RPDvRPD_%d_NBins_%d_MB_2; RPDX POS cm; RPDX NEG cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
 	Y_RPDvRPD = new TH2D(Form("Y_RPDvRPD %d", runnumber), Form("Y_RPDvRPD_%d_NBins_%d_MB_2; RPDY POS cm; RPDY NEG cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
 
+	for( int s = 0; s < 2; s++){ 
+	//s stands for side
+		EM_B_Position[s] = new TH1D(Form("EM%s Beam Position %d", stit[s], runnumber),Form("EM_B_Position %s %d; cm; counts",stit[s], runnumber), 200,-4.5, 4.5 );
+	}
 
 
 	//DECLARING NEW THStack FOR PLOTTING MANY HISTOS ON SAME PAD//
@@ -189,15 +193,15 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	double RawDataRPD[NSIDE][NRPD][NTS] = { {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}},    //neg  // these are used to store the raw data 
 										    {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}} }; //pos
 	
-	double Ridge_Subtracted_RPD_Data[2][16] = {0};
 
 	double HAD_TS_BLOB_Ratios[2][4] = {0};
 
-	int HADvaluePos = 0;
-	int HADvalueNeg = 0;
-	
+	int HADvalue = 0;
 	int PassedHADCheckPos = 0;
 	int PassedHADCheckNeg = 0;
+
+	int lowerbound10Neutron = 0;
+	int upperbound10Neutron = 0;
 
 	double RPDXP = 0;
 	double RPDYP = 0;
@@ -207,12 +211,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	int EM = 0;
 	int HAD = 1;
 	int RPD = 3;
-
-	double cutEMPos = 0;
-	double cutEMNeg = 0;
-
-
-	double NumNeg = 0;
+	double OutPut_Weightedjeffsweights[16] = {0};
 	/// END Declaring TLeaf... /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/// Begin filling variables with DATA/fC LOOP https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
@@ -273,108 +272,163 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
 				}
 			}
-		} //end channel loop
-
-		double testvalue = 0;
-
-	/*	
-		Fiber_Ridge_Subtractor_Outputs_Array( RawDataRPD, testvalue, 0.05, Ridge_Subtracted_RPD_Data);
-
-		//cout << "testvalue" << testvalue << endl;
-
-		for (int s = 0; s < 2; s++){
-			for (int c = 0; c < 16; c++){
-				//cout << "side " << s << " channel " << c << " Data: " << Ridge_Subtracted_RPD_Data[s][c] << endl;
-				if (Ridge_Subtracted_RPD_Data[s][c] < 0 && Ridge_Subtracted_RPD_Data[s][c] != -10){
-					NumNeg += 1;
-					break;
-				}
-			}
 		}
-*/
-
-
 
 		for ( int s = 0; s < 2; s++){
 			for (int c = 0; c < 4; c++){
 			HAD_TS_BLOB_Ratios[s][c] = (RawDataHAD[s][c][4]/RawDataHAD[s][c][5]);
 			}
 		}
+		double HADandEMfC = 0;
+		double EMfC = 0;
+		double HADfC = 0;
 
-		int HADvalue = 0;
-
-		if (false){ //logic dictates the EM position function tells us beam position and then a cut is applied	
+		
+		if (true /*true*/){ //logic dictates the EM position function tells us beam position and then a cut is applied	
 			for (int s = 0; s < 2; s++){
 				if (s == 0) {
 					HADvalue = 4;
+					for (int emc = 0; emc < 5; emc++){ //em cut for 10 N peak
+						if (RawDataEM[s][emc][4]/RawDataEM[s][emc][5] > N_ratiovalue ){
+       					   EMfC += RawDataEM[s][emc][4];
+          				}
+          			}
+          			for (int hadc = 0; hadc < 4; hadc++){ //HAD cut for 10 N peak
+						if (RawDataHAD[s][hadc][4]/RawDataHAD[s][hadc][5] > N_ratiovalue ){
+       					   HADfC += RawDataEM[s][hadc][4];
+          				}
+          			}
+          			HADandEMfC = (EMfC*.19 + HADfC); // total fC value based on software used to make n peaks EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C
+					lowerbound10Neutron = 121500;
+					upperbound10Neutron = 138500;
+
 				}
 				else{
 					HADvalue = 7;
+					for (int emc = 0; emc < 5; emc++){ // em cut for 10 n peak
+						if (RawDataEM[s][emc][4]/RawDataEM[s][emc][5] > N_ratiovalue ){
+       					   EMfC += RawDataEM[s][emc][4];
+          				}
+          			}
+          			for (int hadc = 0; hadc < 4; hadc++){ //HAD cut for 10 N peak
+						if (RawDataHAD[s][hadc][4]/RawDataHAD[s][hadc][5] > N_ratiovalue ){
+       					   HADfC += RawDataEM[s][hadc][4];
+          				}
+          			}
+          			HADandEMfC = (EMfC*.19 + HADfC); // total fC value based on software used to make n peaks EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C
+					
+					lowerbound10Neutron = 74000;
+					upperbound10Neutron = 86000;
 				}
 				if (HAD_TS_BLOB_Ratios[s][0] > HADvalue && HAD_TS_BLOB_Ratios[s][1] > HADvalue && HAD_TS_BLOB_Ratios[s][2] > HADvalue && HAD_TS_BLOB_Ratios[s][3] > HADvalue){
-					for (int c = 0; c < 16; c++){
-						double fC_of_TS456_Summed = RawDataRPD[s][c][4] + RawDataRPD[s][c][5] + RawDataRPD[s][c][6];
-						double fC_of_TS45_Summed  = RawDataRPD[s][c][4] + RawDataRPD[s][c][5];
+					//for (int c = 0; c < 16; c++){
+						//double fC_of_TS345_Summed = RawDataRPD[s][c][4] + RawDataRPD[s][c][5] + RawDataRPD[s][c][3];
+						//double fC_of_TS45_Summed  = RawDataRPD[s][c][4] + RawDataRPD[s][c][5];
 		
-						if ( (RawDataRPD[s][c][4] > RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] > RawDataRPD[s][c][7])){
-							NumberofProcessedRPDEvents++;	
+						if ( /*(RawDataRPD[s][c][4] > RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] > RawDataRPD[s][c][7]) && */lowerbound10Neutron < HADandEMfC &&  upperbound10Neutron > HADandEMfC){
+							//NumberofProcessedRPDEvents++;	
 							///for math calcualting values use histograms as u KNOW EXACTLY WHAT the weights are coming from!!
-							fC_RPD[s][c]->Fill(fC_of_TS456_Summed); 
-							fC_RPD_Pure[s][c]->Fill(fC_of_TS456_Summed); 
-				
+							if (false){
+							//	fC_RPD[s][c]->Fill(fC_of_TS345_Summed); 
+							//	fC_RPD_Pure[s][c]->Fill(fC_of_TS345_Summed); 
+							}
+
+							if (false){
+
+								if ( s == 0){
+									if (RawDataEM[0][2][4]/RawDataEM[0][2][5] > 3){
+										double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
+										EM_B_Position[0]->Fill(NEG_EM_BEAM_POSITION);
+									}
+								}
+								else{
+									if (RawDataEM[1][2][4]/RawDataEM[1][2][5] > 8){
+										double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
+										EM_B_Position[1]->Fill(POS_EM_BEAM_POSITION);
+									}
+								}
+							}
+
+
+							/*if (s == 0){
+
+								double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
+
+								if ( POS_EM_BEAM_POSITION > 1 && POS_EM_BEAM_POSITION < 1.4){
+									JeffWeighter3000_OutputsArray(  POS_EM_BEAM_POSITION, 1, OutPut_Weightedjeffsweights);
+						
+										cout << "POS_EM_BEAM_POSITION:  " << POS_EM_BEAM_POSITION << endl;
+						
+									for (int i = 0; i < 16; i++){
+										cout << "POS_Jeffoutput#" << i << "= " << OutPut_Weightedjeffsweights[i] << endl;
+									}
+								}
+							}
+							else if (s == 1){
+
+								double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
+
+								if ( NEG_EM_BEAM_POSITION > .8 && NEG_EM_BEAM_POSITION < 1.4){
+									JeffWeighter3000_OutputsArray(  NEG_EM_BEAM_POSITION, 0, OutPut_Weightedjeffsweights);
+										
+										cout << "NEG_EM_BEAM_POSITION:  " << NEG_EM_BEAM_POSITION << endl;
+							
+									for (int i = 0; i < 16; i++){
+										cout << "NEG_Jeffoutput#" << i << "= " << OutPut_Weightedjeffsweights[i] << endl;
+									}
+								}
+							}*/
 						}
-					}
+					//}//
 				}
 			}	
 		}
+
+		double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
+		EM_B_Position[0]->Fill(NEG_EM_BEAM_POSITION);
+
+		double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
+		EM_B_Position[1]->Fill(POS_EM_BEAM_POSITION);
+		
+		
+
+		double InputJeffWeighter[16] = {0};
 	
 		PassedHADCheckPos = 0;
 		PassedHADCheckNeg = 0;
-		
-		HADvaluePos = 7;
-		HADvalueNeg = 4;
 
-		double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
-		double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
-		//cout << "EMPos" << POS_EM_BEAM_POSITION << endl;
+		double ignorerpdxneg;
+		double ignorerpdyneg;
+		double ignorerpdxpos;
+		double ignorerpdypos;
+		double weightsareonea[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+		double weightsareoneb[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+		double weightsareonec[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+		double weightsareoned[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 		
-		if (true){
-			if (RawDataEM[1][2][4]/RawDataEM[1][2][5] > 8){
-				EM_B_Position[1]->Fill(POS_EM_BEAM_POSITION);
-				cutEMPos = POS_EM_BEAM_POSITION; // making so em vs rpd plot retains cuts from other plots
-			}
-			if (RawDataEM[0][2][4]/RawDataEM[0][2][5] > 3){
-				EM_B_Position[0]->Fill(NEG_EM_BEAM_POSITION);
-				cutEMNeg = NEG_EM_BEAM_POSITION;
-			}
+		HADvalue = 7;
+
+		if (HAD_TS_BLOB_Ratios[1][0] > HADvalue && HAD_TS_BLOB_Ratios[1][1] > HADvalue && HAD_TS_BLOB_Ratios[1][2] > HADvalue && HAD_TS_BLOB_Ratios[1][3] > HADvalue ){
+			
+			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, RPDXP, RPDYP, ignorerpdxneg, ignorerpdxneg);
+		
+			Pos_RPDvRPD->Fill(RPDXP, RPDYP);
+			PassedHADCheckPos = 1;
 		}
 
-		double InputJeffWeighter[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-
-		if (HAD_TS_BLOB_Ratios[1][0] > HADvaluePos && HAD_TS_BLOB_Ratios[1][1] > HADvaluePos && HAD_TS_BLOB_Ratios[1][2] > HADvaluePos && HAD_TS_BLOB_Ratios[1][3] > HADvaluePos &&
-		 HAD_TS_BLOB_Ratios[0][0] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][1] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][2] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][3] > HADvalueNeg){
-			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, RPDXP, RPDYP, RPDXN, RPDYN);
+		HADvalue = 4;
 		
+		if (HAD_TS_BLOB_Ratios[0][0] > HADvalue && HAD_TS_BLOB_Ratios[0][1] > HADvalue && HAD_TS_BLOB_Ratios[0][2] > HADvalue && HAD_TS_BLOB_Ratios[0][3] > HADvalue ){
 		
-			//cout << "RDPXP" << RPDXP << endl;
-			//cout << "RDPYP" << RPDYP << endl;
-			//cout << "RDPXN" << RPDXN << endl;
-			//cout << "RDPYN" << RPDYN << endl;
-			if (RPDXP != -10 && RPDYP != -10 && RPDXP != -10 && RPDYP != -10){
-				Pos_RPDvRPD->Fill(RPDXP, RPDYP);
-				Neg_RPDvRPD->Fill(RPDXN,RPDYN);
-				PassedHADCheckPos = 1; //ensuring cuts were satisfied for rpd cuts neg v pos
-				PassedHADCheckNeg = 1;
-			}
+			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, ignorerpdxpos, ignorerpdypos, RPDXN, RPDYN);
+		
+			Neg_RPDvRPD->Fill(RPDXN,RPDYN);
+			PassedHADCheckNeg = 1;
 		}
 
 		if (PassedHADCheckNeg == 1 && PassedHADCheckPos == 1){
 			X_RPDvRPD->Fill(RPDXP, RPDXN);
 			Y_RPDvRPD->Fill(RPDYP, RPDYN);
-			if (cutEMPos != 0 && cutEMNeg != 0){ //ensuring all cuts are applied
-				Pos_RPDvEM->Fill(RPDXP, cutEMPos);
-				Neg_RPDvEM->Fill(RPDXN, cutEMNeg);
-			}
 		}
 
 		if(i % 100000 == 0) cout << i << " events are processed." << endl;
@@ -382,7 +436,7 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	/// END filling variables with DATA/fC LOOP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	//cout << NumberofProcessedRPDEvents << " of Qualified RPD Events were Processed" << endl;
-	cout << "NumNeg" << NumNeg << endl;
+	
 	
 	///////////////////////////////////////
     // Formatting and drawing histograms //
@@ -395,28 +449,28 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	TCanvas *c4 = new TCanvas("c4", "RUN 326776", 2000, 1500);
 	//gPad-> SetLogy();
+	
 	if (true){
-		EM_B_Position[1]->Draw("HIST E");
-		c4->SaveAs(Form("ZDC_figures/EM_position_beam/EM_BEAM_%s__%d.png", stit2[1], runnumber));
-		EM_B_Position[0]->Draw("HIST E");
-		c4->SaveAs(Form("ZDC_figures/EM_position_beam/EM_BEAM_%s__%d.png", stit2[0], runnumber));
-
-		Pos_RPDvEM->Draw("COLZ");
-		c4->SaveAs(Form("ZDC_figures/RPDvEM_position_beam/RPDvEM_BEAM_%s__%d.png", stit2[1], runnumber));
-		Neg_RPDvEM->Draw("COLZ");
-		c4->SaveAs(Form("ZDC_figures/RPDvEM_position_beam/RPDvEM_BEAM_%s__%d.png", stit2[0], runnumber));
-
 
 		Pos_RPDvRPD->Draw("colz");
 		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[1], runnumber));
 		Neg_RPDvRPD->Draw("colz");
 		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[0], runnumber));
-
+	
 		X_RPDvRPD->Draw("colz");
 		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_XvX_%d.png", runnumber));
 		Y_RPDvRPD->Draw("colz");
 		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_YvY_%d.png", runnumber));
+
+		c4->SetLogy();
+		EM_B_Position[0]->Draw("HIST L");
+		c4->SaveAs(Form("ZDC_figures/EM_position_beam/EM_BEAM_%s__%d.png", stit2[0], runnumber));
+		EM_B_Position[1]->Draw("HIST L");
+		c4->SaveAs(Form("ZDC_figures/EM_position_beam/EM_BEAM_%s__%d.png", stit2[1], runnumber));
 	}
+
+
+
 
 	int A = 4;
 	int B = 2;
@@ -429,38 +483,38 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 				gPad->SetLogy();
 	
 				fC_RPD[i][j/*-1*/]->SetLineColor(B);
-				fC_RPD[i][j]->Draw("hist e"); //->Draw("same");
+				fC_RPD[i][j]->Draw("HIST L"); //->Draw("same");
 	
 				
 				
 	
 				 
-				 c4->SaveAs(Form("ZDC_figures/fC_Dist_SOLO/Solo_RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
+				 c4->SaveAs(Form("ZDC_figures/fC_Dist_SOLO/10NeutronCUT_Solo_RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
 			} 
 			
-			 for(int j=0 ; j < 16; j++){
-				
-				c4->cd(); /// this resets and clears the canvas idky blame rene burn...
-				gPad->SetLogy();
-				
-				hsRPD[i][j] = new THStack("hsRPD","");
-				fC_RPD[i][j/*-1*/]->SetLineColor(B);
-				
-				hsRPD[i][j]->Add(fC_RPD[i][j/*-1*/]);
-				fC_RPD_Pure[i][j/*-1*/]->SetLineColor(A);
-			
-				hsRPD[i][j]->Add(fC_RPD_Pure[i][j/*-1*/]);
-			
-				hsRPD[i][j]->Draw("hist c"); 
-				
-				TPad *newpad=new TPad("newpad","a transparent pad",0,0,1,1);
-				newpad->SetFillStyle(4000);
-				newpad->Draw();
-				newpad->cd();
-				//TPaveLabel *title = new TPaveLabel(0.1,0.94,0.9,0.98, Form("%s_%d_RPD_Channel_%d_Xmax_%d", stit2[i], runnumber, j+1, MaxXTH1F));
-			
-				 c4->SaveAs(Form("ZDC_figures/fC_DIST_COMPARE/RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
-			}  
+			// for(int j=0 ; j < 16; j++){
+			//	
+			//	c4->cd(); /// this resets and clears the canvas idky blame rene burn...
+			//	gPad->SetLogy();
+			//	
+			//	hsRPD[i][j] = new THStack("hsRPD","");
+			//	fC_RPD[i][j/*-1*/]->SetLineColor(B);
+			//	
+			//	hsRPD[i][j]->Add(fC_RPD[i][j/*-1*/]);
+			//	fC_RPD_Pure[i][j/*-1*/]->SetLineColor(A);
+			//
+			//	hsRPD[i][j]->Add(fC_RPD_Pure[i][j/*-1*/]);
+			//
+			//	hsRPD[i][j]->Draw("hist c"); 
+			//	
+			//	TPad *newpad=new TPad("newpad","a transparent pad",0,0,1,1);
+			//	newpad->SetFillStyle(4000);
+			//	newpad->Draw();
+			//	newpad->cd();
+			//	//TPaveLabel *title = new TPaveLabel(0.1,0.94,0.9,0.98, Form("%s_%d_RPD_Channel_%d_Xmax_%d", stit2[i], runnumber, j+1, MaxXTH1F));
+			//
+			//	 c4->SaveAs(Form("ZDC_figures/fC_DIST_COMPARE/RPD_%d_Weighted_10_0_%s_fCvCounts_%d.png", j+1, stit2[i], runnumber)); // potential bug area
+			//}  
 			
 			//c4->SaveAs(Form("ZDC_figures/Data_Weights326776/RPD_Data_Weights_326776_10_0_%s_ALLQB_%d.png",stit2[i], runnumber));// this is the culprit and caused the loop to keep going
 			

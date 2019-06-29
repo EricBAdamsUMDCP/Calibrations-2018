@@ -50,10 +50,10 @@ void Returns_X_Y_P_N_RPD_Beam_Position(double RawDataRPD[2][16][10],  const std:
 	const int NRPD = 16;
 	const int NRPDColnRow = 4;
 	double AxisRPD[NRPDColnRow] = { -3.0, -1.0, 1.0, 3.0 };
-	double RPD_COL_P[NRPD];
-	double RPD_ROW_P[NRPD];
-	double RPD_COL_N[NRPD];
-	double RPD_ROW_N[NRPD];
+	double RPD_COL_P[NRPD] = {0};
+	double RPD_ROW_P[NRPD] = {0};
+	double RPD_COL_N[NRPD] = {0};
+	double RPD_ROW_N[NRPD] = {0};
 
 	double sumWeightRPD_P_X = 0;
 	double sumRPD_P_X = 0;

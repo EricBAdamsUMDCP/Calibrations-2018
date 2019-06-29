@@ -17,7 +17,8 @@
 #include "TPaveLabel.h" //Eric ADDDED
 
 #include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h"
-#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/RunWeighted_RPD_Beam_Position_Finder.h"
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/X_Y_P_N_RPD_Beam_Position_Calculator.h"
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/JeffWeighter3000.h"
 //#include "EM_Beam_Position_Cut_and_Value_Header.h" //custom header written by Eric A to measure beam position
 
 using namespace std;
@@ -43,9 +44,9 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	cout << "Dataset=" << " AOD_zdc_digi_tree_326776_many_3 EDITED: 6/26/2019 6:42:31 PM " << endl;
 	
 	
-	TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root");
+	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root");
 
-	//TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+	TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
 	
 	TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 	
@@ -205,6 +206,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	int EM = 0;
 	int HAD = 1;
 	int RPD = 3;
+	double OutPut_Weightedjeffsweights[16] = {0};
 	/// END Declaring TLeaf... /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/// Begin filling variables with DATA/fC LOOP https://i.kym-cdn.com/photos/images/newsfeed/001/393/650/27f.jpg /////////////////////////////////////////////
@@ -323,17 +325,49 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 							///for math calcualting values use histograms as u KNOW EXACTLY WHAT the weights are coming from!!
 							fC_RPD[s][c]->Fill(fC_of_TS345_Summed); 
 							fC_RPD_Pure[s][c]->Fill(fC_of_TS345_Summed); 
-				
+
+							/*if (s == 0){
+
+								double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
+
+								if ( POS_EM_BEAM_POSITION > 1 && POS_EM_BEAM_POSITION < 1.4){
+									JeffWeighter3000_OutputsArray(  POS_EM_BEAM_POSITION, 1, OutPut_Weightedjeffsweights);
+						
+										cout << "POS_EM_BEAM_POSITION:  " << POS_EM_BEAM_POSITION << endl;
+						
+									for (int i = 0; i < 16; i++){
+										cout << "POS_Jeffoutput#" << i << "= " << OutPut_Weightedjeffsweights[i] << endl;
+									}
+								}
+							}
+							else if (s == 1){
+
+								double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
+
+								if ( NEG_EM_BEAM_POSITION > .8 && NEG_EM_BEAM_POSITION < 1.4){
+									JeffWeighter3000_OutputsArray(  NEG_EM_BEAM_POSITION, 0, OutPut_Weightedjeffsweights);
+										
+										cout << "NEG_EM_BEAM_POSITION:  " << NEG_EM_BEAM_POSITION << endl;
+							
+									for (int i = 0; i < 16; i++){
+										cout << "NEG_Jeffoutput#" << i << "= " << OutPut_Weightedjeffsweights[i] << endl;
+									}
+								}
+							}*/
 						}
 					}
 				}
 			}	
 		}
+		
+		
+
+
 	
 		PassedHADCheckPos = 0;
 		PassedHADCheckNeg = 0;
 
-		/*double weightsareonea[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+		double weightsareonea[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 		double weightsareoneb[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 		double weightsareonec[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 		double weightsareoned[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
@@ -363,7 +397,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 		if (PassedHADCheckNeg == 1 && PassedHADCheckPos == 1){
 			X_RPDvRPD->Fill(RPDXP, RPDXN);
 			Y_RPDvRPD->Fill(RPDYP, RPDYN);
-		}*/
+		}
 
 		if(i % 100000 == 0) cout << i << " events are processed." << endl;
 	}
@@ -384,7 +418,7 @@ void fC_dist_and_POSITION_RPD(int runnumber=326776){
 	TCanvas *c4 = new TCanvas("c4", "RUN 326776", 2000, 1500);
 	//gPad-> SetLogy();
 	
-	if (false){
+	if (true){
 		Pos_RPDvRPD->Draw("colz");
 		c4->SaveAs(Form("ZDC_figures/RPD_position_beam/RPD_BEAM_%s__%d.png", stit2[1], runnumber));
 		Neg_RPDvRPD->Draw("colz");
