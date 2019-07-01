@@ -384,33 +384,32 @@ void fC_dist_and_POSITION_RPD_and_positionEM(int runnumber=326776){
 			}	
 		}
 
+		double NegOutPut_Weightedjeffsweights[16] = {0};
+		double PosOutPut_Weightedjeffsweights[16] = {0};
+
 		double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
 		EM_B_Position[0]->Fill(NEG_EM_BEAM_POSITION);
+		JeffWeighter3000_OutputsArray( NEG_EM_BEAM_POSITION, 0, NegOutPut_Weightedjeffsweights)
 
 		double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
 		EM_B_Position[1]->Fill(POS_EM_BEAM_POSITION);
-		
-		
-
-		double InputJeffWeighter[16] = {0};
+		JeffWeighter3000_OutputsArray( POS_EM_BEAM_POSITION, 1, PosOutPut_Weightedjeffsweights)
+	
 	
 		PassedHADCheckPos = 0;
 		PassedHADCheckNeg = 0;
 
-		double ignorerpdxneg;
-		double ignorerpdyneg;
-		double ignorerpdxpos;
-		double ignorerpdypos;
-		double weightsareonea[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-		double weightsareoneb[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-		double weightsareonec[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-		double weightsareoned[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+		double ignorerpdxneg = 0;
+		double ignorerpdyneg = 0;
+		double ignorerpdxpos = 0;
+		double ignorerpdypos = 0;
+	
 		
 		HADvalue = 7;
 
 		if (HAD_TS_BLOB_Ratios[1][0] > HADvalue && HAD_TS_BLOB_Ratios[1][1] > HADvalue && HAD_TS_BLOB_Ratios[1][2] > HADvalue && HAD_TS_BLOB_Ratios[1][3] > HADvalue ){
 			
-			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, RPDXP, RPDYP, ignorerpdxneg, ignorerpdxneg);
+			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "On", PosOutPut_Weightedjeffsweights, RPDXP, RPDYP, ignorerpdxneg, ignorerpdxneg);
 		
 			Pos_RPDvRPD->Fill(RPDXP, RPDYP);
 			PassedHADCheckPos = 1;
@@ -420,7 +419,7 @@ void fC_dist_and_POSITION_RPD_and_positionEM(int runnumber=326776){
 		
 		if (HAD_TS_BLOB_Ratios[0][0] > HADvalue && HAD_TS_BLOB_Ratios[0][1] > HADvalue && HAD_TS_BLOB_Ratios[0][2] > HADvalue && HAD_TS_BLOB_Ratios[0][3] > HADvalue ){
 		
-			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, ignorerpdxpos, ignorerpdypos, RPDXN, RPDYN);
+			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "On", NegOutPut_Weightedjeffsweights, ignorerpdxpos, ignorerpdypos, RPDXN, RPDYN);
 		
 			Neg_RPDvRPD->Fill(RPDXN,RPDYN);
 			PassedHADCheckNeg = 1;

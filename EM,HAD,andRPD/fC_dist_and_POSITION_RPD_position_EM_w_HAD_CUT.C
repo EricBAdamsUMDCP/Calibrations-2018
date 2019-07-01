@@ -19,6 +19,8 @@
 #include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h"
 #include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/X_Y_P_N_RPD_Beam_Position_Calculator.h"
 #include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/Fiber_Ridge_Subtractor.h"
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/JeffWeighter3000.h"
+
 //#include "EM_Beam_Position_Cut_and_Value_Header.h" //custom header written by Eric A to measure beam position
 
 using namespace std;
@@ -40,7 +42,7 @@ void initRootStyle();
 void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 	initRootStyle();
 	
-	cout << "Running SOFTWARE: fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT.C  Edited: 6/25/2019 4:14:21 PM" << endl;
+	cout << "Running SOFTWARE: fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT.C  Edited: 7/1/2019 9:33:21 AM" << endl;
 	
 	
 	
@@ -142,14 +144,14 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 		}
 	}
 	
-	Pos_RPDvRPD = new TH2D(Form("Pos_RPDvRPD %d", runnumber), Form("Pos_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
-	Neg_RPDvRPD = new TH2D(Form("Neg_RPDvRPD %d", runnumber), Form("Neg_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
+	Pos_RPDvRPD = new TH2D(Form("Pos_RPDvRPD %d", runnumber), Form("jeffweighted_Pos_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
+	Neg_RPDvRPD = new TH2D(Form("Neg_RPDvRPD %d", runnumber), Form("jeffweighted_Neg_RPDvRPD_%d_NBins_%d_MB_2; RPDX cm; RPDY cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
 
-	Pos_RPDvEM = new TH2D(Form("Pos_RPDvEM %d", runnumber), Form("Pos_RPDvEM_%d_NBins_%d_MB_2; RPDX cm; EMY cm", runnumber, 1000), 1000, -4, 4, 1000, -4.5, 4.5);
-	Neg_RPDvEM = new TH2D(Form("Neg_RPDvEM %d", runnumber), Form("Neg_RPDvEM_%d_NBins_%d_MB_2; RPDX cm; EMY cm", runnumber, 1000), 1000, -4, 4, 1000, -4.5, 4.5);
+	Pos_RPDvEM = new TH2D(Form("Pos_RPDvEM %d", runnumber), Form("jeffweighted_Pos_RPDvEM_%d_NBins_%d_MB_2; RPDX cm; EMY cm", runnumber, 1000), 1000, -4, 4, 1000, -4.5, 4.5);
+	Neg_RPDvEM = new TH2D(Form("Neg_RPDvEM %d", runnumber), Form("jeffweighted_Neg_RPDvEM_%d_NBins_%d_MB_2; RPDX cm; EMY cm", runnumber, 1000), 1000, -4, 4, 1000, -4.5, 4.5);
 
-	X_RPDvRPD = new TH2D(Form("X_RPDvRPD %d", runnumber), Form("X_RPDvRPD_%d_NBins_%d_MB_2; RPDX POS cm; RPDX NEG cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
-	Y_RPDvRPD = new TH2D(Form("Y_RPDvRPD %d", runnumber), Form("Y_RPDvRPD_%d_NBins_%d_MB_2; RPDY POS cm; RPDY NEG cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
+	X_RPDvRPD = new TH2D(Form("X_RPDvRPD %d", runnumber), Form("jeffweighted_X_RPDvRPD_%d_NBins_%d_MB_2; RPDX POS cm; RPDX NEG cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
+	Y_RPDvRPD = new TH2D(Form("Y_RPDvRPD %d", runnumber), Form("jeffweighted_Y_RPDvRPD_%d_NBins_%d_MB_2; RPDY POS cm; RPDY NEG cm", runnumber, 1000), 1000, -4, 4, 1000, -4, 4);
 
 
 
@@ -336,6 +338,13 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 
 		double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
 		double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
+
+		double  NegOutPut_Weightedjeffsweights[16] = {0};
+		double  PosOutPut_Weightedjeffsweights[16] = {0};
+		double 	ignore_value_dump = 0;
+
+		JeffWeighter3000_OutputsArray( NEG_EM_BEAM_POSITION, 0, NegOutPut_Weightedjeffsweights);
+		JeffWeighter3000_OutputsArray( POS_EM_BEAM_POSITION, 0, PosOutPut_Weightedjeffsweights);
 		//cout << "EMPos" << POS_EM_BEAM_POSITION << endl;
 		
 		if (true){
@@ -353,7 +362,8 @@ void fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT(int runnumber=326776){
 
 		if (HAD_TS_BLOB_Ratios[1][0] > HADvaluePos && HAD_TS_BLOB_Ratios[1][1] > HADvaluePos && HAD_TS_BLOB_Ratios[1][2] > HADvaluePos && HAD_TS_BLOB_Ratios[1][3] > HADvaluePos &&
 		 HAD_TS_BLOB_Ratios[0][0] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][1] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][2] > HADvalueNeg && HAD_TS_BLOB_Ratios[0][3] > HADvalueNeg){
-			Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "Off", InputJeffWeighter, RPDXP, RPDYP, RPDXN, RPDYN);
+		Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "On", NegOutPut_Weightedjeffsweights, ignore_value_dump, ignore_value_dump, RPDXN, RPDYN);
+		Returns_X_Y_P_N_RPD_Beam_Position(RawDataRPD,  "On", PosOutPut_Weightedjeffsweights, RPDXP, RPDYP, ignore_value_dump, ignore_value_dump);
 		
 		
 			//cout << "RDPXP" << RPDXP << endl;
