@@ -32,10 +32,10 @@ using namespace std;
 void initRootStyle();
 
 //main function macro
-void AttemptAtGettingPhi(int runnumber=326776){
+void GET_Phi_Eta_Pt_Example(int runnumber=326776){
 	initRootStyle();
 	
-	cout << "Running SOFTWARE: AttemptAtGettingPhi.C  Edited: 7/2/2019 3:46:06 PM" << endl;
+	cout << "Running SOFTWARE: GET_Phi_Eta_Pt_Example.C  Edited: 7/2/2019 3:46:06 PM" << endl;
 	
 	
 	
@@ -111,13 +111,28 @@ void AttemptAtGettingPhi(int runnumber=326776){
 	/////////////////////////////////////////
 	//DECLARING HISTOGRAMS FOR fC VERSUS TS//
 	///////////////////////////////////////// 
+
+	int Check_Eta = false;
+	int Check_Pt = false;
+	int Check_Phi = true;
 	
 	TH1D* PtDist;
 	TH1D* EtaDist;
+	TH1D* PhiDist;
 
-	 //PtDist = new TH1D("PtDist", "PtDist",1000,0, 10000);
-	 EtaDist = new TH1D("EtaDist", "EtaDist",100,-10, 10);
-	
+	if (Check_Pt){
+		
+		PtDist = new TH1D("PtDist", "PtDist",1000,0, 10000);
+	}
+	if (Check_Eta){
+		
+		EtaDist = new TH1D("EtaDist", "EtaDist",100,-5, 5);
+	}
+	if (Check_Phi){
+		
+		PhiDist = new TH1D("PhiDist", "PhiDist",100,-10, 10);
+	}
+
 
 	/// END Histogram Declaration ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -183,8 +198,16 @@ void AttemptAtGettingPhi(int runnumber=326776){
 			//cout << "phi " << k << ": " << PhiValues << endl;
 			//cout << "eta " << k << ": " << EtaValues << endl;
 			//cout << " Pt " << k << ": " << PtValues << endl;
-			//PtDist->Fill(PtValues);
-			EtaDist->Fill(EtaValues);
+			
+			if (Check_Pt){
+				PtDist->Fill(PtValues);
+			}
+			if (Check_Eta){
+				EtaDist->Fill(EtaValues);
+			}
+			if (Check_Phi){
+				PhiDist->Fill(PhiValues);
+			}
 			
 		}
 
@@ -263,9 +286,19 @@ void AttemptAtGettingPhi(int runnumber=326776){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	TCanvas *c4 = new TCanvas("c4", "RUN 326776", 2000, 1500);
 	gPad-> SetLogy();
-	//PtDist->Draw("HIST E");
-	EtaDist->Draw("HIST E");
+	
+	if (Check_Pt){
+		PtDist->Draw("HIST E");
+	}
+	if (Check_Eta){
+		EtaDist->Draw("HIST E");
+	}
+	if (Check_Phi){
+		PhiDist->Draw("HIST E");
+	}
 
+
+	
 	f2.Write();
 	
 	return;
