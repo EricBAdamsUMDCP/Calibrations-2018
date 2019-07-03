@@ -1,0 +1,3 @@
+file path to rpd beam test file 
+
+/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/EM,HAD,andRPD/fC_dist_and_POSITION_RPD_position_EM_w_HAD_CUT

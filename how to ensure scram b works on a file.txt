@@ -1,0 +1,5 @@
+/home/ebadams/CMSSW_10_3_3/src/ZDC/newZDCAnalyzer/plugins
+
+touch plugins/newZDCAnalyzer.cc
+
+scram b

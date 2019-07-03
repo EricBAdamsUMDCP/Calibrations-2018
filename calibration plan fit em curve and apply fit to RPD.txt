@@ -1,0 +1,23 @@
+fit em curve and apply fit to RPD
+use this function to correct the RPDs
+create the function by energy in each column divided by the total number of events (which we can do by dividing the histogram by the number of channels)
+
+we can force the fit of rpd using the EM section to correct gains but this assumes the EMs are calibrated properly which is still in question expecially neg which that side is screwed up but then again we are using a function (a gaussian is ideal)
+
+we can then change the gains of the columns of the RPD while keeping the total charge the same
+
+because the RPD should have a similar to identical distribution on the x in the y, using the same strategy but block by block.
+
+
+basic plan is to create a modified header file which takes in another array which contains weights for each block for both sides
+
+create a new em headerive us the energy dist
+
+where the output is the energy in each channel of the EM and normalize them by dividing by the total # of events which will give us normalized energy and we can fit this to a curve
+
+
+
+MICHAEL ALSO SAYS NOT TO CUT OFF THE PEDESTAL AS THE pedestal is expected in 1 neutron events but its only channel wise and why do I see a 1 neutron peak while I cutout the pedestal.
+
+more tracks mean higher centrality
+

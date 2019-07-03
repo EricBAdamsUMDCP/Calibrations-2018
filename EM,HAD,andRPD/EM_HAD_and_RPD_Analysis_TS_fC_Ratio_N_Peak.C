@@ -13,6 +13,8 @@
 #include "TStyle.h"
 #include "TLegend.h"
 
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/Calibrations/RunWeightHeader/EM_Beam_Position_returns_Value_function.h"
+
 using namespace std;
 
 //void initRootStyle();
@@ -34,16 +36,18 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
 //THE BLOB SEEN WHEN TS 5 IS INCLUDED IS LIKELY FROM AN OUT OF TIME SIGNAL.
 
   TH1::SetDefaultSumw2();
-
+//includes 10N or 10 neutron peak cut
   
-  cout << "running software EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C 6/25/2019 11:49:20 AM" << endl;
+  cout << "running software EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak.C 7/1/2019 2:12:19 PM" << endl;
+
+  //NOTE DATA DISTRIBUTION SOFTWARE UPDATED
 
   // Name of directory to plot
   //TFile *f = new TFile(Form("digitree_%d.root",runnumber)); // opening the root file
   
   TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); // opening root fie (only have 1 uncommented)
 
-  //TFile *f = new TFile("/home/ebadams/CMSSW_10_3_1/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
+  //TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/AOD_zdc_digi_tree_326776_many_3.root"); // opening the root file
   
   //TTree *ZDCRecTree = (TTree*)f->Get("ZDCRecTree"); // reading ZDC rec tree
   TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
@@ -53,6 +57,15 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
                                                     {"1","2","3","4","5"}, //HD sections run only 1-4
                                                     {"1","2","3","4","5"} //EM sections run 1-5
                                                   };
+
+  const int NChannels = 50;
+  const int NRPD=16; 
+  const int NEM = 5;
+  const int NHAD = 4;
+  const int EM = 0;
+  const int HADtype = 1;
+  const int RPD = 3;
+
   double EMmultiplicativevalue = 0.19; 
   double RPDmultiplicativevalue = 0.0; //BASICALLY ABSORBS NO ENERGY
   double P_ratiovalue = 7.0; //used to be 6
@@ -70,6 +83,7 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH1F* HADfC[2][4];
   TH1F* P_HADSUM;
   TH1F* N_HADSUM;
+  TH1D* EM_HighfCcut[2];
   /*TH1F* RATIOemfC_OnetoThree[2];
   TH1F* RATIOemfC_TwotoThree[2];
   TH1F* RATIOemfC_FourtoThree[2];
@@ -82,8 +96,11 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   TH2F* NEMvTotalE;
   TH2F* P_45vTotalE;
   TH2F* N_45vTotalE;
+  TH2D* PEM_PositionvTotE;
+  TH2D* NEM_PositionvTotE;
 
   for(int iside = 0; iside < 2; iside++){
+    EM_HighfCcut[iside] = new TH1D(Form("EM_HighfCcut %s",stit2[iside]), Form("EM_HighfCcut_%s",stit[iside]),200,-4.5,4.5);
     for(int ich = 0; ich < 5; ich++){
       em[iside][ich]   = new TH1F(Form("em %s %d",stit2[iside],ich+1), Form("EM%s channel %d",stit[iside],ich+1),10,0,9);
       //emfC[iside][ich] = new TH1F(Form("emfC %s %d",stit2[iside],ich+1),Form("EMfC%s channel %d fC",stit[iside],ich+1),500,0,2000);
@@ -116,9 +133,13 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   PEMvTotalE = new TH2F(Form("PEMvTotalE"),Form("PEMvTotalE ts 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 40, 60000, 100, 50, 80000); //used to be 50
   NEMvTotalE = new TH2F(Form("NEMvTotalE"),Form("NEMvTotalE TS 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 40, 60000, 100, 50, 80000); //nin used to be 700
 
-
   P_45vTotalE = new TH2F(Form("P_45vTotalE"),Form("ts4/5 em and had vTotalE ts 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 60, 50, 20000, 60, 0, 200);
   N_45vTotalE = new TH2F(Form("N_45vTotalE"),Form("ts4/5 em and had vTotalE TS 4; Sum HAD + %f * EM (fC) + %f*RPD (fC); ts4/5 em and had vTotalE ts 4 (fC)", EMmultiplicativevalue, RPDmultiplicativevalue), 60, 50, 20000, 60, 0, 200);
+
+  PEM_PositionvTotE = new TH2D(Form("PEM_PositionvTotE"),Form("PEM_PositionvTotE; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (cm))", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 40, 600000, 100, -4.5, 4.5); //used to be 50
+  NEM_PositionvTotE = new TH2D(Form("NEM_PositionvTotE"),Form("NEM_PositionvTotE; Sum HAD + %f * EM (fC) + %f*RPD (fC); EM (cm))", EMmultiplicativevalue, RPDmultiplicativevalue), 100, 40, 800000, 100, -4.5, 4.5); //nin used to be 700
+
+
 
   const int NTS=10;            // number of timeslices
   TLeaf* bxidLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("bxid");
@@ -142,12 +163,28 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
     fCleaf[iTS] = (TLeaf*) ZDCDigiTree->GetLeaf(Form("nfC%d",iTS));
   }
   
+
+  double  RawDataEM[NSIDE][NEM][NTS] = {{{0}, {0}, {0}, {0}, {0}},   //neg
+                          {{0}, {0}, {0}, {0}, {0}}}; // pos // these are used to store the raw data 
+
+  double RawDataHAD[NSIDE][NHAD][NTS] = {{{0}, {0}, {0}, {0}},   //neg
+                                         {{0}, {0}, {0}, {0}}}; // pos // these are used to store the raw data 
+
+  double RawDataRPD[NSIDE][NRPD][NTS] = { {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}},    //neg  // these are used to store the raw data 
+                                          {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}} }; //pos
+
+  int INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[NRPD] = {13, 12, 15, 14, 9, 11, 8, 10, 5, 4, 7, 6, 1, 0, 3, 2}; //tenative needs to be checked
+                           //{14, 13, 16, 15, 10, 12, 9, 11, 6, 5, 8, 7, 2, 1, 4, 3} // old bfopr noticed out of bounmds array issue and subtracted 1 kept for reference
+      
+
+  double ratiovalue = 0;
+
   for(int i = 0; i < ZDCDigiTree->GetEntries(); i++){
     ZDCDigiTree->GetEntry(i);
 
     double EM_TS_45[NSIDE][5] = {0}; //actually just 4
     double HAD_TS_45[NSIDE][4] = {0}; // actually just 4
-    double RPD_TS_45[NSIDE][16] = {16}; //4 & 5
+    double RPD_TS_45[NSIDE][16] = {0}; //4 & 5
 
     double EM4v5array[2][5] = {0};
     double HAD4v5array[2][4] = {0};
@@ -158,82 +195,97 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
       int channel = (int)(channelLeaf->GetValue(n))-1;
      
 
-        double TS_fC[NTS] = {(fCleaf[0]->GetValue(n) < cutoff) ? 0 : (fCleaf[0]->GetValue(n)), (fCleaf[1]->GetValue(n) < cutoff) ? 0 : (fCleaf[1]->GetValue(n)),
-        (fCleaf[2]->GetValue(n) < cutoff) ? 0 : (fCleaf[2]->GetValue(n)), (fCleaf[3]->GetValue(n) < cutoff) ? 0 : (fCleaf[3]->GetValue(n)), (fCleaf[4]->GetValue(n) < cutoff) ? 0 : (fCleaf[4]->GetValue(n)), 
-        (fCleaf[5]->GetValue(n) < cutoff) ? 0 : (fCleaf[5]->GetValue(n)), (fCleaf[6]->GetValue(n) < cutoff) ? 0 : (fCleaf[6]->GetValue(n)), (fCleaf[7]->GetValue(n) < cutoff) ? 0 : (fCleaf[7]->GetValue(n)), 
-        (fCleaf[8]->GetValue(n) < cutoff) ? 0 : (fCleaf[8]->GetValue(n)), (fCleaf[9]->GetValue(n) < cutoff) ? 0 : (fCleaf[9]->GetValue(n))};
-         
-
-         ///////////////////////////////////////
-      //  REMOVING TS 5 FROM THE CODE AS REQUESTEDD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //////////////////////////////////////////////////////////
       
-      if (type == 0){
-        
-        if (side == 0){
-          if (TS_fC[4]/TS_fC[5] > N_ratiovalue ){
-          EM_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
-          }
-          EM4v5array[side][channel] = TS_fC[4]/TS_fC[5];
-          if (TS_fC[4]/TS_fC[5] > N_ratiovalue){
-            for(int iTS = 0; iTS < 10; iTS++){
-               em[side][channel]->Fill(iTS, TS_fC[iTS]); 
-               //emfC[side][channel]->Fill(TS_fC[iTS]);
-            }
-          }
-        }
-        else if (side == 1){
-          if (TS_fC[4]/TS_fC[5] > P_ratiovalue ){
-          EM_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
-          }
-          EM4v5array[side][channel] = TS_fC[4]/TS_fC[5];
-          if (TS_fC[4]/TS_fC[5] > P_ratiovalue){
-            for(int iTS = 0; iTS < 10; iTS++){
-               em[side][channel]->Fill(iTS, TS_fC[iTS]); 
-               //emfC[side][channel]->Fill(TS_fC[iTS]);
-            }
-          }
-        }
-      }
-      if (type == 1){ //HAD
-        if (side == 0){
-          if (TS_fC[4]/TS_fC[5] > N_ratiovalue){
-          HAD_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
-          }
-          HAD4v5array[side][channel] = TS_fC[4]/TS_fC[5];
-          for(int iTS = 0; iTS < 10; iTS++){
-            if (TS_fC[4]/TS_fC[5] > N_ratiovalue){
-              HAD[side][channel]->Fill(iTS, TS_fC[iTS]);
-            }
-             //HADfC[side][channel]->Fill(TS_fC[iTS]);
-          }
-        }
-        else if (side == 1){
-          if (TS_fC[4]/TS_fC[5] > P_ratiovalue){
-          HAD_TS_45[side][channel] = TS_fC[4]/* + TS_fC[5]*/;
-          }
-          HAD4v5array[side][channel] = TS_fC[4]/TS_fC[5];
-          if (TS_fC[4]/TS_fC[5] > P_ratiovalue){
-            for(int iTS = 0; iTS < 10; iTS++){
-               HAD[side][channel]->Fill(iTS, TS_fC[iTS]); 
-               //HADfC[side][channel]->Fill(TS_fC[iTS]);
-            }
-          }
-        }
-      }
-      if (type == 3){
-        if (( (TS_fC[4] + TS_fC[5] + TS_fC[6]) > 40) && ( ((TS_fC[4] + TS_fC[5])/(TS_fC[4] + TS_fC[5] + TS_fC[6])) > .8) && (TS_fC[7] <= TS_fC[5]) && 
-        (TS_fC[1] / TS_fC[0] < 1000) && (TS_fC[0] != 0)){
+      //ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
+      //this is used below to keep values at 0 or greater
+      double TS_Zero  = (fCleaf[0]->GetValue(n) < 0) ? 0.0 : (fCleaf[0]->GetValue(n));
+      double TS_One   = (fCleaf[1]->GetValue(n) < 0) ? 0.0 : (fCleaf[1]->GetValue(n));
+      double TS_Two   = (fCleaf[2]->GetValue(n) < 0) ? 0.0 : (fCleaf[2]->GetValue(n));
+      double TS_Three = (fCleaf[3]->GetValue(n) < 0) ? 0.0 : (fCleaf[3]->GetValue(n));
+      double TS_Four  = (fCleaf[4]->GetValue(n) < 0) ? 0.0 : (fCleaf[4]->GetValue(n)); 
+      double TS_Five  = (fCleaf[5]->GetValue(n) < 0) ? 0.0 : (fCleaf[5]->GetValue(n));
+      double TS_Six   = (fCleaf[6]->GetValue(n) < 0) ? 0.0 : (fCleaf[6]->GetValue(n));
+      double TS_Seven = (fCleaf[7]->GetValue(n) < 0) ? 0.0 : (fCleaf[7]->GetValue(n));
+      double TS_Eight = (fCleaf[8]->GetValue(n) < 0) ? 0.0 : (fCleaf[8]->GetValue(n));
+      double TS_Nine  = (fCleaf[9]->GetValue(n) < 0) ? 0.0 : (fCleaf[9]->GetValue(n));
+      
+      /// END filling timeslices with fC (discrimination is by channel number iteration)
+      
+      // Declare variables for sums of TS fCs (456 is main signal of RPD and 45 is main signal of EM and HAD)
+      
+      
+    
+      double TS_ARRAY[NTS] = { TS_Zero, TS_One, TS_Two, TS_Three, TS_Four, TS_Five, TS_Six, TS_Seven, TS_Eight, TS_Nine};
+  
+      // filling arrays with the data per channel side and timeslice for use in the functions that are called. Allows for easier function use and greater efficiency
 
+      if (type == EM){
+        for (int TS = 0; TS < NTS; TS++){
+          RawDataEM[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE EM DATA FOR THAT EVENT
+        }
+      }
+      else if (type == HADtype){ //figure out what cutoff for HAD
+        for (int TS = 0; TS < NTS; TS++){
+          RawDataHAD[side][channel][TS] = TS_ARRAY[TS]; //USE THIS ARRAY IF YOU WANT THE HAD DATA FOR THAT EVENT
+        }
+      }
+      else if (type == RPD){ // make sure to set cuttoff to 40 fC for RPD
+        for (int TS = 0; TS < NTS; TS++){
           if (side == 0){
-            RPD_TS_45[NSIDE][channel] = TS_fC[4] + TS_fC[5];
+            RawDataRPD[side][INVERSION_CORRECTION_ARRAY_FOR_NEG_ONLY[channel]][TS] = TS_ARRAY[TS];
           }
-          else if (side == 1){
-            RPD_TS_45[NSIDE][channel] = TS_fC[4] + TS_fC[5];
+          else{
+            RawDataRPD[side][channel][TS] = TS_ARRAY[TS];
+          }   //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
+          //  THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
+        }
+      }
+    } //end channel loop
+
+    for (int s = 0; s < 2; s++){
+
+      if (s == 0){
+        ratiovalue = N_ratiovalue;
+      }
+      else{
+        ratiovalue = P_ratiovalue;
+      }
+
+      for (int c = 0; c < 5; c++){
+        if (RawDataEM[s][c][4]/RawDataEM[s][c][5] > ratiovalue ){
+         EM_TS_45[s][c] = RawDataEM[s][c][4]/* + TS_fC[5]*/;
+        }
+  
+        EM4v5array[s][c] = RawDataEM[s][c][4]/RawDataEM[s][c][5];
+  
+        if (RawDataEM[s][c][4]/RawDataEM[s][c][5] > ratiovalue){
+          for(int iTS = 0; iTS < 10; iTS++){
+             em[s][c]->Fill(iTS, RawDataEM[s][c][iTS]); 
+             //emfC[s][c]->Fill(TS_fC[iTS]);
           }
+        }
+      }
+
+      for ( int c = 0; c < 4; c++){
+        if (RawDataHAD[s][c][4] /RawDataHAD[s][c][5]  > ratiovalue){
+        HAD_TS_45[s][c] = RawDataHAD[s][c][4] /* + TS_fC[5]*/;
+        }
+        HAD4v5array[s][c] = RawDataHAD[s][c][4]/RawDataHAD[s][c][5];
+        for(int iTS = 0; iTS < 10; iTS++){
+          if (RawDataHAD[s][c][4]/RawDataHAD[s][c][5] > ratiovalue){
+            HAD[s][c]->Fill(iTS, RawDataHAD[s][c][iTS]);
+          }
+           //HADfC[s][c]->Fill(TS_fC[iTS]);
+        }
+      }
+
+      for ( int c = 0; c < 16; c++){
+        if ((RawDataRPD[s][c][4] > RawDataRPD[s][c][6]) && (RawDataRPD[s][c][4] > RawDataRPD[s][c][7])){
+            RPD_TS_45[s][c] = RawDataRPD[s][c][4] + RawDataRPD[s][c][5];
         }
       }
     }
+  
     //channel 3 is decided to be comparator
 
 ////////////////Begin EM/////////////////////////////////////////////////////////////////////////////////////////
@@ -295,16 +347,44 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   double N_SUM = N_SumHADfC + EMmultiplicativevalue*N_SumEMfC + N_SumRPDfC*RPDmultiplicativevalue;
   double P_SUM = P_SumHADfC + EMmultiplicativevalue*P_SumEMfC + P_SumRPDfC*RPDmultiplicativevalue;
 
-  if (graphMaxPos > P_SUM && P_SUM > graphMinPos){
-    PEMvTotalE->Fill((P_SUM), P_SumEMfC); //0.005
-    P_HADSUM->Fill((P_SUM));
-    P_45vTotalE->Fill((P_SUM), (P_sumEM4v5 + P_sumHAD4v5));
-  }
+  double Neg_lowerbound10Neutron = 121500;
+  double Neg_upperbound10Neutron = 138500;
+  double Pos_lowerbound10Neutron = 74000;
+  double Pos_upperbound10Neutron = 86000;
+
+  int Neg_EM_fC_CUT = 350000;
+  int Pos_EM_fC_CUT = 250000;
   
-  if ( graphMaxNeg > N_SUM && N_SUM > graphMinNeg){
-    NEMvTotalE->Fill((N_SUM), N_SumEMfC); //0.005
-    N_HADSUM->Fill((N_SUM));
-    N_45vTotalE->Fill((N_SUM), (N_sumEM4v5 + N_sumHAD4v5));
+  if (P_SUM > graphMinPos/* && Pos_lowerbound10Neutron < P_SUM &&  Pos_upperbound10Neutron > P_SUM*/){
+
+    double POS_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Pos");
+    PEM_PositionvTotE->Fill(P_SUM, POS_EM_BEAM_POSITION);
+
+    if (P_SUM > Pos_EM_fC_CUT){
+       EM_HighfCcut[1]->Fill(POS_EM_BEAM_POSITION);
+    }
+  }
+
+  if ( N_SUM > graphMinNeg /* && Neg_lowerbound10Neutron < N_SUM &&  Neg_upperbound10Neutron > N_SUM*/){
+    double NEG_EM_BEAM_POSITION = EM_Beam_Position_Value( RawDataEM, "Neg");
+    NEM_PositionvTotE->Fill(N_SUM, NEG_EM_BEAM_POSITION);
+
+    if (N_SUM > Neg_EM_fC_CUT){
+      EM_HighfCcut[0]->Fill(NEG_EM_BEAM_POSITION);
+    }
+  }
+
+  if (false){
+    if ( graphMaxNeg > N_SUM && N_SUM > graphMinNeg){
+      NEMvTotalE->Fill((N_SUM), N_SumEMfC); //0.005
+      N_HADSUM->Fill((N_SUM));
+      N_45vTotalE->Fill((N_SUM), (N_sumEM4v5 + N_sumHAD4v5));
+    }
+    if (graphMaxPos > P_SUM && P_SUM > graphMinPos){
+      PEMvTotalE->Fill((P_SUM), P_SumEMfC); //0.005
+      P_HADSUM->Fill((P_SUM));
+      P_45vTotalE->Fill((P_SUM), (P_sumEM4v5 + P_sumHAD4v5));
+    }
   }
 /*
   if (P_SumHADfC > 100){
@@ -335,26 +415,34 @@ void EM_HAD_and_RPD_Analysis_TS_fC_Ratio_N_Peak(int runnumber=326776){
   //TCanvas* c3 = new TCanvas(Form("c3"), Form("RUN_%d", runnumber), 2000, 2000);
   //c3->SetLogy();
  
-
-  c2->SetLogz();
-  PEMvTotalE->Draw("Colz");
-  c2->SaveAs(Form("ZDC_figures/EM_HAD/PEMvTotalE_%d.png",runnumber));
-  NEMvTotalE->Draw("Colz");
-  c2->SaveAs(Form("ZDC_figures/EM_HAD/NEMvTotalE_%d.png",runnumber));
-  P_45vTotalE->Draw("Colz");
-  c2->SaveAs(Form("ZDC_figures/EM_HAD/P_45vTotalE_%d.png",runnumber));
-  N_45vTotalE->Draw("Colz");
-  c2->SaveAs(Form("ZDC_figures/EM_HAD/N_45vTotalE_%d.png",runnumber));
+  if (false){
+    c2->SetLogz();
+    PEMvTotalE->Draw("Colz");
+    c2->SaveAs(Form("ZDC_figures/EM_HAD/PEMvTotalE_%d.png",runnumber));
+    NEMvTotalE->Draw("Colz");
+    c2->SaveAs(Form("ZDC_figures/EM_HAD/NEMvTotalE_%d.png",runnumber));
+    P_45vTotalE->Draw("Colz");
+    c2->SaveAs(Form("ZDC_figures/EM_HAD/P_45vTotalE_%d.png",runnumber));
+    N_45vTotalE->Draw("Colz");
+    c2->SaveAs(Form("ZDC_figures/EM_HAD/N_45vTotalE_%d.png",runnumber));
+    //c2->SetLogy();
   
-  //c2->SetLogy();
+    P_HADSUM->Draw("HIST L");
+    c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
+    // TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
+    // c4->SetLogy();
+    N_HADSUM->Draw("HIST L");
+    c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
 
-  P_HADSUM->Draw("HIST L");
-  c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[1],runnumber));
-  // TCanvas* c4 = new TCanvas(Form("c4"), Form("RUN_%d", runnumber), 2000, 2000);
-  // c4->SetLogy();
-  N_HADSUM->Draw("HIST L");
-  c2->SaveAs(Form("ZDC_figures/had/SUMHAD_%s_%d.png", stit2[0],runnumber));
-
+    PEM_PositionvTotE->Draw("colz");
+    c2->SaveAs(Form("ZDC_figures/EM_HAD/PEM_PositionvTotE_%d.png",runnumber));
+    NEM_PositionvTotE->Draw("colz");
+    c2->SaveAs(Form("ZDC_figures/EM_HAD/NEM_PositionvTotE_%d.png",runnumber));
+  }
+  EM_HighfCcut[1]->Draw("HIST E");
+  c2->SaveAs(Form("ZDC_figures/em/PosEM_HighfCcut_%d.png",runnumber));
+  EM_HighfCcut[0]->Draw("HIST E");
+  c2->SaveAs(Form("ZDC_figures/em/NegEM_HighfCcut_%d.png",runnumber));
 
 
  /* for(int iside = 0; iside < 2; iside++) //uncomment to get graphs
