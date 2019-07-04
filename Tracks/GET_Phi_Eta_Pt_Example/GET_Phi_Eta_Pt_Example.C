@@ -27,9 +27,17 @@ using namespace std;
 
 //!!!!!!!!!!!!!!!!!!!! turned off weighting 
 
-
 //function headers
 void initRootStyle();
+
+void vectortest(int numberoftracks, std::vector<double>* Pt, double &PtValues){
+	for (int n = 0; n < numberoftracks; n++){
+		PtValues += Pt->at(n);
+		
+	}
+	return;
+
+}
 
 //main function macro
 void GET_Phi_Eta_Pt_Example(int runnumber=326776){
@@ -191,27 +199,35 @@ void GET_Phi_Eta_Pt_Example(int runnumber=326776){
 		double NumberofTracks = ntrk->GetValue();
 		//double NumberofTracks = nTrack;
 		//cout << "ntrk" << NumberofTracks << endl;
-		for (int k = 0; k < NumberofTracks; k++){
-			double PhiValues = phi->at(k);
-			double EtaValues = eta->at(k);
-			double PtValues = Pt->at(k);
+		double outputvalue = 0;
+		vectortest(NumberofTracks, Pt, outputvalue);
+		cout << outputvalue << endl;
+
+		/*for (int k = 0; k < NumberofTracks; k++){
+			
+
+			//double PhiValues = phi->at(k);
+			//double EtaValues = eta->at(k);
+			//double PtValues = Pt->at(k);
 			//cout << "phi " << k << ": " << PhiValues << endl;
 			//cout << "eta " << k << ": " << EtaValues << endl;
 			//cout << " Pt " << k << ": " << PtValues << endl;
+				
+			if (false){
+				if (Check_Pt){
+					PtDist->Fill(PtValues);
+				}
+				if (Check_Eta){
+					EtaDist->Fill(EtaValues);
+				}
+				if (Check_Phi){
+					PhiDist->Fill(PhiValues);
+				}
+			}
 			
-			if (Check_Pt){
-				PtDist->Fill(PtValues);
-			}
-			if (Check_Eta){
-				EtaDist->Fill(EtaValues);
-			}
-			if (Check_Phi){
-				PhiDist->Fill(PhiValues);
-			}
-			
-		}
+		}*/
 
-		for ( int n = 0; n < NChannels; n++ ){ //iterates through all channels of both ZDC + and -
+/*		for ( int n = 0; n < NChannels; n++ ){ //iterates through all channels of both ZDC + and -
 			int side = (int)((zsideLeaf->GetValue(n)+1)/2.0);
 			int type = (int)(sectionLeaf->GetValue(n))-1;
 			int channel = (int)(channelLeaf->GetValue(n))-1;
@@ -263,7 +279,7 @@ void GET_Phi_Eta_Pt_Example(int runnumber=326776){
 					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
 				}
 			}
-		} //end channel loop
+		}*/ //end channel loop
 
 		//put functions and code here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -303,6 +319,8 @@ void GET_Phi_Eta_Pt_Example(int runnumber=326776){
 	
 	return;
 }
+
+
 
 
 void initRootStyle()
