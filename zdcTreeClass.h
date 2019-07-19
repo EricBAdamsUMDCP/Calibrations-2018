@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jul  9 15:10:09 2019 by ROOT version 6.12/07
+// Fri Jul 19 12:17:32 2019 by ROOT version 6.12/07
 // from TTree zdcdigi/v1
-// found on file: CentralityMaybeAOD_zdc_digi_tree_326776_Eric.root
+// found on file: /store/user/eadams/HIMinimumBias2/merged_rereco_PbPb2018_AOD_MB2_326822/rereco_PbPb2018_AOD_MinBias2_326822_ZDCandTracks_merged.root
 //////////////////////////////////////////////////////////
 
 #ifndef zdcTreeClass_h
@@ -14,6 +14,8 @@
 
 // Header file for the classes stored in the TTree if any.
 #include "vector"
+
+using namespace std;
 
 class zdcTreeClass {
 public :
@@ -38,10 +40,15 @@ public :
    Float_t         eHF_pos;
    Float_t         eHF_neg;
    Int_t           nTrack;
+   Int_t           nAcceptedTracks;
    Int_t           nPixel;
    vector<double>  *phi;
+   vector<double>  *phiError;
    vector<double>  *eta;
+   vector<double>  *etaError;
    vector<double>  *Pt;
+   vector<double>  *ptError;
+   vector<double>  *chi2;
    Int_t           adc0[50];   //[n]
    Float_t         nfC0[50];   //[n]
    Int_t           adc1[50];   //[n]
@@ -813,10 +820,15 @@ public :
    TBranch        *b_eHF_pos;   //!
    TBranch        *b_eHF_neg;   //!
    TBranch        *b_nTrack;   //!
+   TBranch        *b_nAcceptedTracks;   //!
    TBranch        *b_nPixel;   //!
    TBranch        *b_phi;   //!
+   TBranch        *b_phiError;   //!
    TBranch        *b_eta;   //!
+   TBranch        *b_etaError;   //!
    TBranch        *b_Pt;   //!
+   TBranch        *b_ptError;   //!
+   TBranch        *b_chi2;   //!
    TBranch        *b_adc0;   //!
    TBranch        *b_nfC0;   //!
    TBranch        *b_adc1;   //!
@@ -1591,11 +1603,11 @@ zdcTreeClass::zdcTreeClass(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("CentralityMaybeAOD_zdc_digi_tree_326776_Eric.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/store/user/eadams/HIMinimumBias2/merged_rereco_PbPb2018_AOD_MB2_326822/rereco_PbPb2018_AOD_MinBias2_326822_ZDCandTracks_merged.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("CentralityMaybeAOD_zdc_digi_tree_326776_Eric.root");
+         f = new TFile("/store/user/eadams/HIMinimumBias2/merged_rereco_PbPb2018_AOD_MB2_326822/rereco_PbPb2018_AOD_MinBias2_326822_ZDCandTracks_merged.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("CentralityMaybeAOD_zdc_digi_tree_326776_Eric.root:/analyzer");
+      TDirectory * dir = (TDirectory*)f->Get("/store/user/eadams/HIMinimumBias2/merged_rereco_PbPb2018_AOD_MB2_326822/rereco_PbPb2018_AOD_MinBias2_326822_ZDCandTracks_merged.root:/analyzer");
       dir->GetObject("zdcdigi",tree);
 
    }
@@ -1639,8 +1651,12 @@ void zdcTreeClass::Init(TTree *tree)
 
    // Set object pointer
    phi = 0;
+   phiError = 0;
    eta = 0;
+   etaError = 0;
    Pt = 0;
+   ptError = 0;
+   chi2 = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -1662,10 +1678,15 @@ void zdcTreeClass::Init(TTree *tree)
    fChain->SetBranchAddress("eHF_pos", &eHF_pos, &b_eHF_pos);
    fChain->SetBranchAddress("eHF_neg", &eHF_neg, &b_eHF_neg);
    fChain->SetBranchAddress("nTrack", &nTrack, &b_nTrack);
+   fChain->SetBranchAddress("nAcceptedTracks", &nAcceptedTracks, &b_nAcceptedTracks);
    fChain->SetBranchAddress("nPixel", &nPixel, &b_nPixel);
    fChain->SetBranchAddress("phi", &phi, &b_phi);
+   fChain->SetBranchAddress("phiError", &phiError, &b_phiError);
    fChain->SetBranchAddress("eta", &eta, &b_eta);
+   fChain->SetBranchAddress("etaError", &etaError, &b_etaError);
    fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
+   fChain->SetBranchAddress("ptError", &ptError, &b_ptError);
+   fChain->SetBranchAddress("chi2", &chi2, &b_chi2);
    fChain->SetBranchAddress("adc0", adc0, &b_adc0);
    fChain->SetBranchAddress("nfC0", nfC0, &b_nfC0);
    fChain->SetBranchAddress("adc1", adc1, &b_adc1);

@@ -12,6 +12,7 @@
 #include <cstdio>
 #include "TStyle.h"
 #include "TLegend.h"
+#include "/home/ebadams/CMSSW_10_3_3/src/ZDC/condor/zdcTreeClass.h"
 //#include "CMS_lumi.h" // custom header make a file path for all software
 #include "THStack.h" // ERIC ADDED
 #include "TPaveLabel.h" //Eric ADDDED
@@ -53,17 +54,17 @@ const int nBins = 200; // table of bin edges
 void initRootStyle();
 
 //main function macro
-void AttemptAtGettingChi2(int runnumber=326776){
+void SetBranchStatusPlayground(int runnumber=326776){
 	initRootStyle();
 	
-	cout << "Running SOFTWARE: AttemptAtGettingPhi.C  Edited: 7/2/2019 3:46:06 PM" << endl;
+	cout << "Running SOFTWARE: SetBranchStatusPlayground  Edited: 7/16/2019 11:30:09 AM" << endl;
 	
 	
 	
 	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); cout << "Dataset=" << " PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root" << endl;
 	cout << "a" << endl;
-	TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/newZDCAnalyzer/test/rereco_maybe_AOD_zdc_digi_tree_326776.root"); cout << "Dataset=" << "Tracks_AOD_zdc_digi_tree_326822.root" << endl; // opening the root file
-	
+	//TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/analyzeZDCTree/rereco_maybe_AOD_zdc_digi_tree_327464.root"); cout << "Dataset=" << "rereco_maybe_AOD_zdc_digi_tree_327464.root" << endl; // opening the root file
+	TFile *f = new TFile("/store/user/eadams/HIMinimumBias2/merged_rereco_PbPb2018_AOD_MB2_326822/rereco_PbPb2018_AOD_MinBias2_326822_ZDCandTracks_merged.root"); cout << "newfile326822" << endl;
 	TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 	
 	
@@ -140,7 +141,9 @@ void AttemptAtGettingChi2(int runnumber=326776){
 	TH1D* EtaDist;
 
 	 //PtDist = new TH1D("PtDist", "PtDist",1000,0, 10000);
+	 
 	 EtaDist = new TH1D("EtaDist", "EtaDist",100,-10, 10);
+	 PtDist = new TH1D("PtDist", "PtDist",100,-10, 10);
 	
 
 	/// END Histogram Declaration ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,38 +152,60 @@ void AttemptAtGettingChi2(int runnumber=326776){
 	
 	TLeaf* fCleaf[NTS];
 	TLeaf* fCPureleaf[NTS];
-	Double_t nTrack = 0;
-	TBranch* b_nTrack;
+/*	Double_t nTrack = 0;
+	TBranch* b_nTrack;*/
 
-	std::vector<double>* phi = 0;
+/*	std::vector<double>* phi = 0;
 	std::vector<double>* eta = 0;
 	std::vector<double>* Pt = 0;
-	std::vector<double>* chi2 = 0;
+	std::vector<double>* chi2 = 0;*/
 	double centval = 0;
+/*	int zside;
+	int section;
+	int channel;*/
 	// For c++ root tree interface ////////////////////////
-	TLeaf* bxidLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("bxid");
-	TLeaf* zsideLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("zside");
-	TLeaf* sectionLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("section");
-	TLeaf* channelLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("channel");
-	TLeaf* random = (TLeaf*) ZDCDigiTree->GetLeaf("HLT_HIRandom_v1");
-	TLeaf* ntrk = (TLeaf*) ZDCDigiTree->GetLeaf("nTrack");
-	cout << "b" << endl;
+
+	ZDCDigiTree->SetBranchStatus("*",0); //turns off all branches
+	ZDCDigiTree->SetBranchStatus("zside",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("section",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("channel",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("nTrack",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("nAcceptedTracks",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("Cent",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("phi",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("eta",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("Pt",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("chi2",1); //turnns on branch
+	ZDCDigiTree->SetBranchStatus("nfC0", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC1", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC2", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC3", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC4", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC5", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC6", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC7", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC8", 1);// turns branch on
+	ZDCDigiTree->SetBranchStatus("nfC9", 1);// turns branch on
+
+	//ZDCDigiTree->SetBranchAddress("bxid", &bxid);
+	ZDCDigiTree->SetBranchAddress("zside", zside, &b_zside);
+	ZDCDigiTree->SetBranchAddress("section", section, &b_section);
+	ZDCDigiTree->SetBranchAddress("channel", channel, &b_channel);
+	ZDCDigiTree->SetBranchAddress("nTrack", &nTrack);
+	ZDCDigiTree->SetBranchAddress("nAcceptedTracks", &nAcceptedTracks, &b_nAcceptedTracks);
 	ZDCDigiTree->SetBranchAddress("Cent", &centval);
-	cout << "c" << endl;
-	//ZDCDigiTree->SetBranchAddress("nTrack", &nTrack, &b_nTrack);
-	TLeaf* nHFneg = (TLeaf*) ZDCDigiTree->GetLeaf("nHFneg");
-	TLeaf* nHFpos = (TLeaf*) ZDCDigiTree->GetLeaf("nHFpos");
-	//TLeaf* Phi = (TLeaf*) ZDCDigiTree->GetLeaf("phi");
+//	ZDCDigiTree->SetBranchAddress("nHFneg",	&nHF_pos);
+//	ZDCDigiTree->SetBranchAddress("nHFpos",	&nHF_neg);
 	ZDCDigiTree->SetBranchAddress("phi", &phi);
 	ZDCDigiTree->SetBranchAddress("eta", &eta);
 	ZDCDigiTree->SetBranchAddress("Pt", &Pt);
 	ZDCDigiTree->SetBranchAddress("chi2", &chi2);
 
-
+/*
 	for( int iTS = 0; iTS < NTS; iTS++) {
 		fCleaf[iTS] = (TLeaf*) ZDCDigiTree->GetLeaf(Form("nfC%d",iTS));
 		fCPureleaf[iTS] = (TLeaf*) ZDCDigiTree->GetLeaf(Form("nfC%d",iTS));
-	}
+	}*/
 	
 
 	double  RawDataEM[NSIDE][NEM][NTS] = {{{0}, {0}, {0}, {0}, {0}},   //neg
@@ -203,7 +228,13 @@ void AttemptAtGettingChi2(int runnumber=326776){
 	for ( int i = 0;  i < ZDCDigiTree->GetEntries(); i++ ){
 		ZDCDigiTree->GetEntry(i);
 		
-		double NumberofTracks = ntrk->GetValue();
+		double NumberofTracks = nTrack;
+
+		cout << "NumberofTracks " << NumberofTracks << endl;
+
+		double accNumberofTracks = nAcceptedTracks->GetValue();
+
+		cout << "accNumberofTracks " << accNumberofTracks << endl;
 
 		double Centrality = centval;
 
@@ -215,7 +246,7 @@ void AttemptAtGettingChi2(int runnumber=326776){
 
 		//double NumberofTracks = nTrack;
 		//cout << "ntrk" << NumberofTracks << endl;
-		for (int k = 0; k < NumberofTracks; k++){
+		for (int k = 0; k < accNumberofTracks; k++){
 			double PhiValues = phi->at(k);
 			double EtaValues = eta->at(k);
 			double PtValues = Pt->at(k);
@@ -225,7 +256,7 @@ void AttemptAtGettingChi2(int runnumber=326776){
 			//cout << "eta " << k << ": " << EtaValues << endl;
 			//cout << " Pt " << k << ": " << PtValues << endl;
 			//cout << " chi2" << k << ":" << chi2Values << endl;
-			//PtDist->Fill(PtValues);
+			PtDist->Fill(PtValues); //this line causes a exceeding size of vector error
 			EtaDist->Fill(EtaValues);
 			
 		}
@@ -240,7 +271,7 @@ void AttemptAtGettingChi2(int runnumber=326776){
 			
 			//ternary if operator (x ? y : z) returns y if x is true, otherwise returns z
 			//this is used below to keep values at 0 or greater
-			double TS_Zero  = (fCleaf[0]->GetValue(n) < 0) ? 0.0 : (fCleaf[0]->GetValue(n));
+			/*double TS_Zero  = (fCleaf[0]->GetValue(n) < 0) ? 0.0 : (fCleaf[0]->GetValue(n));
 			double TS_One   = (fCleaf[1]->GetValue(n) < 0) ? 0.0 : (fCleaf[1]->GetValue(n));
 			double TS_Two   = (fCleaf[2]->GetValue(n) < 0) ? 0.0 : (fCleaf[2]->GetValue(n));
 			double TS_Three = (fCleaf[3]->GetValue(n) < 0) ? 0.0 : (fCleaf[3]->GetValue(n));
@@ -281,7 +312,7 @@ void AttemptAtGettingChi2(int runnumber=326776){
 					}	  //USE THIS ARRAY IF YOU WANT THE RPD DATA FOR THAT EVENT
 					//	THERE MUST BE A TRTANSLATOR AS RPD CHANNEL # DOES NOT EQUAL REAL CHANNEL NUMBER!!!
 				}
-			}
+			}*/
 		} //end channel loop
 
 		//put functions and code here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -305,8 +336,9 @@ void AttemptAtGettingChi2(int runnumber=326776){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	TCanvas *c4 = new TCanvas("c4", "RUN 326776", 2000, 1500);
 	gPad-> SetLogy();
-	//PtDist->Draw("HIST E");
+	
 	EtaDist->Draw("HIST E");
+	PtDist->Draw("HIST E");
 
 	f2.Write();
 	

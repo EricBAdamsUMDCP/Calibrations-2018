@@ -53,16 +53,16 @@ const int nBins = 200; // table of bin edges
 void initRootStyle();
 
 //main function macro
-void AttemptAtGettingChi2(int runnumber=326776){
+void TESTofnewAnalyzertruckscentvertex(int runnumber=326776){
 	initRootStyle();
 	
-	cout << "Running SOFTWARE: AttemptAtGettingPhi.C  Edited: 7/2/2019 3:46:06 PM" << endl;
+	cout << "Running SOFTWARE: TESTofnewAnalyzertruckscentvertex  Edited: 7/16/2019 11:30:09 AM" << endl;
 	
 	
 	
 	//TFile* f = new TFile("/home/ebadams/Merged_Root_Files_PbPb2018/MB_2/326776/PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root"); cout << "Dataset=" << " PbPb2018_AOD_MinBias2_326776_RPDZDC_merged.root" << endl;
 	cout << "a" << endl;
-	TFile *f = new TFile("/home/ebadams/CMSSW_10_3_3/src/ZDC/newZDCAnalyzer/test/rereco_maybe_AOD_zdc_digi_tree_326776.root"); cout << "Dataset=" << "Tracks_AOD_zdc_digi_tree_326822.root" << endl; // opening the root file
+	TFile *f = new TFile("/store/user/eadams/HIMinimumBias2/merged_rereco_PbPb2018_AOD_MB2_326822/rereco_PbPb2018_AOD_MinBias2_326822_ZDCandTracks_merged.root"); cout << "Dataset=" << "rereco_maybe_AOD_zdc_digi_tree_326822.root" << endl; // opening the root file
 	
 	TTree *ZDCDigiTree = (TTree*)f->Get("analyzer/zdcdigi"); // reading ZDC digi tree
 	
@@ -140,7 +140,9 @@ void AttemptAtGettingChi2(int runnumber=326776){
 	TH1D* EtaDist;
 
 	 //PtDist = new TH1D("PtDist", "PtDist",1000,0, 10000);
+	 
 	 EtaDist = new TH1D("EtaDist", "EtaDist",100,-10, 10);
+	 PtDist = new TH1D("PtDist", "PtDist",100,-10, 10);
 	
 
 	/// END Histogram Declaration ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,6 +166,7 @@ void AttemptAtGettingChi2(int runnumber=326776){
 	TLeaf* channelLeaf = (TLeaf*) ZDCDigiTree->GetLeaf("channel");
 	TLeaf* random = (TLeaf*) ZDCDigiTree->GetLeaf("HLT_HIRandom_v1");
 	TLeaf* ntrk = (TLeaf*) ZDCDigiTree->GetLeaf("nTrack");
+	TLeaf* nacceptedtrk = (TLeaf*) ZDCDigiTree->GetLeaf("nAcceptedTracks");
 	cout << "b" << endl;
 	ZDCDigiTree->SetBranchAddress("Cent", &centval);
 	cout << "c" << endl;
@@ -205,17 +208,23 @@ void AttemptAtGettingChi2(int runnumber=326776){
 		
 		double NumberofTracks = ntrk->GetValue();
 
+		//cout << "NumberofTracks " << NumberofTracks << endl;
+
+		double accNumberofTracks = nacceptedtrk->GetValue();
+
+		//cout << "accNumberofTracks " << accNumberofTracks << endl;
+
 		double Centrality = centval;
 
 		double centBin = getHiBinFromhiHF(Centrality);
 
-		cout << "centBin" << centBin << endl;
+		//cout << "centBin" << centBin << endl;
 
 		//cout << "cent" << Centrality << endl;
 
 		//double NumberofTracks = nTrack;
 		//cout << "ntrk" << NumberofTracks << endl;
-		for (int k = 0; k < NumberofTracks; k++){
+		for (int k = 0; k < accNumberofTracks; k++){
 			double PhiValues = phi->at(k);
 			double EtaValues = eta->at(k);
 			double PtValues = Pt->at(k);
@@ -225,12 +234,12 @@ void AttemptAtGettingChi2(int runnumber=326776){
 			//cout << "eta " << k << ": " << EtaValues << endl;
 			//cout << " Pt " << k << ": " << PtValues << endl;
 			//cout << " chi2" << k << ":" << chi2Values << endl;
-			//PtDist->Fill(PtValues);
+			PtDist->Fill(PtValues); //this line causes a exceeding size of vector error
 			EtaDist->Fill(EtaValues);
 			
 		}
 
-		for ( int n = 0; n < NChannels; n++ ){ //iterates through all channels of both ZDC + and -
+/*		for ( int n = 0; n < NChannels; n++ ){ //iterates through all channels of both ZDC + and -
 			int side = (int)((zsideLeaf->GetValue(n)+1)/2.0);
 			int type = (int)(sectionLeaf->GetValue(n))-1;
 			int channel = (int)(channelLeaf->GetValue(n))-1;
@@ -285,7 +294,7 @@ void AttemptAtGettingChi2(int runnumber=326776){
 		} //end channel loop
 
 		//put functions and code here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+*/
 
 		if(i % 100000 == 0) cout << i << " events are processed." << endl;
 	}
@@ -305,8 +314,9 @@ void AttemptAtGettingChi2(int runnumber=326776){
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	TCanvas *c4 = new TCanvas("c4", "RUN 326776", 2000, 1500);
 	gPad-> SetLogy();
-	//PtDist->Draw("HIST E");
+	
 	EtaDist->Draw("HIST E");
+	PtDist->Draw("HIST E");
 
 	f2.Write();
 	
